@@ -1,0 +1,586 @@
+REM Oyun 1: Klasik Satranç
+REM 8x8 tahtada iki oyunculu stratejik tahta oyunu
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║            KLASİK SATRANÇ            ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+REM Global değişkenler
+DIM board AS ARRAY
+DIM current_player AS STRING
+DIM game_over AS BOOLEAN
+DIM white_king_pos AS ARRAY
+DIM black_king_pos AS ARRAY
+DIM move_history AS ARRAY
+DIM captured_pieces AS ARRAY
+
+REM Oyunu başlat
+call initialize_chess()
+
+DEF SUB initialize_chess()
+REM 8x8 tahtayı oluştur
+    board = []
+    
+REM Boş tahta oluştur
+    FOR i = 0 TO 7
+        DIM row AS ARRAY
+        row = []
+        FOR j = 0 TO 7
+            INSERT(row, ".")
+        NEXT j
+        INSERT(board, row)
+    NEXT i
+    
+REM Beyaz taşları yerleştir (alt sıra)
+    board(7)(0) = "♖"  ' Kale
+    board(7)(1) = "♘"  ' At
+    board(7)(2) = "♗"  ' Fil
+    board(7)(3) = "♕"  ' Vezir
+    board(7)(4) = "♔"  ' Kral
+    board(7)(5) = "♗"  ' Fil
+    board(7)(6) = "♘"  ' At
+    board(7)(7) = "♖"  ' Kale
+    
+REM Beyaz piyonlar
+    FOR i = 0 TO 7
+        board(6)(i) = "♙"
+    NEXT i
+    
+REM Siyah taşları yerleştir (üst sıra)
+    board(0)(0) = "♜"  ' Kale
+    board(0)(1) = "♞"  ' At
+    board(0)(2) = "♝"  ' Fil
+    board(0)(3) = "♛"  ' Vezir
+    board(0)(4) = "♚"  ' Kral
+    board(0)(5) = "♝"  ' Fil
+    board(0)(6) = "♞"  ' At
+    board(0)(7) = "♜"  ' Kale
+    
+REM Siyah piyonlar
+    FOR i = 0 TO 7
+        board(1)(i) = "♟"
+    NEXT i
+    
+REM Kral pozisyonlarını kaydet
+    white_king_pos = [7, 4]
+    black_king_pos = [0, 4]
+    
+REM Oyun ayarları
+    current_player = "beyaz"
+    game_over = False
+    move_history = []
+    captured_pieces = []
+    
+    PRINT "Satranç tahtası hazırlandı!"
+    PRINT "Beyaz taşlar alt sırada, siyah taşlar üst sırada."
+    PRINT
+END SUB
+
+DEF SUB show_board()
+    PRINT
+    PRINT "   a b c d e f g h"
+    PRINT "  ┌─────────────────┐"
+    
+    FOR i = 0 TO 7
+        PRINT (8 - i) + " │"
+        FOR j = 0 TO 7
+            PRINT board(i)(j) + " "
+        NEXT j
+        PRINT "│"
+    NEXT i
+    
+    PRINT "  └─────────────────┘"
+    PRINT "   a b c d e f g h"
+    PRINT
+END SUB
+
+DEF SUB show_game_status()
+    PRINT "═══ OYUN DURUMU ═══"
+    PRINT "Sıra: " + current_player + " oyuncu"
+    
+    IF LEN(captured_pieces) > 0 THEN
+        PRINT "Alınan taşlar: "
+        DIM white_captured AS STRING
+        DIM black_captured AS STRING
+        white_captured = ""
+        black_captured = ""
+        
+        FOR i = 0 TO LEN(captured_pieces) - 1
+            IF is_white_piece(captured_pieces(i)) THEN
+                white_captured = white_captured + captured_pieces(i) + " "
+            ELSE
+                black_captured = black_captured + captured_pieces(i) + " "
+            END IF
+        NEXT i
+        
+        IF white_captured <> "" THEN PRINT "Beyaz: " + white_captured
+        IF black_captured <> "" THEN PRINT "Siyah: " + black_captured
+    END IF
+    
+    PRINT "Hamle sayısı: " + STR$(LEN(move_history))
+    PRINT
+END SUB
+
+DEF SUB play_chess()
+    WHILE NOT game_over
+        show_board()
+        show_game_status()
+        
+        PRINT current_player + " oyuncunun sırası"
+        PRINT "Hamle formatı: e2-e4 (veya 'çık' yazın)"
+        
+        INPUT "Hamleniz: ", move_input
+        
+        IF UPPER$(move_input) = "ÇIK" OR UPPER$(move_input) = "EXIT" THEN
+            game_over = True
+            PRINT "Oyun sonlandırıldı."
+            EXIT SUB
+        END IF
+        
+        IF UPPER$(move_input) = "YARDIM" THEN
+            call show_help()
+            CONTINUE
+        END IF
+        
+        IF LEN(move_input) = 5 AND MID$(move_input, 3, 1) = "-" THEN
+            DIM from_pos AS STRING
+            DIM to_pos AS STRING
+            from_pos = LEFT$(move_input, 2)
+            to_pos = RIGHT$(move_input, 2)
+            
+            IF is_valid_move(from_pos, to_pos) THEN
+                call make_move(from_pos, to_pos)
+                
+                REM Şah kontrolü
+                IF is_in_check(current_player) THEN
+                    PRINT "⚠️ " + current_player + " kral şahta!"
+                    
+                    IF is_checkmate(current_player) THEN
+                        show_board()
+                        PRINT "🏆 MAT! " + IIF$(current_player = "beyaz", "Siyah", "Beyaz") + " oyuncu kazandı!"
+                        game_over = True
+                        EXIT SUB
+                    END IF
+                END IF
+                
+                REM Sıra değiştir
+                IF current_player = "beyaz" THEN
+                    current_player = "siyah"
+                ELSE
+                    current_player = "beyaz"
+                END IF
+            ELSE
+                PRINT "❌ Geçersiz hamle! Tekrar deneyin."
+            END IF
+        ELSE
+            PRINT "❌ Geçersiz format! Örnek: e2-e4"
+        END IF
+        
+        PRINT
+    WEND
+END SUB
+
+DEF FUNCTION is_valid_move(from_pos AS STRING, to_pos AS STRING) AS BOOLEAN
+    REM Pozisyonları koordinatlara çevir
+    DIM from_coords AS ARRAY
+    DIM to_coords AS ARRAY
+    
+    from_coords = pos_to_coords(from_pos)
+    to_coords = pos_to_coords(to_pos)
+    
+    REM Geçerli koordinat kontrolü
+    IF from_coords(0) = -1 OR to_coords(0) = -1 THEN
+        RETURN False
+    END IF
+    
+    DIM from_row AS INTEGER
+    DIM from_col AS INTEGER
+    DIM to_row AS INTEGER
+    DIM to_col AS INTEGER
+    
+    from_row = from_coords(0)
+    from_col = from_coords(1)
+    to_row = to_coords(0)
+    to_col = to_coords(1)
+    
+    REM Kaynak karede taş var mı?
+    DIM piece AS STRING
+    piece = board(from_row)(from_col)
+    
+    IF piece = "." THEN
+        RETURN False
+    END IF
+    
+    REM Oyuncunun kendi taşı mı?
+    IF current_player = "beyaz" AND NOT is_white_piece(piece) THEN
+        RETURN False
+    END IF
+    
+    IF current_player = "siyah" AND is_white_piece(piece) THEN
+        RETURN False
+    END IF
+    
+    REM Hedef kareye kendi taşını alamaz
+    DIM target_piece AS STRING
+    target_piece = board(to_row)(to_col)
+    
+    IF target_piece <> "." THEN
+        IF current_player = "beyaz" AND is_white_piece(target_piece) THEN
+            RETURN False
+        END IF
+        
+        IF current_player = "siyah" AND NOT is_white_piece(target_piece) THEN
+            RETURN False
+        END IF
+    END IF
+    
+    REM Taşın hareket kurallarını kontrol et
+    RETURN is_legal_piece_move(piece, from_row, from_col, to_row, to_col)
+END FUNCTION
+
+DEF FUNCTION pos_to_coords(pos AS STRING) AS ARRAY
+    IF LEN(pos) <> 2 THEN
+        RETURN [-1, -1]
+    END IF
+    
+    DIM col_char AS STRING
+    DIM row_char AS STRING
+    col_char = LEFT$(pos, 1)
+    row_char = RIGHT$(pos, 1)
+    
+    DIM col AS INTEGER
+    DIM row AS INTEGER
+    
+    SELECT CASE UPPER$(col_char)
+        CASE "A": col = 0
+        CASE "B": col = 1
+        CASE "C": col = 2
+        CASE "D": col = 3
+        CASE "E": col = 4
+        CASE "F": col = 5
+        CASE "G": col = 6
+        CASE "H": col = 7
+        CASE ELSE: RETURN [-1, -1]
+    END SELECT
+    
+    row = VAL(row_char)
+    IF row < 1 OR row > 8 THEN
+        RETURN [-1, -1]
+    END IF
+    
+    row = 8 - row  ' Tahtayı ters çevir
+    
+    RETURN [row, col]
+END FUNCTION
+
+DEF FUNCTION is_white_piece(piece AS STRING) AS BOOLEAN
+    RETURN piece = "♔" OR piece = "♕" OR piece = "♖" OR piece = "♗" OR piece = "♘" OR piece = "♙"
+END FUNCTION
+
+DEF FUNCTION is_legal_piece_move(piece AS STRING, from_row AS INTEGER, from_col AS INTEGER, to_row AS INTEGER, to_col AS INTEGER) AS BOOLEAN
+    DIM row_diff AS INTEGER
+    DIM col_diff AS INTEGER
+    row_diff = to_row - from_row
+    col_diff = to_col - from_col
+    
+    SELECT CASE piece
+        CASE "♙", "♟"  ' Piyon
+            RETURN is_valid_pawn_move(piece, from_row, from_col, to_row, to_col)
+            
+        CASE "♖", "♜"  ' Kale
+            RETURN is_valid_rook_move(from_row, from_col, to_row, to_col)
+            
+        CASE "♗", "♝"  ' Fil
+            RETURN is_valid_bishop_move(from_row, from_col, to_row, to_col)
+            
+        CASE "♘", "♞"  ' At
+            RETURN is_valid_knight_move(row_diff, col_diff)
+            
+        CASE "♕", "♛"  ' Vezir
+            RETURN is_valid_queen_move(from_row, from_col, to_row, to_col)
+            
+        CASE "♔", "♚"  ' Kral
+            RETURN is_valid_king_move(row_diff, col_diff)
+    END SELECT
+    
+    RETURN False
+END FUNCTION
+
+DEF FUNCTION is_valid_pawn_move(piece AS STRING, from_row AS INTEGER, from_col AS INTEGER, to_row AS INTEGER, to_col AS INTEGER) AS BOOLEAN
+    DIM row_diff AS INTEGER
+    DIM col_diff AS INTEGER
+    row_diff = to_row - from_row
+    col_diff = to_col - from_col
+    
+    DIM is_white AS BOOLEAN
+    is_white = is_white_piece(piece)
+    
+    REM Beyaz piyonlar yukarı, siyah piyonlar aşağı hareket eder
+    DIM direction AS INTEGER
+    IF is_white THEN
+        direction = -1  ' Yukarı
+    ELSE
+        direction = 1   ' Aşağı
+    END IF
+    
+    REM Düz ileri hareket
+    IF col_diff = 0 THEN
+        IF row_diff = direction THEN
+            RETURN board(to_row)(to_col) = "."  ' Boş kare
+        END IF
+        
+        REM İlk hamlede 2 kare
+        IF (is_white AND from_row = 6) OR (NOT is_white AND from_row = 1) THEN
+            IF row_diff = 2 * direction THEN
+                RETURN board(to_row)(to_col) = "."
+            END IF
+        END IF
+    END IF
+    
+    REM Çapraz alma
+    IF ABS(col_diff) = 1 AND row_diff = direction THEN
+        DIM target AS STRING
+        target = board(to_row)(to_col)
+        RETURN target <> "." AND is_white_piece(target) <> is_white
+    END IF
+    
+    RETURN False
+END FUNCTION
+
+DEF FUNCTION is_valid_rook_move(from_row AS INTEGER, from_col AS INTEGER, to_row AS INTEGER, to_col AS INTEGER) AS BOOLEAN
+    REM Kale düz çizgide hareket eder
+    IF from_row <> to_row AND from_col <> to_col THEN
+        RETURN False
+    END IF
+    
+    RETURN is_path_clear(from_row, from_col, to_row, to_col)
+END FUNCTION
+
+DEF FUNCTION is_valid_bishop_move(from_row AS INTEGER, from_col AS INTEGER, to_row AS INTEGER, to_col AS INTEGER) AS BOOLEAN
+    REM Fil çapraz hareket eder
+    DIM row_diff AS INTEGER
+    DIM col_diff AS INTEGER
+    row_diff = ABS(to_row - from_row)
+    col_diff = ABS(to_col - from_col)
+    
+    IF row_diff <> col_diff THEN
+        RETURN False
+    END IF
+    
+    RETURN is_path_clear(from_row, from_col, to_row, to_col)
+END FUNCTION
+
+DEF FUNCTION is_valid_knight_move(row_diff AS INTEGER, col_diff AS INTEGER) AS BOOLEAN
+    REM At L şeklinde hareket eder
+    RETURN (ABS(row_diff) = 2 AND ABS(col_diff) = 1) OR (ABS(row_diff) = 1 AND ABS(col_diff) = 2)
+END FUNCTION
+
+DEF FUNCTION is_valid_queen_move(from_row AS INTEGER, from_col AS INTEGER, to_row AS INTEGER, to_col AS INTEGER) AS BOOLEAN
+    REM Vezir kale + fil gibi hareket eder
+    RETURN is_valid_rook_move(from_row, from_col, to_row, to_col) OR is_valid_bishop_move(from_row, from_col, to_row, to_col)
+END FUNCTION
+
+DEF FUNCTION is_valid_king_move(row_diff AS INTEGER, col_diff AS INTEGER) AS BOOLEAN
+    REM Kral her yöne 1 kare hareket eder
+    RETURN ABS(row_diff) <= 1 AND ABS(col_diff) <= 1 AND (row_diff <> 0 OR col_diff <> 0)
+END FUNCTION
+
+DEF FUNCTION is_path_clear(from_row AS INTEGER, from_col AS INTEGER, to_row AS INTEGER, to_col AS INTEGER) AS BOOLEAN
+    DIM row_step AS INTEGER
+    DIM col_step AS INTEGER
+    
+    IF to_row > from_row THEN row_step = 1
+    ELSEIF to_row < from_row THEN row_step = -1
+    ELSE row_step = 0
+    
+    IF to_col > from_col THEN col_step = 1
+    ELSEIF to_col < from_col THEN col_step = -1
+    ELSE col_step = 0
+    
+    DIM check_row AS INTEGER
+    DIM check_col AS INTEGER
+    check_row = from_row + row_step
+    check_col = from_col + col_step
+    
+    WHILE check_row <> to_row OR check_col <> to_col
+        IF board(check_row)(check_col) <> "." THEN
+            RETURN False
+        END IF
+        
+        check_row = check_row + row_step
+        check_col = check_col + col_step
+    WEND
+    
+    RETURN True
+END FUNCTION
+
+DEF SUB make_move(from_pos AS STRING, to_pos AS STRING)
+    DIM from_coords AS ARRAY
+    DIM to_coords AS ARRAY
+    
+    from_coords = pos_to_coords(from_pos)
+    to_coords = pos_to_coords(to_pos)
+    
+    DIM from_row AS INTEGER
+    DIM from_col AS INTEGER
+    DIM to_row AS INTEGER
+    DIM to_col AS INTEGER
+    
+    from_row = from_coords(0)
+    from_col = from_coords(1)
+    to_row = to_coords(0)
+    to_col = to_coords(1)
+    
+    DIM moving_piece AS STRING
+    DIM captured_piece AS STRING
+    
+    moving_piece = board(from_row)(from_col)
+    captured_piece = board(to_row)(to_col)
+    
+    REM Alınan taşı kaydet
+    IF captured_piece <> "." THEN
+        INSERT(captured_pieces, captured_piece)
+        PRINT "🎯 " + captured_piece + " taşı alındı!"
+    END IF
+    
+    REM Hamleyi yap
+    board(to_row)(to_col) = moving_piece
+    board(from_row)(from_col) = "."
+    
+    REM Kral pozisyonunu güncelle
+    IF moving_piece = "♔" THEN
+        white_king_pos = [to_row, to_col]
+    ELSEIF moving_piece = "♚" THEN
+        black_king_pos = [to_row, to_col]
+    END IF
+    
+    REM Hamleyi kaydet
+    DIM move_record AS STRING
+    move_record = from_pos + "-" + to_pos + " (" + moving_piece + ")"
+    INSERT(move_history, move_record)
+    
+    PRINT "✅ Hamle: " + from_pos + " → " + to_pos
+END SUB
+
+DEF FUNCTION is_in_check(player AS STRING) AS BOOLEAN
+    DIM king_pos AS ARRAY
+    IF player = "beyaz" THEN
+        king_pos = white_king_pos
+    ELSE
+        king_pos = black_king_pos
+    END IF
+    
+    DIM king_row AS INTEGER
+    DIM king_col AS INTEGER
+    king_row = king_pos(0)
+    king_col = king_pos(1)
+    
+    REM Düşman taşlarının kralı tehdit edip etmediğini kontrol et
+    FOR i = 0 TO 7
+        FOR j = 0 TO 7
+            DIM piece AS STRING
+            piece = board(i)(j)
+            
+            IF piece <> "." THEN
+                DIM piece_belongs_to_opponent AS BOOLEAN
+                IF player = "beyaz" THEN
+                    piece_belongs_to_opponent = NOT is_white_piece(piece)
+                ELSE
+                    piece_belongs_to_opponent = is_white_piece(piece)
+                END IF
+                
+                IF piece_belongs_to_opponent THEN
+                    IF is_legal_piece_move(piece, i, j, king_row, king_col) THEN
+                        RETURN True
+                    END IF
+                END IF
+            END IF
+        NEXT j
+    NEXT i
+    
+    RETURN False
+END FUNCTION
+
+DEF FUNCTION is_checkmate(player AS STRING) AS BOOLEAN
+    REM Basitleştirilmiş mat kontrolü
+    REM Gerçek satrançta daha karmaşık olacaktır
+    
+    REM Şu anki basit implementasyon sadece şah durumunu kontrol eder
+    RETURN is_in_check(player)
+END FUNCTION
+
+DEF SUB show_help()
+    PRINT
+    PRINT "══════════════ SATRANÇ YARDIM ══════════════"
+    PRINT "HAMLE FORMATI:"
+    PRINT "  • e2-e4 (e2'den e4'e hareket et)"
+    PRINT "  • Kolon: a-h, Sıra: 1-8"
+    PRINT
+    PRINT "TAŞ HAREKETLERİ:"
+    PRINT "  ♙♟ Piyon: İleri 1 kare, çapraz alır, ilk hamlede 2 kare"
+    PRINT "  ♖♜ Kale: Düz çizgide sınırsız"
+    PRINT "  ♗♝ Fil: Çapraz sınırsız"
+    PRINT "  ♘♞ At: L şeklinde (2+1 kare)"
+    PRINT "  ♕♛ Vezir: Her yöne sınırsız"
+    PRINT "  ♔♚ Kral: Her yöne 1 kare"
+    PRINT
+    PRINT "KOMUTLAR:"
+    PRINT "  • 'çık' - Oyunu bitir"
+    PRINT "  • 'yardım' - Bu yardımı göster"
+    PRINT "══════════════════════════════════════════=="
+    PRINT
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "══════════════ SATRANÇ OYUNU ══════════════"
+    PRINT "1. Yeni Oyun Başlat"
+    PRINT "2. Hamle Geçmişini Göster"
+    PRINT "3. Oyun Kuralları"
+    PRINT "4. Çıkış"
+    PRINT "═══════════════════════════════════════════"
+END SUB
+
+REM Ana oyun döngüsü
+DIM main_running AS BOOLEAN
+main_running = True
+
+WHILE main_running
+    show_main_menu()
+    
+    DIM menu_choice AS INTEGER
+    INPUT "Seçiminiz: ", menu_choice
+    
+    SELECT CASE menu_choice
+        CASE 1
+            call initialize_chess()
+            call play_chess()
+            
+        CASE 2
+            IF LEN(move_history) = 0 THEN
+                PRINT "Henüz hamle yapılmadı."
+            ELSE
+                PRINT
+                PRINT "HAMLE GEÇMİŞİ:"
+                FOR i = 0 TO LEN(move_history) - 1
+                    PRINT STR$(i + 1) + ". " + move_history(i)
+                NEXT i
+            END IF
+            
+        CASE 3
+            call show_help()
+            
+        CASE 4
+            main_running = False
+            PRINT "Oyun kapatılıyor... Güle güle!"
+            
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF main_running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
