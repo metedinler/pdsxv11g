@@ -1,0 +1,7 @@
+REM Test matematik islemleri
+PRINT "Toplama: ", 10 + 5
+PRINT "Cikarma: ", 20 - 8
+PRINT "Carpma: ", 6 * 7
+PRINT "Bolme: ", 15 / 3
+PRINT "Mod: ", 17 MOD 5
+PRINT "Us: ", 2 ^ 3
