@@ -1,0 +1,812 @@
+REM Örnek 9: E-Ticaret Satış Analizi ve CRM Sistemi
+REM Bu program online satışları takip eder, müşteri ilişkilerini yönetir ve raporlar oluşturur
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║ E-TİCARET SATIŞ ANALİZİ VE CRM      ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global veri yapıları
+DIM customers AS ARRAY
+DIM products AS ARRAY
+DIM orders AS ARRAY
+DIM campaigns AS ARRAY
+DIM analytics AS OBJECT
+DIM inventory AS ARRAY
+
+REM Sistem başlatma
+call initialize_ecommerce_system()
+
+DEF SUB initialize_ecommerce_system()
+    REM Örnek müşteriler
+    customers = [
+        {"id": 1, "name": "Ahmet Yılmaz", "email": "ahmet@email.com", "phone": "0532-111-1111",
+         "city": "İstanbul", "registration_date": "2024-01-15", "total_orders": 5, "total_spent": 2150.0,
+         "last_order_date": "2024-12-20", "status": "aktif", "segment": "VIP"},
+        {"id": 2, "name": "Ayşe Kaya", "email": "ayse@email.com", "phone": "0533-222-2222",
+         "city": "Ankara", "registration_date": "2024-02-10", "total_orders": 3, "total_spent": 890.0,
+         "last_order_date": "2024-12-18", "status": "aktif", "segment": "düzenli"},
+        {"id": 3, "name": "Mehmet Demir", "email": "mehmet@email.com", "phone": "0534-333-3333",
+         "city": "İzmir", "registration_date": "2024-03-05", "total_orders": 1, "total_spent": 125.0,
+         "last_order_date": "2024-11-15", "status": "pasif", "segment": "yeni"}
+    ]
+    
+    REM Örnek ürünler
+    products = [
+        {"id": 101, "name": "Laptop HP", "category": "Elektronik", "price": 8500.0, "cost": 6800.0,
+         "stock": 15, "sales_count": 25, "rating": 4.5, "status": "aktif"},
+        {"id": 102, "name": "Bluetooth Kulaklık", "category": "Elektronik", "price": 299.0, "cost": 180.0,
+         "stock": 50, "sales_count": 120, "rating": 4.2, "status": "aktif"},
+        {"id": 103, "name": "Spor Ayakkabı", "category": "Spor", "price": 450.0, "cost": 270.0,
+         "stock": 30, "sales_count": 85, "rating": 4.8, "status": "aktif"},
+        {"id": 104, "name": "Kahve Makinesi", "category": "Ev Eşyası", "price": 1250.0, "cost": 900.0,
+         "stock": 8, "sales_count": 12, "rating": 4.3, "status": "aktif"}
+    ]
+    
+    REM Örnek siparişler
+    orders = [
+        {"id": 1001, "customer_id": 1, "date": "2024-12-20", "status": "teslim edildi",
+         "items": [{"product_id": 101, "quantity": 1, "price": 8500.0}],
+         "subtotal": 8500.0, "shipping": 50.0, "tax": 1530.0, "total": 10080.0,
+         "payment_method": "kredi kartı", "shipping_address": "İstanbul"},
+        {"id": 1002, "customer_id": 2, "date": "2024-12-18", "status": "kargoda",
+         "items": [{"product_id": 102, "quantity": 2, "price": 299.0}, {"product_id": 103, "quantity": 1, "price": 450.0}],
+         "subtotal": 1048.0, "shipping": 30.0, "tax": 188.64, "total": 1266.64,
+         "payment_method": "havale", "shipping_address": "Ankara"}
+    ]
+    
+    REM Kampanyalar
+    campaigns = [
+        {"id": 201, "name": "Kış İndirimi", "type": "yüzde", "discount": 20, "min_amount": 500,
+         "start_date": "2024-12-01", "end_date": "2024-12-31", "usage_count": 45, "status": "aktif"},
+        {"id": 202, "name": "Ücretsiz Kargo", "type": "kargo", "discount": 0, "min_amount": 200,
+         "start_date": "2024-12-15", "end_date": "2025-01-15", "usage_count": 78, "status": "aktif"}
+    ]
+    
+    REM Analitik veriler başlangıç değerleri
+    analytics.total_revenue = 0
+    analytics.total_orders = 0
+    analytics.conversion_rate = 0
+    analytics.avg_order_value = 0
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Müşteri Yönetimi (CRM)"
+    PRINT "2. Sipariş Yönetimi"
+    PRINT "3. Ürün Yönetimi"
+    PRINT "4. Satış Analizi"
+    PRINT "5. Kampanya Yönetimi"
+    PRINT "6. Raporlar ve Dashboard"
+    PRINT "7. Müşteri Segmentasyonu"
+    PRINT "8. Tahmin ve Projeksiyonlar"
+    PRINT "9. Performans Metrikleri"
+    PRINT "10. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB customer_management()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ MÜŞTERİ YÖNETİMİ (CRM) ═══"
+        PRINT "1. Müşteri Listesi"
+        PRINT "2. Yeni Müşteri Ekle"
+        PRINT "3. Müşteri Detayları"
+        PRINT "4. Müşteri Güncelle"
+        PRINT "5. Müşteri Arama"
+        PRINT "6. Müşteri Segmentleri"
+        PRINT "7. İletişim Geçmişi"
+        PRINT "8. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call list_customers()
+            CASE 2: call add_customer()
+            CASE 3: call customer_details()
+            CASE 4: call update_customer()
+            CASE 5: call search_customers()
+            CASE 6: call customer_segments()
+            CASE 7: PRINT "İletişim geçmişi modülü geliştirme aşamasında..."
+            CASE 8: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB list_customers()
+    PRINT
+    PRINT "MÜŞTERİ LİSTESİ:"
+    PRINT STRING$(120, "=")
+    PRINT "ID  | Ad Soyad        | E-mail             | Şehir    | Sipariş | Toplam    | Son Sipariş | Segment"
+    PRINT STRING$(120, "-")
+    
+    FOR i = 0 TO LEN(customers) - 1
+        DIM c AS OBJECT
+        c = customers(i)
+        
+        PRINT RIGHT$("   " + STR$(c.id), 3) + " | " +
+              LEFT$(c.name + STRING$(15, " "), 15) + " | " +
+              LEFT$(c.email + STRING$(18, " "), 18) + " | " +
+              LEFT$(c.city + STRING$(8, " "), 8) + " | " +
+              RIGHT$("      " + STR$(c.total_orders), 7) + " | " +
+              RIGHT$("        " + STR$(c.total_spent), 9) + " | " +
+              c.last_order_date + " | " +
+              c.segment
+    NEXT i
+    
+    PRINT STRING$(120, "=")
+    PRINT "Toplam müşteri sayısı: " + STR$(LEN(customers))
+END SUB
+
+DEF SUB add_customer()
+    PRINT
+    PRINT "YENİ MÜŞTERİ EKLEME:"
+    
+    DIM new_customer AS OBJECT
+    DIM max_id AS INTEGER
+    max_id = 0
+    
+    FOR i = 0 TO LEN(customers) - 1
+        IF customers(i).id > max_id THEN max_id = customers(i).id
+    NEXT i
+    
+    new_customer.id = max_id + 1
+    
+    INPUT "Ad Soyad: ", new_customer.name
+    INPUT "E-mail: ", new_customer.email
+    INPUT "Telefon: ", new_customer.phone
+    INPUT "Şehir: ", new_customer.city
+    
+    new_customer.registration_date = FORMAT$(NOW(), "yyyy-mm-dd")
+    new_customer.total_orders = 0
+    new_customer.total_spent = 0.0
+    new_customer.last_order_date = ""
+    new_customer.status = "aktif"
+    new_customer.segment = "yeni"
+    
+    INSERT(customers, new_customer)
+    
+    PRINT "Yeni müşteri eklendi! ID: " + STR$(new_customer.id)
+END SUB
+
+DEF SUB customer_details()
+    INPUT "Müşteri ID: ", customer_id
+    
+    DIM customer_index AS INTEGER
+    customer_index = find_customer_by_id(customer_id)
+    
+    IF customer_index = -1 THEN
+        PRINT "Müşteri bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    DIM c AS OBJECT
+    c = customers(customer_index)
+    
+    PRINT
+    PRINT "═══ MÜŞTERİ DETAYLARI ═══"
+    PRINT "ID: " + STR$(c.id)
+    PRINT "Ad Soyad: " + c.name
+    PRINT "E-mail: " + c.email
+    PRINT "Telefon: " + c.phone
+    PRINT "Şehir: " + c.city
+    PRINT "Kayıt Tarihi: " + c.registration_date
+    PRINT "Durum: " + c.status
+    PRINT "Segment: " + c.segment
+    PRINT
+    PRINT "SİPARİŞ İSTATİSTİKLERİ:"
+    PRINT "Toplam sipariş: " + STR$(c.total_orders)
+    PRINT "Toplam harcama: " + STR$(c.total_spent) + " ₺"
+    IF c.total_orders > 0 THEN
+        PRINT "Ortalama sipariş tutarı: " + STR$(ROUND(c.total_spent / c.total_orders, 2)) + " ₺"
+    END IF
+    PRINT "Son sipariş: " + c.last_order_date
+    
+    REM Müşteriye ait siparişleri listele
+    PRINT
+    PRINT "SİPARİŞ GEÇMİŞİ:"
+    DIM found_orders AS BOOLEAN
+    found_orders = False
+    
+    FOR i = 0 TO LEN(orders) - 1
+        IF orders(i).customer_id = customer_id THEN
+            found_orders = True
+            PRINT "Sipariş #" + STR$(orders(i).id) + " - " + orders(i).date + 
+                  " - " + STR$(orders(i).total) + " ₺ - " + orders(i).status
+        END IF
+    NEXT i
+    
+    IF NOT found_orders THEN
+        PRINT "Henüz sipariş bulunmuyor."
+    END IF
+END SUB
+
+DEF FUNCTION find_customer_by_id(id AS INTEGER) AS INTEGER
+    FOR i = 0 TO LEN(customers) - 1
+        IF customers(i).id = id THEN
+            RETURN i
+        END IF
+    NEXT i
+    RETURN -1
+END FUNCTION
+
+DEF SUB order_management()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ SİPARİŞ YÖNETİMİ ═══"
+        PRINT "1. Sipariş Listesi"
+        PRINT "2. Yeni Sipariş Oluştur"
+        PRINT "3. Sipariş Detayları"
+        PRINT "4. Sipariş Durumu Güncelle"
+        PRINT "5. Sipariş Arama"
+        PRINT "6. Bekleyen Siparişler"
+        PRINT "7. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call list_orders()
+            CASE 2: call create_order()
+            CASE 3: call order_details()
+            CASE 4: call update_order_status()
+            CASE 5: call search_orders()
+            CASE 6: call pending_orders()
+            CASE 7: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB list_orders()
+    PRINT
+    PRINT "SİPARİŞ LİSTESİ:"
+    PRINT STRING$(100, "=")
+    PRINT "Sipariş ID | Müşteri ID | Tarih      | Durum          | Toplam"
+    PRINT STRING$(100, "-")
+    
+    FOR i = 0 TO LEN(orders) - 1
+        DIM o AS OBJECT
+        o = orders(i)
+        
+        PRINT RIGHT$("         " + STR$(o.id), 10) + " | " +
+              RIGHT$("         " + STR$(o.customer_id), 10) + " | " +
+              o.date + " | " +
+              LEFT$(o.status + STRING$(14, " "), 14) + " | " +
+              RIGHT$("       " + STR$(o.total), 8) + " ₺"
+    NEXT i
+    
+    PRINT STRING$(100, "=")
+    PRINT "Toplam sipariş sayısı: " + STR$(LEN(orders))
+END SUB
+
+DEF SUB create_order()
+    PRINT
+    PRINT "YENİ SİPARİŞ OLUŞTUR:"
+    
+    DIM new_order AS OBJECT
+    DIM max_id AS INTEGER
+    max_id = 1000
+    
+    FOR i = 0 TO LEN(orders) - 1
+        IF orders(i).id > max_id THEN max_id = orders(i).id
+    NEXT i
+    
+    new_order.id = max_id + 1
+    
+    INPUT "Müşteri ID: ", new_order.customer_id
+    
+    REM Müşteriyi kontrol et
+    IF find_customer_by_id(new_order.customer_id) = -1 THEN
+        PRINT "Müşteri bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    new_order.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    new_order.status = "yeni"
+    new_order.payment_method = "kredi kartı"
+    new_order.shipping_address = ""
+    new_order.items = []
+    new_order.subtotal = 0.0
+    new_order.shipping = 30.0  ' Varsayılan kargo ücreti
+    new_order.tax = 0.0
+    new_order.total = 0.0
+    
+    PRINT
+    PRINT "Ürün ekleme (çıkmak için 0):"
+    
+    DIM continue_adding AS BOOLEAN
+    continue_adding = True
+    
+    WHILE continue_adding
+        PRINT
+        PRINT "Mevcut ürünler:"
+        FOR j = 0 TO LEN(products) - 1
+            PRINT STR$(products(j).id) + ". " + products(j).name + " - " + STR$(products(j).price) + " ₺"
+        NEXT j
+        
+        INPUT "Ürün ID (0 = bitir): ", product_id
+        
+        IF product_id = 0 THEN
+            continue_adding = False
+        ELSE
+            DIM product_found AS BOOLEAN
+            product_found = False
+            
+            FOR k = 0 TO LEN(products) - 1
+                IF products(k).id = product_id THEN
+                    product_found = True
+                    
+                    INPUT "Miktar: ", quantity
+                    
+                    DIM item AS OBJECT
+                    item.product_id = product_id
+                    item.quantity = quantity
+                    item.price = products(k).price
+                    
+                    INSERT(new_order.items, item)
+                    new_order.subtotal = new_order.subtotal + (quantity * products(k).price)
+                    
+                    PRINT "Ürün eklendi: " + products(k).name + " x" + STR$(quantity)
+                    EXIT FOR
+                END IF
+            NEXT k
+            
+            IF NOT product_found THEN
+                PRINT "Ürün bulunamadı!"
+            END IF
+        END IF
+    WEND
+    
+    IF LEN(new_order.items) = 0 THEN
+        PRINT "Sipariş iptal edildi - ürün eklenmedi."
+        EXIT SUB
+    END IF
+    
+    REM Vergi hesapla (%18 KDV)
+    new_order.tax = new_order.subtotal * 0.18
+    
+    REM Toplam hesapla
+    new_order.total = new_order.subtotal + new_order.shipping + new_order.tax
+    
+    INPUT "Teslimat adresi: ", new_order.shipping_address
+    
+    INSERT(orders, new_order)
+    
+    PRINT
+    PRINT "Sipariş oluşturuldu!"
+    PRINT "Sipariş ID: " + STR$(new_order.id)
+    PRINT "Ara toplam: " + STR$(new_order.subtotal) + " ₺"
+    PRINT "Kargo: " + STR$(new_order.shipping) + " ₺"
+    PRINT "Vergi: " + STR$(ROUND(new_order.tax, 2)) + " ₺"
+    PRINT "TOPLAM: " + STR$(ROUND(new_order.total, 2)) + " ₺"
+    
+    REM Müşteri bilgilerini güncelle
+    call update_customer_stats(new_order.customer_id, new_order.total)
+END SUB
+
+DEF SUB update_customer_stats(customer_id AS INTEGER, order_total AS DOUBLE)
+    DIM customer_index AS INTEGER
+    customer_index = find_customer_by_id(customer_id)
+    
+    IF customer_index >= 0 THEN
+        customers(customer_index).total_orders = customers(customer_index).total_orders + 1
+        customers(customer_index).total_spent = customers(customer_index).total_spent + order_total
+        customers(customer_index).last_order_date = FORMAT$(NOW(), "yyyy-mm-dd")
+        
+        REM Segment güncelle
+        IF customers(customer_index).total_spent >= 2000 THEN
+            customers(customer_index).segment = "VIP"
+        ELSEIF customers(customer_index).total_orders >= 3 THEN
+            customers(customer_index).segment = "düzenli"
+        END IF
+    END IF
+END SUB
+
+DEF SUB sales_analysis()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ SATIŞ ANALİZİ ═══"
+        PRINT "1. Günlük/Haftalık/Aylık Satışlar"
+        PRINT "2. En Çok Satan Ürünler"
+        PRINT "3. Müşteri Analizi"
+        PRINT "4. Kategori Analizi"
+        PRINT "5. Karlılık Analizi"
+        PRINT "6. Coğrafi Analiz"
+        PRINT "7. Trend Analizi"
+        PRINT "8. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call time_based_sales()
+            CASE 2: call top_selling_products()
+            CASE 3: call customer_analysis()
+            CASE 4: call category_analysis()
+            CASE 5: call profitability_analysis()
+            CASE 6: call geographical_analysis()
+            CASE 7: call trend_analysis()
+            CASE 8: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB top_selling_products()
+    PRINT
+    PRINT "EN ÇOK SATAN ÜRÜNLER:"
+    PRINT STRING$(80, "=")
+    
+    REM Ürünleri satış sayısına göre sırala (basit bubble sort)
+    DIM sorted_products AS ARRAY
+    sorted_products = products  ' Kopya oluştur
+    
+    FOR i = 0 TO LEN(sorted_products) - 2
+        FOR j = 0 TO LEN(sorted_products) - 2 - i
+            IF sorted_products(j).sales_count < sorted_products(j + 1).sales_count THEN
+                DIM temp AS OBJECT
+                temp = sorted_products(j)
+                sorted_products(j) = sorted_products(j + 1)
+                sorted_products(j + 1) = temp
+            END IF
+        NEXT j
+    NEXT i
+    
+    PRINT "Sıra | Ürün Adı           | Kategori   | Satış | Stok | Gelir"
+    PRINT STRING$(80, "-")
+    
+    FOR i = 0 TO LEN(sorted_products) - 1
+        DIM p AS OBJECT
+        p = sorted_products(i)
+        
+        DIM revenue AS DOUBLE
+        revenue = p.sales_count * p.price
+        
+        PRINT RIGHT$("   " + STR$(i + 1), 4) + " | " +
+              LEFT$(p.name + STRING$(18, " "), 18) + " | " +
+              LEFT$(p.category + STRING$(10, " "), 10) + " | " +
+              RIGHT$("    " + STR$(p.sales_count), 5) + " | " +
+              RIGHT$("   " + STR$(p.stock), 4) + " | " +
+              RIGHT$("       " + STR$(revenue), 8)
+    NEXT i
+    
+    PRINT STRING$(80, "=")
+END SUB
+
+DEF SUB customer_analysis()
+    PRINT
+    PRINT "MÜŞTERİ ANALİZİ:"
+    PRINT STRING$(70, "=")
+    
+    DIM total_customers AS INTEGER
+    DIM active_customers AS INTEGER
+    DIM vip_customers AS INTEGER
+    DIM total_revenue AS DOUBLE
+    
+    total_customers = LEN(customers)
+    active_customers = 0
+    vip_customers = 0
+    total_revenue = 0
+    
+    FOR i = 0 TO LEN(customers) - 1
+        DIM c AS OBJECT
+        c = customers(i)
+        
+        total_revenue = total_revenue + c.total_spent
+        
+        IF c.status = "aktif" THEN
+            active_customers = active_customers + 1
+        END IF
+        
+        IF c.segment = "VIP" THEN
+            vip_customers = vip_customers + 1
+        END IF
+    NEXT i
+    
+    PRINT "GENEL İSTATİSTİKLER:"
+    PRINT "Toplam müşteri: " + STR$(total_customers)
+    PRINT "Aktif müşteri: " + STR$(active_customers)
+    PRINT "VIP müşteri: " + STR$(vip_customers)
+    PRINT "Toplam gelir: " + STR$(ROUND(total_revenue, 2)) + " ₺"
+    IF total_customers > 0 THEN
+        PRINT "Müşteri başına ortalama gelir: " + STR$(ROUND(total_revenue / total_customers, 2)) + " ₺"
+    END IF
+    
+    PRINT
+    PRINT "SEGMENT DAĞILIMI:"
+    DIM yeni_count, duzenli_count AS INTEGER
+    yeni_count = 0
+    duzenli_count = 0
+    
+    FOR i = 0 TO LEN(customers) - 1
+        SELECT CASE customers(i).segment
+            CASE "yeni": yeni_count = yeni_count + 1
+            CASE "düzenli": duzenli_count = duzenli_count + 1
+        END SELECT
+    NEXT i
+    
+    PRINT "Yeni müşteri: " + STR$(yeni_count) + " (%" + STR$(ROUND((yeni_count / total_customers) * 100, 1)) + ")"
+    PRINT "Düzenli müşteri: " + STR$(duzenli_count) + " (%" + STR$(ROUND((duzenli_count / total_customers) * 100, 1)) + ")"
+    PRINT "VIP müşteri: " + STR$(vip_customers) + " (%" + STR$(ROUND((vip_customers / total_customers) * 100, 1)) + ")"
+    
+    PRINT
+    PRINT "EN DEĞERLİ MÜŞTERİLER:"
+    PRINT "Sıra | Müşteri Adı      | Toplam Harcama | Sipariş Sayısı"
+    PRINT STRING$(60, "-")
+    
+    REM Müşterileri harcamaya göre sırala
+    DIM sorted_customers AS ARRAY
+    sorted_customers = customers
+    
+    FOR i = 0 TO LEN(sorted_customers) - 2
+        FOR j = 0 TO LEN(sorted_customers) - 2 - i
+            IF sorted_customers(j).total_spent < sorted_customers(j + 1).total_spent THEN
+                DIM temp AS OBJECT
+                temp = sorted_customers(j)
+                sorted_customers(j) = sorted_customers(j + 1)
+                sorted_customers(j + 1) = temp
+            END IF
+        NEXT j
+    NEXT i
+    
+    DIM show_count AS INTEGER
+    show_count = MIN(5, LEN(sorted_customers))
+    
+    FOR i = 0 TO show_count - 1
+        DIM c AS OBJECT
+        c = sorted_customers(i)
+        
+        PRINT RIGHT$("   " + STR$(i + 1), 4) + " | " +
+              LEFT$(c.name + STRING$(16, " "), 16) + " | " +
+              RIGHT$("             " + STR$(c.total_spent), 14) + " | " +
+              RIGHT$("            " + STR$(c.total_orders), 13)
+    NEXT i
+END SUB
+
+DEF SUB profitability_analysis()
+    PRINT
+    PRINT "KARLILIK ANALİZİ:"
+    PRINT STRING$(70, "=")
+    
+    DIM total_revenue AS DOUBLE
+    DIM total_cost AS DOUBLE
+    DIM total_profit AS DOUBLE
+    
+    total_revenue = 0
+    total_cost = 0
+    
+    PRINT "Ürün           | Satış | Gelir    | Maliyet  | Kar      | Kar Marjı"
+    PRINT STRING$(70, "-")
+    
+    FOR i = 0 TO LEN(products) - 1
+        DIM p AS OBJECT
+        p = products(i)
+        
+        DIM product_revenue AS DOUBLE
+        DIM product_cost AS DOUBLE
+        DIM product_profit AS DOUBLE
+        DIM profit_margin AS DOUBLE
+        
+        product_revenue = p.sales_count * p.price
+        product_cost = p.sales_count * p.cost
+        product_profit = product_revenue - product_cost
+        
+        IF product_revenue > 0 THEN
+            profit_margin = (product_profit / product_revenue) * 100
+        ELSE
+            profit_margin = 0
+        END IF
+        
+        total_revenue = total_revenue + product_revenue
+        total_cost = total_cost + product_cost
+        
+        PRINT LEFT$(p.name + STRING$(14, " "), 14) + " | " +
+              RIGHT$("    " + STR$(p.sales_count), 5) + " | " +
+              RIGHT$("       " + STR$(ROUND(product_revenue, 0)), 8) + " | " +
+              RIGHT$("       " + STR$(ROUND(product_cost, 0)), 8) + " | " +
+              RIGHT$("       " + STR$(ROUND(product_profit, 0)), 8) + " | " +
+              RIGHT$("      " + STR$(ROUND(profit_margin, 1)), 7) + "%"
+    NEXT i
+    
+    total_profit = total_revenue - total_cost
+    
+    PRINT STRING$(70, "=")
+    PRINT "TOPLAM ÖZET:"
+    PRINT "Toplam gelir: " + STR$(ROUND(total_revenue, 2)) + " ₺"
+    PRINT "Toplam maliyet: " + STR$(ROUND(total_cost, 2)) + " ₺"
+    PRINT "Toplam kar: " + STR$(ROUND(total_profit, 2)) + " ₺"
+    
+    IF total_revenue > 0 THEN
+        DIM overall_margin AS DOUBLE
+        overall_margin = (total_profit / total_revenue) * 100
+        PRINT "Genel kar marjı: %" + STR$(ROUND(overall_margin, 2))
+    END IF
+END SUB
+
+DEF SUB dashboard_reports()
+    PRINT
+    PRINT "═══ DASHBOARD VE RAPORLAR ═══"
+    
+    REM Temel metrikleri hesapla
+    call calculate_kpis()
+    
+    PRINT "ANA PERFORMANS GÖSTERGELERİ (KPI):"
+    PRINT STRING$(60, "=")
+    
+    DIM total_revenue AS DOUBLE
+    DIM total_orders AS INTEGER
+    DIM avg_order_value AS DOUBLE
+    DIM active_customers AS INTEGER
+    
+    total_revenue = 0
+    total_orders = LEN(orders)
+    active_customers = 0
+    
+    FOR i = 0 TO LEN(orders) - 1
+        total_revenue = total_revenue + orders(i).total
+    NEXT i
+    
+    IF total_orders > 0 THEN
+        avg_order_value = total_revenue / total_orders
+    ELSE
+        avg_order_value = 0
+    END IF
+    
+    FOR i = 0 TO LEN(customers) - 1
+        IF customers(i).status = "aktif" THEN
+            active_customers = active_customers + 1
+        END IF
+    NEXT i
+    
+    PRINT "📊 Toplam gelir: " + STR$(ROUND(total_revenue, 2)) + " ₺"
+    PRINT "🛒 Toplam sipariş: " + STR$(total_orders)
+    PRINT "💰 Ortalama sipariş değeri: " + STR$(ROUND(avg_order_value, 2)) + " ₺"
+    PRINT "👥 Aktif müşteri sayısı: " + STR$(active_customers)
+    PRINT "📈 Müşteri başına gelir: " + STR$(ROUND(total_revenue / active_customers, 2)) + " ₺"
+    
+    PRINT
+    PRINT "BU AY PERFORMANCE:"
+    PRINT "🔥 En çok satan ürün: " + products(0).name
+    PRINT "⭐ En değerli müşteri: " + customers(0).name
+    PRINT "📍 En çok sipariş alan şehir: İstanbul"
+    
+    PRINT
+    PRINT "UYARILAR:"
+    
+    REM Düşük stoklu ürünleri kontrol et
+    DIM low_stock_count AS INTEGER
+    low_stock_count = 0
+    
+    FOR i = 0 TO LEN(products) - 1
+        IF products(i).stock <= 10 THEN
+            low_stock_count = low_stock_count + 1
+        END IF
+    NEXT i
+    
+    IF low_stock_count > 0 THEN
+        PRINT "⚠️  " + STR$(low_stock_count) + " ürün düşük stokta!"
+    END IF
+    
+    REM Pasif müşteri kontrolü
+    DIM inactive_customers AS INTEGER
+    inactive_customers = LEN(customers) - active_customers
+    
+    IF inactive_customers > 0 THEN
+        PRINT "📱 " + STR$(inactive_customers) + " pasif müşteriyle iletişime geçin"
+    END IF
+    
+    PRINT
+    PRINT "ÖNERILER:"
+    PRINT "💡 VIP müşteriler için özel kampanya düzenleyin"
+    PRINT "💡 Düşük stoklu ürünler için acil tedarik planı yapın"
+    PRINT "💡 Pasif müşteriler için geri kazanım kampanyası başlatın"
+END SUB
+
+DEF SUB calculate_kpis()
+    REM Bu fonksiyon KPI hesaplamalarını yapar
+    analytics.total_revenue = 0
+    analytics.total_orders = LEN(orders)
+    
+    FOR i = 0 TO LEN(orders) - 1
+        analytics.total_revenue = analytics.total_revenue + orders(i).total
+    NEXT i
+    
+    IF analytics.total_orders > 0 THEN
+        analytics.avg_order_value = analytics.total_revenue / analytics.total_orders
+    ELSE
+        analytics.avg_order_value = 0
+    END IF
+    
+    REM Conversion rate basit hesaplama (varsayımsal)
+    analytics.conversion_rate = 2.5  ' %2.5 varsayımsal oran
+END SUB
+
+DEF SUB campaign_management()
+    PRINT
+    PRINT "═══ KAMPANYA YÖNETİMİ ═══"
+    PRINT "1. Aktif Kampanyalar"
+    PRINT "2. Yeni Kampanya Oluştur"
+    PRINT "3. Kampanya Performansı"
+    PRINT "4. Kampanya Geçmişi"
+    
+    INPUT "Seçiminiz: ", choice
+    
+    SELECT CASE choice
+        CASE 1: call list_campaigns()
+        CASE 2: call create_campaign()
+        CASE 3: call campaign_performance()
+        CASE 4: PRINT "Kampanya geçmişi modülü geliştirme aşamasında..."
+    END SELECT
+END SUB
+
+DEF SUB list_campaigns()
+    PRINT
+    PRINT "AKTİF KAMPANYALAR:"
+    PRINT STRING$(80, "=")
+    
+    FOR i = 0 TO LEN(campaigns) - 1
+        DIM camp AS OBJECT
+        camp = campaigns(i)
+        
+        IF camp.status = "aktif" THEN
+            PRINT "ID: " + STR$(camp.id) + " | " + camp.name
+            PRINT "Tür: " + camp.type + " | İndirim: %" + STR$(camp.discount)
+            PRINT "Minimum tutar: " + STR$(camp.min_amount) + " ₺"
+            PRINT "Tarih: " + camp.start_date + " - " + camp.end_date
+            PRINT "Kullanım: " + STR$(camp.usage_count) + " kez"
+            PRINT STRING$(40, "-")
+        END IF
+    NEXT i
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-10): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            customer_management()
+        CASE 2
+            order_management()
+        CASE 3
+            PRINT "Ürün yönetimi modülü geliştirme aşamasında..."
+        CASE 4
+            sales_analysis()
+        CASE 5
+            campaign_management()
+        CASE 6
+            dashboard_reports()
+        CASE 7
+            PRINT "Müşteri segmentasyonu modülü geliştirme aşamasında..."
+        CASE 8
+            PRINT "Tahmin ve projeksiyon modülü geliştirme aşamasında..."
+        CASE 9
+            PRINT "Performans metrikleri modülü geliştirme aşamasında..."
+        CASE 10
+            running = False
+            PRINT "E-ticaret CRM sistemi kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "E-ticaret sistemi kapatıldı."
