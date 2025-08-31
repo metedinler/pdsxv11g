@@ -1,0 +1,7 @@
+REM Test degisken atamalari
+A = 10
+B = 20
+C = A + B
+PRINT "A =", A
+PRINT "B =", B
+PRINT "C =", C
