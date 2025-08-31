@@ -1,0 +1,135 @@
+REM Test 7: İstatistiksel fonksiyonlar testleri
+REM Bu program NumPy ve Pandas tabanlı istatistik fonksiyonlarını test eder
+
+PRINT "=== İstatistiksel Fonksiyonlar Testleri ==="
+PRINT
+
+REM Test verileri
+DIM data AS ARRAY
+DIM data2 AS ARRAY
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+data2 = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+PRINT "Test verisi 1:", data
+PRINT "Test verisi 2:", data2
+PRINT
+
+REM Temel istatistikler
+PRINT "1. Temel İstatistiksel Fonksiyonlar:"
+PRINT "MEAN(data) =", ROUND(MEAN(data), 2)
+PRINT "MEDIAN(data) =", MEDIAN(data)
+PRINT "STD(data) =", ROUND(STD(data), 4)
+PRINT "VAR(data) =", ROUND(VAR(data), 4)
+PRINT "SUM(data) =", SUM(data)
+PRINT "PROD(data) =", PROD(data)
+
+PRINT
+
+REM Percentile ve quantile
+PRINT "2. Percentile ve Quantile:"
+PRINT "PERCENTILE(data, 25) =", PERCENTILE(data, 25)
+PRINT "PERCENTILE(data, 50) =", PERCENTILE(data, 50)
+PRINT "PERCENTILE(data, 75) =", PERCENTILE(data, 75)
+PRINT "QUANTILE(data, 0.25) =", QUANTILE(data, 0.25)
+PRINT "QUANTILE(data, 0.75) =", QUANTILE(data, 0.75)
+
+PRINT
+
+REM İki değişkenli istatistikler
+PRINT "3. İki Değişkenli İstatistikler:"
+PRINT "CORR(data, data2) =", ROUND(CORR(data, data2), 6)
+PRINT "COV(data, data2) =", ROUND(COV(data, data2), 2)
+
+PRINT
+
+REM Array işlemleri
+PRINT "4. NumPy Array İşlemleri:"
+
+REM Array oluşturma
+DIM zeros_array AS ARRAY
+DIM ones_array AS ARRAY
+DIM range_array AS ARRAY
+
+zeros_array = ZEROS(5)
+ones_array = ONES(4)
+range_array = ARANGE(0, 10, 2)
+
+PRINT "ZEROS(5) =", zeros_array
+PRINT "ONES(4) =", ones_array
+PRINT "ARANGE(0, 10, 2) =", range_array
+
+PRINT
+
+REM Linspace
+DIM linspace_array AS ARRAY
+linspace_array = LINSPACE(0, 1, 6)
+PRINT "LINSPACE(0, 1, 6) =", linspace_array
+
+PRINT
+
+REM Array birleştirme
+DIM arr1 AS ARRAY
+DIM arr2 AS ARRAY
+DIM concat_result AS ARRAY
+
+arr1 = [1, 2, 3]
+arr2 = [4, 5, 6]
+concat_result = CONCATENATE(arr1, arr2)
+PRINT "CONCATENATE([1,2,3], [4,5,6]) =", concat_result
+
+PRINT
+
+REM Normal dağılım simülasyonu
+DEF FUNCTION random_normal_approx(mean, std_dev)
+    REM Box-Muller dönüşümü yaklaşımı
+    DIM u1 AS DOUBLE
+    DIM u2 AS DOUBLE
+    u1 = RND()
+    u2 = RND()
+    RETURN mean + std_dev * SQR(-2 * LOG(u1)) * COS(2 * PI * u2)
+END FUNCTION
+
+PRINT "5. Rastgele Normal Dağılım Örnekleri (μ=100, σ=15):"
+FOR i = 1 TO 5
+    PRINT "Örnek " + STR$(i) + ":", ROUND(random_normal_approx(100, 15), 1)
+NEXT i
+
+PRINT
+
+REM Daha büyük veri kümesi testi
+DIM large_data AS ARRAY
+large_data = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95]
+
+PRINT "6. Büyük Veri Kümesi Analizi:"
+PRINT "Veri boyutu:", LEN(large_data)
+PRINT "Ortalama:", ROUND(MEAN(large_data), 2)
+PRINT "Medyan:", MEDIAN(large_data)
+PRINT "Standart sapma:", ROUND(STD(large_data), 2)
+PRINT "Minimum:", MIN(large_data)
+PRINT "Maksimum:", MAX(large_data)
+PRINT "25. percentil:", PERCENTILE(large_data, 25)
+PRINT "75. percentil:", PERCENTILE(large_data, 75)
+
+PRINT
+
+REM Z-score hesaplama
+DEF FUNCTION z_score(value, mean_val, std_val)
+    RETURN (value - mean_val) / std_val
+END FUNCTION
+
+DIM sample_mean AS DOUBLE
+DIM sample_std AS DOUBLE
+DIM test_value AS DOUBLE
+
+sample_mean = MEAN(large_data)
+sample_std = STD(large_data)
+test_value = 75
+
+PRINT "7. Z-Score Hesaplaması:"
+PRINT "Test değeri:", test_value
+PRINT "Ortalama:", ROUND(sample_mean, 2)
+PRINT "Standart sapma:", ROUND(sample_std, 2)
+PRINT "Z-score:", ROUND(z_score(test_value, sample_mean, sample_std), 4)
+
+PRINT
+PRINT "İstatistiksel fonksiyonlar testleri tamamlandı!"
