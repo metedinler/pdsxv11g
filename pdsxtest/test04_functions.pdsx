@@ -1,0 +1,98 @@
+REM Test 4: Fonksiyon tanımlama ve çağırma testleri
+REM Bu program kullanıcı tanımlı fonksiyonları test eder
+
+PRINT "=== Fonksiyon Testleri ==="
+PRINT
+
+REM DEF FN - tek satır fonksiyon
+DEF FN square(x) = x * x
+DEF FN cube(x) = x * x * x
+DEF FN add(a, b) = a + b
+
+PRINT "1. DEF FN Fonksiyonları:"
+PRINT "5'in karesi:", square(5)
+PRINT "3'ün küpü:", cube(3)
+PRINT "7 + 3 =", add(7, 3)
+
+PRINT
+
+REM DEF FUNCTION - çok satır fonksiyon
+DEF FUNCTION factorial(n)
+    IF n <= 1 THEN
+        RETURN 1
+    ELSE
+        RETURN n * factorial(n - 1)
+    END IF
+END FUNCTION
+
+DEF FUNCTION fibonacci(n)
+    IF n <= 1 THEN
+        RETURN n
+    ELSE
+        RETURN fibonacci(n-1) + fibonacci(n-2)
+    END IF
+END FUNCTION
+
+DEF FUNCTION max_of_three(a, b, c)
+    DIM max_val AS DOUBLE
+    max_val = a
+    IF b > max_val THEN
+        max_val = b
+    END IF
+    IF c > max_val THEN
+        max_val = c
+    END IF
+    RETURN max_val
+END FUNCTION
+
+PRINT "2. DEF FUNCTION Fonksiyonları:"
+PRINT "5! =", factorial(5)
+PRINT "7. Fibonacci sayısı:", fibonacci(7)
+PRINT "Max(15, 8, 23) =", max_of_three(15, 8, 23)
+
+PRINT
+
+REM FUNC - lambda tarzı fonksiyon
+FUNC multiply(a, b)
+    RETURN a * b
+END FUNC
+
+FUNC is_even(num)
+    IF num MOD 2 = 0 THEN
+        RETURN True
+    ELSE
+        RETURN False
+    END IF
+END FUNC
+
+PRINT "3. FUNC Fonksiyonları:"
+PRINT "6 * 7 =", multiply(6, 7)
+PRINT "8 çift mi?", is_even(8)
+PRINT "9 çift mi?", is_even(9)
+
+PRINT
+
+REM DEF SUB - alt program
+DEF SUB greet(name, age)
+    PRINT "Merhaba " + name + "!"
+    PRINT "Yaşınız: " + STR$(age)
+    PRINT "Hoş geldiniz!"
+END SUB
+
+DEF SUB print_pattern(rows)
+    FOR i = 1 TO rows
+        FOR j = 1 TO i
+            PRINT "*";
+        NEXT j
+        PRINT
+    NEXT i
+END SUB
+
+PRINT "4. DEF SUB Alt Programları:"
+greet("Ali", 25)
+PRINT
+PRINT "Yıldız deseni (5 satır):"
+print_pattern(5)
+
+PRINT
+PRINT "Fonksiyon testleri tamamlandı!"
