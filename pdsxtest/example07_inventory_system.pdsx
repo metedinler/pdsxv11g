@@ -1,0 +1,805 @@
+REM Örnek 7: Envanter ve Stok Yönetim Sistemi
+REM Bu program işletmeler için kapsamlı envanter takibi yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║   ENVANTER VE STOK YÖNETİM SİSTEMİ   ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global veri yapıları
+DIM products AS ARRAY
+DIM transactions AS ARRAY
+DIM suppliers AS ARRAY
+DIM categories AS ARRAY
+DIM low_stock_alerts AS ARRAY
+
+REM Sistem başlatma
+products = []
+transactions = []
+suppliers = []
+categories = ["Elektronik", "Giyim", "Gıda", "Ev Eşyası", "Kozmetik", "Kitap", "Spor", "Oyuncak"]
+low_stock_alerts = []
+
+REM Örnek veriler ekleme
+call initialize_sample_data()
+
+DEF SUB initialize_sample_data()
+    REM Örnek tedarikçiler
+    suppliers = [
+        {"name": "ABC Tedarik", "contact": "0212-111-1111", "email": "info@abctedarik.com"},
+        {"name": "XYZ Dağıtım", "contact": "0216-222-2222", "email": "satis@xyzdagitim.com"},
+        {"name": "Mega Toptan", "contact": "0312-333-3333", "email": "siparis@megatoptan.com"}
+    ]
+    
+    REM Örnek ürünler
+    products = [
+        {"id": 1001, "name": "Laptop Dell", "category": "Elektronik", "stock": 25, "min_stock": 10, 
+         "price": 8500.00, "supplier": "ABC Tedarik", "description": "15.6 inç laptop"},
+        {"id": 1002, "name": "Bluetooth Kulaklık", "category": "Elektronik", "stock": 50, "min_stock": 15,
+         "price": 299.90, "supplier": "XYZ Dağıtım", "description": "Kablosuz kulaklık"},
+        {"id": 1003, "name": "T-Shirt Pamuk", "category": "Giyim", "stock": 100, "min_stock": 25,
+         "price": 45.00, "supplier": "Mega Toptan", "description": "100% pamuk t-shirt"},
+        {"id": 1004, "name": "Kahve Makinesi", "category": "Ev Eşyası", "stock": 8, "min_stock": 5,
+         "price": 1250.00, "supplier": "ABC Tedarik", "description": "Otomatik kahve makinesi"},
+        {"id": 1005, "name": "Protein Tozu", "category": "Spor", "stock": 3, "min_stock": 10,
+         "price": 180.00, "supplier": "XYZ Dağıtım", "description": "Whey protein 1kg"}
+    ]
+    
+    REM Örnek işlemler
+    transactions = [
+        {"type": "giriş", "product_id": 1001, "quantity": 30, "date": "2024-01-15", "price": 8000.00, "note": "İlk stok"},
+        {"type": "çıkış", "product_id": 1001, "quantity": 5, "date": "2024-01-20", "price": 8500.00, "note": "Satış"},
+        {"type": "giriş", "product_id": 1002, "quantity": 100, "date": "2024-01-10", "price": 250.00, "note": "Yeni sipariş"}
+    ]
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Ürün Yönetimi"
+    PRINT "2. Stok Hareketleri"
+    PRINT "3. Raporlar ve Analizler"
+    PRINT "4. Tedarikçi Yönetimi"
+    PRINT "5. Düşük Stok Uyarıları"
+    PRINT "6. Envanter Değerleme"
+    PRINT "7. Kategori Yönetimi"
+    PRINT "8. Stok Devir Analizi"
+    PRINT "9. Tahmin ve Planlama"
+    PRINT "10. Sistem Ayarları"
+    PRINT "11. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB product_management()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ ÜRÜN YÖNETİMİ ═══"
+        PRINT "1. Ürün Listesi"
+        PRINT "2. Yeni Ürün Ekle"
+        PRINT "3. Ürün Güncelle"
+        PRINT "4. Ürün Sil"
+        PRINT "5. Ürün Ara"
+        PRINT "6. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call list_products()
+            CASE 2: call add_product()
+            CASE 3: call update_product()
+            CASE 4: call delete_product()
+            CASE 5: call search_products()
+            CASE 6: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB list_products()
+    PRINT
+    PRINT "ÜRÜN LİSTESİ:"
+    PRINT STRING$(100, "=")
+    PRINT "ID    | Ürün Adı           | Kategori    | Stok | Min  | Fiyat    | Tedarikçi"
+    PRINT STRING$(100, "-")
+    
+    FOR i = 0 TO LEN(products) - 1
+        DIM p AS OBJECT
+        p = products(i)
+        
+        PRINT RIGHT$("     " + STR$(p.id), 5) + " | " +
+              LEFT$(p.name + STRING$(18, " "), 18) + " | " +
+              LEFT$(p.category + STRING$(10, " "), 10) + " | " +
+              RIGHT$("    " + STR$(p.stock), 4) + " | " +
+              RIGHT$("   " + STR$(p.min_stock), 3) + " | " +
+              RIGHT$("       " + STR$(p.price), 8) + " | " +
+              p.supplier
+    NEXT i
+    
+    PRINT STRING$(100, "=")
+    PRINT "Toplam ürün sayısı: " + STR$(LEN(products))
+END SUB
+
+DEF SUB add_product()
+    PRINT
+    PRINT "YENİ ÜRÜN EKLEME:"
+    
+    DIM new_product AS OBJECT
+    DIM new_id AS INTEGER
+    
+    REM Yeni ID oluştur
+    new_id = 1000
+    FOR i = 0 TO LEN(products) - 1
+        IF products(i).id >= new_id THEN
+            new_id = products(i).id + 1
+        END IF
+    NEXT i
+    
+    new_product.id = new_id
+    PRINT "Yeni ürün ID: " + STR$(new_id)
+    
+    INPUT "Ürün adı: ", new_product.name
+    
+    PRINT "Kategoriler:"
+    FOR i = 0 TO LEN(categories) - 1
+        PRINT STR$(i + 1) + ". " + categories(i)
+    NEXT i
+    INPUT "Kategori numarası: ", cat_num
+    IF cat_num >= 1 AND cat_num <= LEN(categories) THEN
+        new_product.category = categories(cat_num - 1)
+    ELSE
+        INPUT "Özel kategori adı: ", new_product.category
+    END IF
+    
+    INPUT "Başlangıç stok miktarı: ", new_product.stock
+    INPUT "Minimum stok miktarı: ", new_product.min_stock
+    INPUT "Birim fiyat: ", new_product.price
+    
+    PRINT "Tedarikçiler:"
+    FOR i = 0 TO LEN(suppliers) - 1
+        PRINT STR$(i + 1) + ". " + suppliers(i).name
+    NEXT i
+    INPUT "Tedarikçi numarası (veya 0 için yeni): ", sup_num
+    
+    IF sup_num >= 1 AND sup_num <= LEN(suppliers) THEN
+        new_product.supplier = suppliers(sup_num - 1).name
+    ELSE
+        INPUT "Tedarikçi adı: ", new_product.supplier
+    END IF
+    
+    INPUT "Ürün açıklaması: ", new_product.description
+    
+    INSERT(products, new_product)
+    
+    REM Stok giriş kaydı oluştur
+    IF new_product.stock > 0 THEN
+        DIM trans AS OBJECT
+        trans.type = "giriş"
+        trans.product_id = new_product.id
+        trans.quantity = new_product.stock
+        trans.date = FORMAT$(NOW(), "yyyy-mm-dd")
+        trans.price = new_product.price
+        trans.note = "İlk stok girişi"
+        INSERT(transactions, trans)
+    END IF
+    
+    PRINT
+    PRINT "Ürün başarıyla eklendi! ID: " + STR$(new_product.id)
+END SUB
+
+DEF SUB update_product()
+    INPUT "Güncellenecek ürün ID: ", product_id
+    
+    DIM product_index AS INTEGER
+    product_index = -1
+    
+    FOR i = 0 TO LEN(products) - 1
+        IF products(i).id = product_id THEN
+            product_index = i
+            EXIT FOR
+        END IF
+    NEXT i
+    
+    IF product_index = -1 THEN
+        PRINT "Ürün bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    DIM p AS OBJECT
+    p = products(product_index)
+    
+    PRINT
+    PRINT "Mevcut ürün bilgileri:"
+    PRINT "Ad: " + p.name
+    PRINT "Kategori: " + p.category
+    PRINT "Stok: " + STR$(p.stock)
+    PRINT "Min stok: " + STR$(p.min_stock)
+    PRINT "Fiyat: " + STR$(p.price)
+    PRINT "Tedarikçi: " + p.supplier
+    
+    PRINT
+    PRINT "Yeni değerler girin (değiştirmek istemiyorsanız Enter basın):"
+    
+    INPUT "Yeni ad: ", new_name
+    IF new_name <> "" THEN p.name = new_name
+    
+    INPUT "Yeni kategori: ", new_category
+    IF new_category <> "" THEN p.category = new_category
+    
+    INPUT "Yeni minimum stok: ", new_min
+    IF new_min > 0 THEN p.min_stock = new_min
+    
+    INPUT "Yeni fiyat: ", new_price
+    IF new_price > 0 THEN p.price = new_price
+    
+    INPUT "Yeni tedarikçi: ", new_supplier
+    IF new_supplier <> "" THEN p.supplier = new_supplier
+    
+    INPUT "Yeni açıklama: ", new_desc
+    IF new_desc <> "" THEN p.description = new_desc
+    
+    products(product_index) = p
+    PRINT "Ürün güncellendi!"
+END SUB
+
+DEF SUB delete_product()
+    INPUT "Silinecek ürün ID: ", product_id
+    
+    DIM product_index AS INTEGER
+    product_index = -1
+    
+    FOR i = 0 TO LEN(products) - 1
+        IF products(i).id = product_id THEN
+            product_index = i
+            EXIT FOR
+        END IF
+    NEXT i
+    
+    IF product_index = -1 THEN
+        PRINT "Ürün bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    PRINT "Ürün: " + products(product_index).name
+    INPUT "Bu ürünü silmek istediğinizden emin misiniz? (E/H): ", confirm
+    
+    IF UPPER$(confirm) = "E" THEN
+        DELETE(products, product_index)
+        PRINT "Ürün silindi!"
+    ELSE
+        PRINT "Silme işlemi iptal edildi."
+    END IF
+END SUB
+
+DEF SUB search_products()
+    PRINT
+    PRINT "ÜRÜN ARAMA:"
+    PRINT "1. İsme göre ara"
+    PRINT "2. Kategoriye göre ara"
+    PRINT "3. Tedarikçiye göre ara"
+    PRINT "4. Düşük stoklu ürünler"
+    
+    INPUT "Seçiminiz: ", search_type
+    
+    DIM results AS ARRAY
+    results = []
+    
+    SELECT CASE search_type
+        CASE 1
+            INPUT "Aranacak ürün adı: ", search_term
+            FOR i = 0 TO LEN(products) - 1
+                IF INSTR(UPPER$(products(i).name), UPPER$(search_term)) > 0 THEN
+                    INSERT(results, products(i))
+                END IF
+            NEXT i
+            
+        CASE 2
+            INPUT "Aranacak kategori: ", search_term
+            FOR i = 0 TO LEN(products) - 1
+                IF INSTR(UPPER$(products(i).category), UPPER$(search_term)) > 0 THEN
+                    INSERT(results, products(i))
+                END IF
+            NEXT i
+            
+        CASE 3
+            INPUT "Aranacak tedarikçi: ", search_term
+            FOR i = 0 TO LEN(products) - 1
+                IF INSTR(UPPER$(products(i).supplier), UPPER$(search_term)) > 0 THEN
+                    INSERT(results, products(i))
+                END IF
+            NEXT i
+            
+        CASE 4
+            FOR i = 0 TO LEN(products) - 1
+                IF products(i).stock <= products(i).min_stock THEN
+                    INSERT(results, products(i))
+                END IF
+            NEXT i
+    END SELECT
+    
+    IF LEN(results) = 0 THEN
+        PRINT "Arama kriterine uygun ürün bulunamadı."
+    ELSE
+        PRINT
+        PRINT "ARAMA SONUÇLARI:"
+        PRINT STRING$(80, "-")
+        FOR i = 0 TO LEN(results) - 1
+            DIM r AS OBJECT
+            r = results(i)
+            PRINT "ID: " + STR$(r.id) + " | " + r.name + " | Stok: " + STR$(r.stock)
+        NEXT i
+        PRINT STRING$(80, "-")
+        PRINT "Bulunan ürün sayısı: " + STR$(LEN(results))
+    END IF
+END SUB
+
+DEF SUB stock_movements()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ STOK HAREKETLERİ ═══"
+        PRINT "1. Stok Giriş"
+        PRINT "2. Stok Çıkış"
+        PRINT "3. Stok Transfer"
+        PRINT "4. Hareket Geçmişi"
+        PRINT "5. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call stock_in()
+            CASE 2: call stock_out()
+            CASE 3: call stock_transfer()
+            CASE 4: call movement_history()
+            CASE 5: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB stock_in()
+    PRINT
+    PRINT "STOK GİRİŞ:"
+    
+    INPUT "Ürün ID: ", product_id
+    
+    DIM product_index AS INTEGER
+    product_index = find_product_by_id(product_id)
+    
+    IF product_index = -1 THEN
+        PRINT "Ürün bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    DIM p AS OBJECT
+    p = products(product_index)
+    
+    PRINT "Ürün: " + p.name + " (Mevcut stok: " + STR$(p.stock) + ")"
+    
+    INPUT "Giriş miktarı: ", quantity
+    INPUT "Birim maliyet: ", cost
+    INPUT "Not (isteğe bağlı): ", note
+    
+    IF quantity <= 0 THEN
+        PRINT "Geçersiz miktar!"
+        EXIT SUB
+    END IF
+    
+    p.stock = p.stock + quantity
+    products(product_index) = p
+    
+    REM Hareket kaydı oluştur
+    DIM trans AS OBJECT
+    trans.type = "giriş"
+    trans.product_id = product_id
+    trans.quantity = quantity
+    trans.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    trans.price = cost
+    trans.note = note
+    INSERT(transactions, trans)
+    
+    PRINT "Stok girişi tamamlandı. Yeni stok: " + STR$(p.stock)
+END SUB
+
+DEF SUB stock_out()
+    PRINT
+    PRINT "STOK ÇIKIŞ:"
+    
+    INPUT "Ürün ID: ", product_id
+    
+    DIM product_index AS INTEGER
+    product_index = find_product_by_id(product_id)
+    
+    IF product_index = -1 THEN
+        PRINT "Ürün bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    DIM p AS OBJECT
+    p = products(product_index)
+    
+    PRINT "Ürün: " + p.name + " (Mevcut stok: " + STR$(p.stock) + ")"
+    
+    INPUT "Çıkış miktarı: ", quantity
+    INPUT "Satış fiyatı: ", price
+    INPUT "Not (isteğe bağlı): ", note
+    
+    IF quantity <= 0 THEN
+        PRINT "Geçersiz miktar!"
+        EXIT SUB
+    END IF
+    
+    IF quantity > p.stock THEN
+        PRINT "Yetersiz stok! Mevcut: " + STR$(p.stock)
+        INPUT "Yine de devam etmek istiyor musunuz? (E/H): ", confirm
+        IF UPPER$(confirm) <> "E" THEN
+            EXIT SUB
+        END IF
+    END IF
+    
+    p.stock = p.stock - quantity
+    products(product_index) = p
+    
+    REM Hareket kaydı oluştur
+    DIM trans AS OBJECT
+    trans.type = "çıkış"
+    trans.product_id = product_id
+    trans.quantity = quantity
+    trans.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    trans.price = price
+    trans.note = note
+    INSERT(transactions, trans)
+    
+    PRINT "Stok çıkışı tamamlandı. Kalan stok: " + STR$(p.stock)
+    
+    REM Düşük stok kontrolü
+    IF p.stock <= p.min_stock THEN
+        PRINT "⚠️  UYARI: Düşük stok seviyesi!"
+        call add_low_stock_alert(product_id)
+    END IF
+END SUB
+
+DEF FUNCTION find_product_by_id(id AS INTEGER) AS INTEGER
+    FOR i = 0 TO LEN(products) - 1
+        IF products(i).id = id THEN
+            RETURN i
+        END IF
+    NEXT i
+    RETURN -1
+END FUNCTION
+
+DEF SUB add_low_stock_alert(product_id AS INTEGER)
+    REM Zaten uyarı var mı kontrol et
+    FOR i = 0 TO LEN(low_stock_alerts) - 1
+        IF low_stock_alerts(i) = product_id THEN
+            EXIT SUB  ' Zaten var
+        END IF
+    NEXT i
+    
+    INSERT(low_stock_alerts, product_id)
+END SUB
+
+DEF SUB movement_history()
+    PRINT
+    PRINT "HAREKETLERİ FİLTRELE:"
+    PRINT "1. Tüm hareketler"
+    PRINT "2. Belirli ürün"
+    PRINT "3. Belirli tarih aralığı"
+    PRINT "4. Hareket tipine göre"
+    
+    INPUT "Seçiminiz: ", filter_type
+    
+    DIM filtered_transactions AS ARRAY
+    filtered_transactions = []
+    
+    SELECT CASE filter_type
+        CASE 1
+            filtered_transactions = transactions
+            
+        CASE 2
+            INPUT "Ürün ID: ", filter_product_id
+            FOR i = 0 TO LEN(transactions) - 1
+                IF transactions(i).product_id = filter_product_id THEN
+                    INSERT(filtered_transactions, transactions(i))
+                END IF
+            NEXT i
+            
+        CASE 3
+            INPUT "Başlangıç tarihi (yyyy-mm-dd): ", start_date
+            INPUT "Bitiş tarihi (yyyy-mm-dd): ", end_date
+            FOR i = 0 TO LEN(transactions) - 1
+                IF transactions(i).date >= start_date AND transactions(i).date <= end_date THEN
+                    INSERT(filtered_transactions, transactions(i))
+                END IF
+            NEXT i
+            
+        CASE 4
+            INPUT "Hareket tipi (giriş/çıkış): ", move_type
+            FOR i = 0 TO LEN(transactions) - 1
+                IF transactions(i).type = move_type THEN
+                    INSERT(filtered_transactions, transactions(i))
+                END IF
+            NEXT i
+    END SELECT
+    
+    IF LEN(filtered_transactions) = 0 THEN
+        PRINT "Gösterilecek hareket bulunamadı."
+        EXIT SUB
+    END IF
+    
+    PRINT
+    PRINT "HAREKET GEÇMİŞİ:"
+    PRINT STRING$(90, "=")
+    PRINT "Tarih      | Tip   | Ürün ID | Ürün Adı        | Miktar | Fiyat   | Not"
+    PRINT STRING$(90, "-")
+    
+    FOR i = 0 TO LEN(filtered_transactions) - 1
+        DIM t AS OBJECT
+        t = filtered_transactions(i)
+        
+        DIM product_name AS STRING
+        DIM p_idx AS INTEGER
+        p_idx = find_product_by_id(t.product_id)
+        
+        IF p_idx >= 0 THEN
+            product_name = products(p_idx).name
+        ELSE
+            product_name = "Silinmiş Ürün"
+        END IF
+        
+        PRINT t.date + " | " +
+              LEFT$(t.type + "     ", 5) + " | " +
+              RIGHT$("      " + STR$(t.product_id), 7) + " | " +
+              LEFT$(product_name + STRING$(15, " "), 15) + " | " +
+              RIGHT$("     " + STR$(t.quantity), 6) + " | " +
+              RIGHT$("      " + STR$(t.price), 7) + " | " +
+              t.note
+    NEXT i
+    
+    PRINT STRING$(90, "=")
+    PRINT "Toplam hareket sayısı: " + STR$(LEN(filtered_transactions))
+END SUB
+
+DEF SUB reports_and_analysis()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ RAPORLAR VE ANALİZLER ═══"
+        PRINT "1. Stok Durum Raporu"
+        PRINT "2. Değer Raporu"
+        PRINT "3. Kategori Analizi"
+        PRINT "4. Tedarikçi Analizi"
+        PRINT "5. Satış Analizi"
+        PRINT "6. Karlılık Analizi"
+        PRINT "7. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call stock_status_report()
+            CASE 2: call value_report()
+            CASE 3: call category_analysis()
+            CASE 4: call supplier_analysis()
+            CASE 5: call sales_analysis()
+            CASE 6: call profitability_analysis()
+            CASE 7: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB stock_status_report()
+    PRINT
+    PRINT "STOK DURUM RAPORU:"
+    PRINT STRING$(80, "=")
+    
+    DIM total_products AS INTEGER
+    DIM low_stock_count AS INTEGER
+    DIM out_of_stock_count AS INTEGER
+    DIM overstocked_count AS INTEGER
+    
+    total_products = LEN(products)
+    low_stock_count = 0
+    out_of_stock_count = 0
+    overstocked_count = 0
+    
+    FOR i = 0 TO LEN(products) - 1
+        DIM p AS OBJECT
+        p = products(i)
+        
+        IF p.stock = 0 THEN
+            out_of_stock_count = out_of_stock_count + 1
+        ELSEIF p.stock <= p.min_stock THEN
+            low_stock_count = low_stock_count + 1
+        ELSEIF p.stock > (p.min_stock * 3) THEN  ' Fazla stok kriteri
+            overstocked_count = overstocked_count + 1
+        END IF
+    NEXT i
+    
+    PRINT "Toplam ürün sayısı: " + STR$(total_products)
+    PRINT "Stokta tükenen: " + STR$(out_of_stock_count)
+    PRINT "Düşük stoklu: " + STR$(low_stock_count)
+    PRINT "Fazla stoklu: " + STR$(overstocked_count)
+    PRINT "Normal stoklu: " + STR$(total_products - out_of_stock_count - low_stock_count - overstocked_count)
+    
+    PRINT
+    PRINT "DÜŞÜK STOKLU ÜRÜNLER:"
+    PRINT STRING$(60, "-")
+    FOR i = 0 TO LEN(products) - 1
+        DIM p AS OBJECT
+        p = products(i)
+        IF p.stock <= p.min_stock THEN
+            PRINT STR$(p.id) + " | " + p.name + " | Stok: " + STR$(p.stock) + " | Min: " + STR$(p.min_stock)
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB value_report()
+    PRINT
+    PRINT "DEĞER RAPORU:"
+    PRINT STRING$(70, "=")
+    
+    DIM total_value AS DOUBLE
+    DIM total_quantity AS INTEGER
+    
+    total_value = 0
+    total_quantity = 0
+    
+    FOR i = 0 TO LEN(products) - 1
+        DIM p AS OBJECT
+        p = products(i)
+        
+        DIM product_value AS DOUBLE
+        product_value = p.stock * p.price
+        total_value = total_value + product_value
+        total_quantity = total_quantity + p.stock
+        
+        PRINT LEFT$(p.name + STRING$(20, " "), 20) + " | " +
+              RIGHT$("     " + STR$(p.stock), 6) + " | " +
+              RIGHT$("        " + STR$(p.price), 9) + " | " +
+              RIGHT$("          " + STR$(ROUND(product_value, 2)), 11)
+    NEXT i
+    
+    PRINT STRING$(70, "=")
+    PRINT "TOPLAM DEĞERLENDİRME:"
+    PRINT "Toplam ürün adedi: " + STR$(total_quantity)
+    PRINT "Toplam stok değeri: " + STR$(ROUND(total_value, 2)) + " ₺"
+    PRINT "Ortalama ürün değeri: " + STR$(ROUND(total_value / LEN(products), 2)) + " ₺"
+END SUB
+
+DEF SUB low_stock_alerts()
+    PRINT
+    PRINT "═══ DÜŞÜK STOK UYARILARI ═══"
+    
+    REM Düşük stok listesini güncelle
+    low_stock_alerts = []
+    FOR i = 0 TO LEN(products) - 1
+        IF products(i).stock <= products(i).min_stock THEN
+            INSERT(low_stock_alerts, products(i).id)
+        END IF
+    NEXT i
+    
+    IF LEN(low_stock_alerts) = 0 THEN
+        PRINT "✅ Düşük stoklu ürün bulunmuyor!"
+    ELSE
+        PRINT "⚠️  " + STR$(LEN(low_stock_alerts)) + " ürün düşük stok seviyesinde!"
+        PRINT STRING$(80, "-")
+        
+        FOR i = 0 TO LEN(low_stock_alerts) - 1
+            DIM product_id AS INTEGER
+            product_id = low_stock_alerts(i)
+            
+            DIM p_idx AS INTEGER
+            p_idx = find_product_by_id(product_id)
+            
+            IF p_idx >= 0 THEN
+                DIM p AS OBJECT
+                p = products(p_idx)
+                
+                DIM urgency AS STRING
+                IF p.stock = 0 THEN
+                    urgency = "🔴 TÜKENDİ"
+                ELSEIF p.stock < (p.min_stock / 2) THEN
+                    urgency = "🟠 ACİL"
+                ELSE
+                    urgency = "🟡 DÜŞÜK"
+                END IF
+                
+                PRINT urgency + " | " + STR$(p.id) + " | " + p.name
+                PRINT "    Mevcut: " + STR$(p.stock) + " | Minimum: " + STR$(p.min_stock)
+                PRINT "    Tedarikçi: " + p.supplier
+                PRINT
+            END IF
+        NEXT i
+        
+        INPUT "Bu ürünler için sipariş oluşturmak istiyor musunuz? (E/H): ", create_order
+        IF UPPER$(create_order) = "E" THEN
+            call create_purchase_order()
+        END IF
+    END IF
+END SUB
+
+DEF SUB create_purchase_order()
+    PRINT
+    PRINT "SİPARİŞ OLUŞTUR:"
+    PRINT STRING$(50, "-")
+    
+    FOR i = 0 TO LEN(low_stock_alerts) - 1
+        DIM product_id AS INTEGER
+        product_id = low_stock_alerts(i)
+        
+        DIM p_idx AS INTEGER
+        p_idx = find_product_by_id(product_id)
+        
+        IF p_idx >= 0 THEN
+            DIM p AS OBJECT
+            p = products(p_idx)
+            
+            PRINT "Ürün: " + p.name + " (Mevcut: " + STR$(p.stock) + ")"
+            DIM suggested_quantity AS INTEGER
+            suggested_quantity = p.min_stock * 2 - p.stock
+            
+            INPUT "Sipariş miktarı [Önerilen: " + STR$(suggested_quantity) + "]: ", order_qty
+            
+            IF order_qty = 0 THEN order_qty = suggested_quantity
+            
+            IF order_qty > 0 THEN
+                PRINT "✅ " + p.name + " - " + STR$(order_qty) + " adet sipariş listesine eklendi"
+                PRINT "   Tedarikçi: " + p.supplier
+            END IF
+            PRINT
+        END IF
+    NEXT i
+    
+    PRINT "Sipariş listesi oluşturuldu. Tedarikçilerle iletişime geçin."
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-11): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            product_management()
+        CASE 2
+            stock_movements()
+        CASE 3
+            reports_and_analysis()
+        CASE 4
+            PRINT "Tedarikçi yönetimi modülü geliştirme aşamasında..."
+        CASE 5
+            low_stock_alerts()
+        CASE 6
+            value_report()
+        CASE 7
+            PRINT "Kategori yönetimi modülü geliştirme aşamasında..."
+        CASE 8
+            PRINT "Stok devir analizi modülü geliştirme aşamasında..."
+        CASE 9
+            PRINT "Tahmin ve planlama modülü geliştirme aşamasında..."
+        CASE 10
+            PRINT "Sistem ayarları modülü geliştirme aşamasında..."
+        CASE 11
+            running = False
+            PRINT "Envanter sistemi kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Envanter yönetim sistemi kapatıldı."
