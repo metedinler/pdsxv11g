@@ -1,0 +1,14 @@
+DIM DOUBLE_IT AS INTEGER
+DIM TRIPLE AS INTEGER
+REM Cok basit fonksiyon testi
+DEF FUNCTION double_it(x)
+RETURN x * 2
+END FUNCTION
+
+DIM result AS INTEGER
+result = double_it(10)
+PRINT "double_it(10) =", result
+
+DIM result2 AS INTEGER
+result2 = triple(5)
+PRINT "triple(5) =", result2
