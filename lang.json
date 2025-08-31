@@ -1,0 +1,14 @@
+{
+  "en": {
+    "welcome": "Welcome to the interpreter!",
+    "goodbye": "Goodbye!",
+    "error": "An error occurred.",
+    "help": "Type HELP for a list of commands."
+  },
+  "tr": {
+    "welcome": "Yorumlayıcıya hoş geldiniz!",
+    "goodbye": "Güle güle!",
+    "error": "Bir hata oluştu.",
+    "help": "Komutlar için HELP yazın."
+  }
+}
