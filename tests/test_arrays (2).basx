@@ -1,0 +1,8 @@
+REM Test diziler - pdsXv11 syntax
+DIM ARR(5)
+LET ARR(1) = 10
+LET ARR(2) = 20
+LET ARR(3) = 30
+PRINT "Dizi[1] = ", ARR(1)
+PRINT "Dizi[2] = ", ARR(2)
+PRINT "Dizi[3] = ", ARR(3)
