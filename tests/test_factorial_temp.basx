@@ -1,0 +1,19 @@
+DIM FACTORIAL AS INTEGER
+REM Factorial - temporary variable kullanarak
+DEF FUNCTION factorial(n)
+DIM result AS INTEGER
+DIM temp AS INTEGER
+IF n <= 1 THEN result = 1
+IF n > 1 THEN temp = n - 1
+IF n > 1 THEN temp = factorial(temp)
+IF n > 1 THEN result = n * temp
+RETURN result
+END FUNCTION
+
+DIM f5 AS INTEGER
+f5 = factorial(5)
+PRINT "factorial(5) =", f5
+
+DIM f3 AS INTEGER
+f3 = factorial(3)
+PRINT "factorial(3) =", f3
