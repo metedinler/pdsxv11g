@@ -1,0 +1,602 @@
+REM Oyun 3: 2048
+REM Sayıları birleştirerek 2048'e ulaşma oyunu
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║               2048                   ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global değişkenler
+DIM board AS ARRAY
+DIM score AS INTEGER
+DIM best_score AS INTEGER
+DIM moves_count AS INTEGER
+DIM game_won AS BOOLEAN
+DIM game_over AS BOOLEAN
+
+REM Oyunu başlat
+call initialize_2048()
+
+DEF SUB initialize_2048()
+    REM 4x4 tahta oluştur
+    board = []
+    FOR i = 0 TO 3
+        DIM row AS ARRAY
+        row = []
+        FOR j = 0 TO 3
+            INSERT(row, 0)
+        NEXT j
+        INSERT(board, row)
+    NEXT i
+    
+    score = 0
+    best_score = 2048  ' Varsayılan en yüksek skor
+    moves_count = 0
+    game_won = False
+    game_over = False
+    
+    REM İlk iki sayıyı ekle
+    call add_random_tile()
+    call add_random_tile()
+    
+    PRINT "2048 oyunu başlatıldı!"
+    PRINT "Hedef: Karoları birleştirerek 2048'e ulaşın!"
+END SUB
+
+DEF SUB add_random_tile()
+    REM Boş hücreleri bul
+    DIM empty_cells AS ARRAY
+    empty_cells = []
+    
+    FOR i = 0 TO 3
+        FOR j = 0 TO 3
+            IF board(i)(j) = 0 THEN
+                INSERT(empty_cells, [i, j])
+            END IF
+        NEXT j
+    NEXT i
+    
+    REM Boş hücre yoksa çık
+    IF LEN(empty_cells) = 0 THEN
+        EXIT SUB
+    END IF
+    
+    REM Rastgele boş hücre seç
+    DIM random_index AS INTEGER
+    random_index = RND(0, LEN(empty_cells) - 1)
+    
+    DIM cell AS ARRAY
+    cell = empty_cells(random_index)
+    
+    REM %90 ihtimalle 2, %10 ihtimalle 4 ekle
+    DIM value AS INTEGER
+    IF RND(1, 10) <= 9 THEN
+        value = 2
+    ELSE
+        value = 4
+    END IF
+    
+    board(cell(0))(cell(1)) = value
+END SUB
+
+DEF SUB show_board()
+    PRINT
+    PRINT "Skor: " + STR$(score) + "  |  En İyi: " + STR$(best_score) + "  |  Hamle: " + STR$(moves_count)
+    PRINT
+    PRINT "┌────────────────────────┐"
+    
+    FOR i = 0 TO 3
+        PRINT "│"
+        FOR j = 0 TO 3
+            IF board(i)(j) = 0 THEN
+                PRINT "     "
+            ELSE
+                DIM num_str AS STRING
+                num_str = STR$(board(i)(j))
+                DIM padding AS INTEGER
+                padding = (5 - LEN(num_str)) / 2
+                PRINT STRING$(padding, " ") + num_str + STRING$(5 - LEN(num_str) - padding, " ")
+            END IF
+            
+            IF j < 3 THEN PRINT "│"
+        NEXT j
+        PRINT "│"
+        
+        IF i < 3 THEN
+            PRINT "├────────────────────────┤"
+        END IF
+    NEXT i
+    
+    PRINT "└────────────────────────┘"
+    PRINT
+END SUB
+
+DEF SUB show_controls()
+    PRINT "KONTROLLER:"
+    PRINT "🔼 W/Yukarı - Yukarı hareket"
+    PRINT "🔽 S/Aşağı - Aşağı hareket"  
+    PRINT "◀️ A/Sol - Sol hareket"
+    PRINT "▶️ D/Sağ - Sağ hareket"
+    PRINT "Q - Çıkış"
+    PRINT "R - Yeni oyun"
+    PRINT "H - Yardım"
+    PRINT
+END SUB
+
+DEF SUB play_2048()
+    WHILE NOT game_over
+        show_board()
+        
+        IF game_won AND NOT has_move() THEN
+            PRINT "🏆 TEBRİKLER! 2048'e ulaştınız ve oyunu kazandınız!"
+            PRINT "Devam etmek için herhangi bir tuşa basın veya Q ile çıkın."
+        END IF
+        
+        IF NOT has_move() AND NOT game_won THEN
+            PRINT "💀 GAME OVER! Daha fazla hamle yapılamıyor."
+            game_over = True
+            EXIT SUB
+        END IF
+        
+        show_controls()
+        
+        REM Yeni klavye girişi sistemi kullan
+        PRINT "Hareket için tuşlara basın (WASD veya Ok tuşları)..."
+        DIM move AS STRING
+        move = GETKEY("W,A,S,D,Q,R,H,<YUKARIOK>,<ASAGIOK>,<SOLOK>,<SAGOK>,<ESC>")
+        
+        REM move değerini büyük harfe çevir
+        IF move = "<YUKARIOK>" THEN
+            move = "W"
+        ELSEIF move = "<ASAGIOK>" THEN
+            move = "S"
+        ELSEIF move = "<SOLOK>" THEN
+            move = "A"
+        ELSEIF move = "<SAGOK>" THEN
+            move = "D"
+        ELSEIF move = "<ESC>" THEN
+            move = "Q"
+        ELSE
+            move = UPPER$(move)
+        END IF
+        
+        SELECT CASE move
+            CASE "W", "YUKARI", "UP"
+                IF move_up() THEN
+                    call add_random_tile()
+                    moves_count = moves_count + 1
+                END IF
+                
+            CASE "S", "AŞAĞI", "DOWN"
+                IF move_down() THEN
+                    call add_random_tile()
+                    moves_count = moves_count + 1
+                END IF
+                
+            CASE "A", "SOL", "LEFT"
+                IF move_left() THEN
+                    call add_random_tile()
+                    moves_count = moves_count + 1
+                END IF
+                
+            CASE "D", "SAĞ", "RIGHT"
+                IF move_right() THEN
+                    call add_random_tile()
+                    moves_count = moves_count + 1
+                END IF
+                
+            CASE "Q", "ÇIK", "EXIT"
+                PRINT "Oyun sonlandırılıyor..."
+                game_over = True
+                
+            CASE "R", "YENİ", "NEW"
+                INPUT "Yeni oyun başlatılsın mı? (E/H): ", confirm
+                IF UPPER$(confirm) = "E" THEN
+                    call initialize_2048()
+                END IF
+                
+            CASE "H", "YARDIM", "HELP"
+                call show_help()
+                
+            CASE ELSE
+                PRINT "❌ Geçersiz hareket! W/A/S/D tuşlarını kullanın."
+        END SELECT
+        
+        REM Kazanma kontrolü
+        IF NOT game_won AND has_2048() THEN
+            game_won = True
+            IF score > best_score THEN
+                best_score = score
+            END IF
+            show_board()
+            PRINT "🎉 KAZANDINIZ! 2048 karesi oluşturdunuz!"
+            PRINT "Devam etmek için herhangi bir hamle yapabilirsiniz."
+        END IF
+        
+        PRINT
+    WEND
+END SUB
+
+DEF FUNCTION move_left() AS BOOLEAN
+    DIM moved AS BOOLEAN
+    moved = False
+    
+    FOR i = 0 TO 3
+        DIM row AS ARRAY
+        row = []
+        
+        REM Sıfır olmayan değerleri al
+        FOR j = 0 TO 3
+            IF board(i)(j) <> 0 THEN
+                INSERT(row, board(i)(j))
+            END IF
+        NEXT j
+        
+        REM Birleştirme yap
+        DIM merged_row AS ARRAY
+        merged_row = []
+        DIM j AS INTEGER
+        j = 0
+        
+        WHILE j < LEN(row)
+            IF j < LEN(row) - 1 AND row(j) = row(j + 1) THEN
+                REM İki aynı sayıyı birleştir
+                DIM merged_value AS INTEGER
+                merged_value = row(j) * 2
+                INSERT(merged_row, merged_value)
+                score = score + merged_value
+                j = j + 2  ' İki değeri atlasın
+            ELSE
+                INSERT(merged_row, row(j))
+                j = j + 1
+            END IF
+        WEND
+        
+        REM Satırı 4 elemana tamamla (sağdan sıfırlarla)
+        WHILE LEN(merged_row) < 4
+            INSERT(merged_row, 0)
+        WEND
+        
+        REM Değişiklik olup olmadığını kontrol et
+        FOR j = 0 TO 3
+            IF board(i)(j) <> merged_row(j) THEN
+                moved = True
+            END IF
+            board(i)(j) = merged_row(j)
+        NEXT j
+    NEXT i
+    
+    RETURN moved
+END FUNCTION
+
+DEF FUNCTION move_right() AS BOOLEAN
+    DIM moved AS BOOLEAN
+    moved = False
+    
+    FOR i = 0 TO 3
+        DIM row AS ARRAY
+        row = []
+        
+        REM Sıfır olmayan değerleri ters sırada al
+        FOR j = 3 TO 0 STEP -1
+            IF board(i)(j) <> 0 THEN
+                INSERT(row, board(i)(j))
+            END IF
+        NEXT j
+        
+        REM Birleştirme yap
+        DIM merged_row AS ARRAY
+        merged_row = []
+        DIM j AS INTEGER
+        j = 0
+        
+        WHILE j < LEN(row)
+            IF j < LEN(row) - 1 AND row(j) = row(j + 1) THEN
+                DIM merged_value AS INTEGER
+                merged_value = row(j) * 2
+                INSERT(merged_row, merged_value)
+                score = score + merged_value
+                j = j + 2
+            ELSE
+                INSERT(merged_row, row(j))
+                j = j + 1
+            END IF
+        WEND
+        
+        REM Satırı 4 elemana tamamla
+        WHILE LEN(merged_row) < 4
+            INSERT(merged_row, 0)
+        WEND
+        
+        REM Ters sırada geri yerleştir
+        FOR j = 0 TO 3
+            DIM new_value AS INTEGER
+            new_value = merged_row(3 - j)
+            IF board(i)(j) <> new_value THEN
+                moved = True
+            END IF
+            board(i)(j) = new_value
+        NEXT j
+    NEXT i
+    
+    RETURN moved
+END FUNCTION
+
+DEF FUNCTION move_up() AS BOOLEAN
+    DIM moved AS BOOLEAN
+    moved = False
+    
+    FOR j = 0 TO 3
+        DIM col AS ARRAY
+        col = []
+        
+        REM Sütundaki sıfır olmayan değerleri al
+        FOR i = 0 TO 3
+            IF board(i)(j) <> 0 THEN
+                INSERT(col, board(i)(j))
+            END IF
+        NEXT i
+        
+        REM Birleştirme yap
+        DIM merged_col AS ARRAY
+        merged_col = []
+        DIM i AS INTEGER
+        i = 0
+        
+        WHILE i < LEN(col)
+            IF i < LEN(col) - 1 AND col(i) = col(i + 1) THEN
+                DIM merged_value AS INTEGER
+                merged_value = col(i) * 2
+                INSERT(merged_col, merged_value)
+                score = score + merged_value
+                i = i + 2
+            ELSE
+                INSERT(merged_col, col(i))
+                i = i + 1
+            END IF
+        WEND
+        
+        REM Sütunu 4 elemana tamamla
+        WHILE LEN(merged_col) < 4
+            INSERT(merged_col, 0)
+        WEND
+        
+        REM Değişiklikleri uygula
+        FOR i = 0 TO 3
+            IF board(i)(j) <> merged_col(i) THEN
+                moved = True
+            END IF
+            board(i)(j) = merged_col(i)
+        NEXT i
+    NEXT j
+    
+    RETURN moved
+END FUNCTION
+
+DEF FUNCTION move_down() AS BOOLEAN
+    DIM moved AS BOOLEAN
+    moved = False
+    
+    FOR j = 0 TO 3
+        DIM col AS ARRAY
+        col = []
+        
+        REM Sütundaki sıfır olmayan değerleri ters sırada al
+        FOR i = 3 TO 0 STEP -1
+            IF board(i)(j) <> 0 THEN
+                INSERT(col, board(i)(j))
+            END IF
+        NEXT i
+        
+        REM Birleştirme yap
+        DIM merged_col AS ARRAY
+        merged_col = []
+        DIM i AS INTEGER
+        i = 0
+        
+        WHILE i < LEN(col)
+            IF i < LEN(col) - 1 AND col(i) = col(i + 1) THEN
+                DIM merged_value AS INTEGER
+                merged_value = col(i) * 2
+                INSERT(merged_col, merged_value)
+                score = score + merged_value
+                i = i + 2
+            ELSE
+                INSERT(merged_col, col(i))
+                i = i + 1
+            END IF
+        WEND
+        
+        REM Sütunu 4 elemana tamamla
+        WHILE LEN(merged_col) < 4
+            INSERT(merged_col, 0)
+        WEND
+        
+        REM Ters sırada geri yerleştir
+        FOR i = 0 TO 3
+            DIM new_value AS INTEGER
+            new_value = merged_col(3 - i)
+            IF board(i)(j) <> new_value THEN
+                moved = True
+            END IF
+            board(i)(j) = new_value
+        NEXT i
+    NEXT j
+    
+    RETURN moved
+END FUNCTION
+
+DEF FUNCTION has_move() AS BOOLEAN
+    REM Boş hücre var mı?
+    FOR i = 0 TO 3
+        FOR j = 0 TO 3
+            IF board(i)(j) = 0 THEN
+                RETURN True
+            END IF
+        NEXT j
+    NEXT i
+    
+    REM Birleştirilebilir komşu var mı?
+    FOR i = 0 TO 3
+        FOR j = 0 TO 3
+            DIM current AS INTEGER
+            current = board(i)(j)
+            
+            REM Sağdaki komşu
+            IF j < 3 AND board(i)(j + 1) = current THEN
+                RETURN True
+            END IF
+            
+            REM Altındaki komşu
+            IF i < 3 AND board(i + 1)(j) = current THEN
+                RETURN True
+            END IF
+        NEXT j
+    NEXT i
+    
+    RETURN False
+END FUNCTION
+
+DEF FUNCTION has_2048() AS BOOLEAN
+    FOR i = 0 TO 3
+        FOR j = 0 TO 3
+            IF board(i)(j) = 2048 THEN
+                RETURN True
+            END IF
+        NEXT j
+    NEXT i
+    RETURN False
+END FUNCTION
+
+DEF SUB show_help()
+    PRINT
+    PRINT "═══════════════ 2048 OYUN KURALLARI ═══════════════"
+    PRINT "🎯 HEDEF:"
+    PRINT "   Karoları hareket ettirip birleştirerek 2048'e ulaşın!"
+    PRINT
+    PRINT "🎮 NASIL OYNANIR:"
+    PRINT "   • W/A/S/D tuşlarıyla karoları hareket ettirin"
+    PRINT "   • Aynı sayılı karolar çarpıştığında birleşir"
+    PRINT "   • Her hamlede yeni bir karo (2 veya 4) eklenir"
+    PRINT "   • Tahta dolduğunda ve hamle kalmadığında oyun biter"
+    PRINT
+    PRINT "🏆 PUANLAMA:"
+    PRINT "   • Her birleştirmede birleşen sayı kadar puan alırsınız"
+    PRINT "   • Daha büyük sayıları birleştirin = Daha yüksek puan"
+    PRINT
+    PRINT "💡 STRATEJİ İPUÇLARI:"
+    PRINT "   • En büyük karolarınızı bir köşede toplayın"
+    PRINT "   • Bir yöne fazla odaklanmayın, dengeli oyun oynayın"
+    PRINT "   • İleriye dönük planlama yapın"
+    PRINT "   • Acele etmeyin, her hamleyi düşünün"
+    PRINT
+    PRINT "📊 BAŞARI SEVİYELERİ:"
+    PRINT "   128  - Başlangıç ✨"
+    PRINT "   256  - İyi 👍" 
+    PRINT "   512  - Harika 🔥"
+    PRINT "   1024 - Mükemmel 💎"
+    PRINT "   2048 - Efsane! 🏆"
+    PRINT "═══════════════════════════════════════════════════"
+    PRINT
+END SUB
+
+DEF SUB show_final_stats()
+    PRINT
+    PRINT "═══ FİNAL İSTATİSTİKLERİ ═══"
+    PRINT "Final Skor: " + STR$(score)
+    PRINT "En İyi Skor: " + STR$(best_score)
+    PRINT "Toplam Hamle: " + STR$(moves_count)
+    
+    REM En yüksek karoyu bul
+    DIM max_tile AS INTEGER
+    max_tile = 0
+    FOR i = 0 TO 3
+        FOR j = 0 TO 3
+            IF board(i)(j) > max_tile THEN
+                max_tile = board(i)(j)
+            END IF
+        NEXT j
+    NEXT i
+    
+    PRINT "En Yüksek Karo: " + STR$(max_tile)
+    
+    IF game_won THEN
+        PRINT "Durum: 🏆 KAZANDINIZ!"
+    ELSE
+        PRINT "Durum: 💀 Game Over"
+    END IF
+    
+    IF moves_count > 0 THEN
+        DIM avg_score AS DOUBLE
+        avg_score = score / moves_count
+        PRINT "Hamle Başına Ortalama Puan: " + STR$(ROUND(avg_score, 1))
+    END IF
+    
+    PRINT
+    PRINT "BAŞARI DEĞERLENDİRMESİ:"
+    SELECT CASE max_tile
+        CASE 128 TO 255
+            PRINT "⭐ İyi başlangıç!"
+        CASE 256 TO 511
+            PRINT "⭐⭐ Güzel performans!"
+        CASE 512 TO 1023
+            PRINT "⭐⭐⭐ Harika oyun!"
+        CASE 1024 TO 2047
+            PRINT "⭐⭐⭐⭐ Mükemmel sonuç!"
+        CASE 2048
+            PRINT "⭐⭐⭐⭐⭐ EFSANEVİ!"
+        CASE ELSE
+            PRINT "🏁 İyi deneme, tekrar deneyin!"
+    END SELECT
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "═══════════════ 2048 OYUNU ═══════════════"
+    PRINT "1. Yeni Oyun Başlat"
+    PRINT "2. Oyun Kurallarını Göster"
+    PRINT "3. En İyi Skorlar"
+    PRINT "4. Çıkış"
+    PRINT "═══════════════════════════════════════════"
+END SUB
+
+REM Ana oyun döngüsü
+DIM main_running AS BOOLEAN
+main_running = True
+
+WHILE main_running
+    show_main_menu()
+    
+    DIM menu_choice AS INTEGER
+    INPUT "Seçiminiz: ", menu_choice
+    
+    SELECT CASE menu_choice
+        CASE 1
+            call initialize_2048()
+            call play_2048()
+            call show_final_stats()
+            
+        CASE 2
+            call show_help()
+            
+        CASE 3
+            PRINT
+            PRINT "═══ EN İYİ SKORLAR ═══"
+            PRINT "En yüksek skor: " + STR$(best_score)
+            PRINT "Bu seansın skoru: " + STR$(score)
+            PRINT
+            
+        CASE 4
+            main_running = False
+            PRINT "2048 oyunu kapatılıyor... Güle güle!"
+            
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF main_running THEN
+        PRINT
+        INPUT "Ana menüye dönmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
