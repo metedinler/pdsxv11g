@@ -1,0 +1,88 @@
+' Test tüm eksik özellikleri
+
+' Test 1: DIM AS ARRAY - Çok boyutlu diziler
+DIM multi_array(2, 3) AS ARRAY
+multi_array(0, 0) = "test"
+multi_array(1, 2) = 42
+PRINT "Multi-dimensional array test:"
+PRINT multi_array(0, 0), multi_array(1, 2)
+
+' Test 2: String dizileri - DIM arr(10) AS STRING
+DIM str_arr(5) AS STRING
+str_arr(0) = "Hello"
+str_arr(1) = "World" 
+str_arr(2) = "Test"
+PRINT "String array test:"
+PRINT str_arr(0) + " " + str_arr(1) + " " + str_arr(2)
+
+' Test 3: Matrix operasyonları - TRANSPOSE, INV, DIAG
+DIM matrix AS ARRAY
+matrix = [[1, 2], [3, 4]]
+PRINT "Matrix operations test:"
+PRINT "Original matrix:", matrix
+' PRINT "Transposed:", TRANSPOSE(matrix)
+' PRINT "Diagonal:", DIAG(matrix)
+
+' Test 4: ENUM tipi
+ENUM Colors
+Red = 1
+Green = 2
+Blue = 3
+END ENUM
+
+DIM my_color AS Colors
+my_color = Colors.Red
+PRINT "Enum test:"
+PRINT "My color:", my_color
+
+' Test 5: DATAFRAME tipi (already tested)
+DATAFRAME df_test
+"name": ["Ali", "Veli"]
+"score": [85, 92]
+END DATAFRAME
+PRINT "DataFrame test:"
+PRINT df_test
+
+' Test 6: STRUCT/UNION nested yapı
+STRUCT Person
+name AS STRING
+age AS INTEGER
+address AS Address
+END STRUCT
+
+STRUCT Address
+street AS STRING
+city AS STRING
+END STRUCT
+
+DIM person1 AS Person
+person1.name = "Ahmet"
+person1.age = 30
+person1.address.street = "Main St"
+person1.address.city = "Istanbul"
+PRINT "Nested struct test:"
+PRINT person1.name, person1.age, person1.address.city
+
+' Test 7: FUNC ... END FUNC lambda syntax
+FUNC add(a, b)
+RETURN a + b
+END FUNC
+
+FUNC multiply(x, y)
+RETURN x * y
+END FUNC
+
+PRINT "Lambda function test:"
+PRINT "add(5, 3) =", add(5, 3)
+PRINT "multiply(4, 6) =", multiply(4, 6)
+
+' Test 8: FOR EACH IN (already tested)
+DIM test_list AS LIST
+test_list = ["apple", "banana", "cherry"]
+
+PRINT "FOR EACH test:"
+FOR EACH fruit IN test_list
+    PRINT "Fruit:", fruit
+NEXT
+
+END
