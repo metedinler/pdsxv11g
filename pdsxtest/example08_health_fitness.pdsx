@@ -1,0 +1,726 @@
+REM Örnek 8: Sağlık Takip ve Fitness Sistemi
+REM Bu program kişisel sağlık verileri, egzersiz takibi ve beslenme planlaması yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║   SAĞLIK TAKİP VE FİTNESS SİSTEMİ   ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global veri yapıları
+DIM user_profile AS OBJECT
+DIM daily_logs AS ARRAY
+DIM exercises AS ARRAY
+DIM foods AS ARRAY
+DIM goals AS OBJECT
+DIM measurements AS ARRAY
+
+REM Sistem başlatma
+call initialize_health_system()
+
+DEF SUB initialize_health_system()
+    REM Kullanıcı profili başlangıç değerleri
+    user_profile.name = ""
+    user_profile.age = 0
+    user_profile.gender = ""
+    user_profile.height = 0
+    user_profile.weight = 0
+    user_profile.activity_level = ""
+    user_profile.goal_type = ""
+    
+    REM Günlük kayıtlar
+    daily_logs = []
+    
+    REM Egzersiz veritabanı
+    exercises = [
+        {"name": "Yürüyüş", "category": "kardiyovasküler", "calorie_per_min": 5.0, "difficulty": "kolay"},
+        {"name": "Koşu", "category": "kardiyovasküler", "calorie_per_min": 12.0, "difficulty": "orta"},
+        {"name": "Bisiklet", "category": "kardiyovasküler", "calorie_per_min": 8.0, "difficulty": "orta"},
+        {"name": "Şınav", "category": "güç", "calorie_per_min": 8.0, "difficulty": "orta"},
+        {"name": "Mekik", "category": "güç", "calorie_per_min": 6.0, "difficulty": "kolay"},
+        {"name": "Plank", "category": "core", "calorie_per_min": 4.0, "difficulty": "orta"},
+        {"name": "Squat", "category": "güç", "calorie_per_min": 7.0, "difficulty": "orta"},
+        {"name": "Yoga", "category": "esneklik", "calorie_per_min": 3.0, "difficulty": "kolay"},
+        {"name": "Pilates", "category": "core", "calorie_per_min": 4.5, "difficulty": "orta"},
+        {"name": "Yüzme", "category": "kardiyovasküler", "calorie_per_min": 11.0, "difficulty": "zor"}
+    ]
+    
+    REM Besin veritabanı (100 gram başına)
+    foods = [
+        {"name": "Tavuk Göğsü", "calorie": 165, "protein": 31, "carb": 0, "fat": 3.6},
+        {"name": "Pirinç", "calorie": 130, "protein": 2.7, "carb": 28, "fat": 0.3},
+        {"name": "Brokoli", "calorie": 34, "protein": 2.8, "carb": 7, "fat": 0.4},
+        {"name": "Yumurta", "calorie": 155, "protein": 13, "carb": 1.1, "fat": 11},
+        {"name": "Avokado", "calorie": 160, "protein": 2, "carb": 9, "fat": 15},
+        {"name": "Somon", "calorie": 208, "protein": 20, "carb": 0, "fat": 13},
+        {"name": "Elma", "calorie": 52, "protein": 0.3, "carb": 14, "fat": 0.2},
+        {"name": "Muz", "calorie": 89, "protein": 1.1, "carb": 23, "fat": 0.3},
+        {"name": "Fıstık", "calorie": 567, "protein": 26, "carb": 16, "fat": 49},
+        {"name": "Yoğurt", "calorie": 59, "protein": 10, "carb": 3.6, "fat": 0.4}
+    ]
+    
+    REM Hedefler
+    goals.daily_calorie = 0
+    goals.daily_protein = 0
+    goals.daily_exercise_min = 0
+    goals.weekly_exercise_days = 0
+    goals.target_weight = 0
+    goals.target_date = ""
+    
+    REM Ölçümler
+    measurements = []
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Profil Yönetimi"
+    PRINT "2. Günlük Takip"
+    PRINT "3. Egzersiz Planı"
+    PRINT "4. Beslenme Planı"
+    PRINT "5. İlerleme Raporu"
+    PRINT "6. Hedef Belirleme"
+    PRINT "7. Sağlık Hesaplamaları"
+    PRINT "8. İstatistikler"
+    PRINT "9. Motivasyon ve İpuçları"
+    PRINT "10. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB profile_management()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ PROFİL YÖNETİMİ ═══"
+        PRINT "1. Profil Oluştur/Güncelle"
+        PRINT "2. Profil Görüntüle"
+        PRINT "3. Temel Metabolizma Hesapla"
+        PRINT "4. İdeal Kilo Hesapla"
+        PRINT "5. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call create_update_profile()
+            CASE 2: call display_profile()
+            CASE 3: call calculate_bmr()
+            CASE 4: call calculate_ideal_weight()
+            CASE 5: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB create_update_profile()
+    PRINT
+    PRINT "PROFİL BİLGİLERİ:"
+    
+    INPUT "Adınız: ", user_profile.name
+    INPUT "Yaşınız: ", user_profile.age
+    
+    PRINT "Cinsiyet: 1-Erkek, 2-Kadın"
+    INPUT "Seçiminiz: ", gender_choice
+    IF gender_choice = 1 THEN
+        user_profile.gender = "Erkek"
+    ELSE
+        user_profile.gender = "Kadın"
+    END IF
+    
+    INPUT "Boyunuz (cm): ", user_profile.height
+    INPUT "Kilonuz (kg): ", user_profile.weight
+    
+    PRINT "Aktivite seviyeniz:"
+    PRINT "1. Sedanter (masabaşı işi)"
+    PRINT "2. Hafif aktif (haftalık 1-3 gün egzersiz)"
+    PRINT "3. Orta aktif (haftalık 3-5 gün egzersiz)"
+    PRINT "4. Çok aktif (haftalık 6-7 gün egzersiz)"
+    PRINT "5. Süper aktif (günde 2 kez egzersiz veya ağır fiziksel iş)"
+    
+    INPUT "Seçiminiz: ", activity_choice
+    SELECT CASE activity_choice
+        CASE 1: user_profile.activity_level = "sedanter"
+        CASE 2: user_profile.activity_level = "hafif_aktif"
+        CASE 3: user_profile.activity_level = "orta_aktif"
+        CASE 4: user_profile.activity_level = "çok_aktif"
+        CASE 5: user_profile.activity_level = "süper_aktif"
+    END SELECT
+    
+    PRINT "Hedefiniz:"
+    PRINT "1. Kilo vermek"
+    PRINT "2. Kilo almak"
+    PRINT "3. Kilo korumak"
+    PRINT "4. Kas yapmak"
+    
+    INPUT "Seçiminiz: ", goal_choice
+    SELECT CASE goal_choice
+        CASE 1: user_profile.goal_type = "kilo_verme"
+        CASE 2: user_profile.goal_type = "kilo_alma"
+        CASE 3: user_profile.goal_type = "kilo_koruma"
+        CASE 4: user_profile.goal_type = "kas_yapma"
+    END SELECT
+    
+    PRINT
+    PRINT "Profil başarıyla oluşturuldu/güncellendi!"
+    call auto_calculate_goals()
+END SUB
+
+DEF SUB auto_calculate_goals()
+    REM Temel metabolizma hızı hesapla (Harris-Benedict)
+    DIM bmr AS DOUBLE
+    IF user_profile.gender = "Erkek" THEN
+        bmr = 88.362 + (13.397 * user_profile.weight) + (4.799 * user_profile.height) - (5.677 * user_profile.age)
+    ELSE
+        bmr = 447.593 + (9.247 * user_profile.weight) + (3.098 * user_profile.height) - (4.330 * user_profile.age)
+    END IF
+    
+    REM Aktivite faktörü uygula
+    DIM activity_factor AS DOUBLE
+    SELECT CASE user_profile.activity_level
+        CASE "sedanter": activity_factor = 1.2
+        CASE "hafif_aktif": activity_factor = 1.375
+        CASE "orta_aktif": activity_factor = 1.55
+        CASE "çok_aktif": activity_factor = 1.725
+        CASE "süper_aktif": activity_factor = 1.9
+    END SELECT
+    
+    DIM daily_calorie_need AS DOUBLE
+    daily_calorie_need = bmr * activity_factor
+    
+    REM Hedef türüne göre kalori hedefi belirle
+    SELECT CASE user_profile.goal_type
+        CASE "kilo_verme"
+            goals.daily_calorie = daily_calorie_need - 500  ' 0.5 kg/hafta kilo kaybı için
+        CASE "kilo_alma"
+            goals.daily_calorie = daily_calorie_need + 500  ' 0.5 kg/hafta kilo alımı için
+        CASE "kilo_koruma", "kas_yapma"
+            goals.daily_calorie = daily_calorie_need
+    END SELECT
+    
+    REM Protein hedefi (kg başına)
+    SELECT CASE user_profile.goal_type
+        CASE "kas_yapma": goals.daily_protein = user_profile.weight * 2.0
+        CASE ELSE: goals.daily_protein = user_profile.weight * 1.6
+    END SELECT
+    
+    REM Egzersiz hedefleri
+    goals.daily_exercise_min = 30
+    goals.weekly_exercise_days = 4
+    
+    PRINT "Otomatik hedefler hesaplandı:"
+    PRINT "Günlük kalori hedefi: " + STR$(ROUND(goals.daily_calorie, 0)) + " kalori"
+    PRINT "Günlük protein hedefi: " + STR$(ROUND(goals.daily_protein, 0)) + " gram"
+END SUB
+
+DEF SUB display_profile()
+    IF user_profile.name = "" THEN
+        PRINT "Henüz profil oluşturulmamış!"
+        EXIT SUB
+    END IF
+    
+    PRINT
+    PRINT "═══ KULLANICI PROFİLİ ═══"
+    PRINT "Ad: " + user_profile.name
+    PRINT "Yaş: " + STR$(user_profile.age) + " yıl"
+    PRINT "Cinsiyet: " + user_profile.gender
+    PRINT "Boy: " + STR$(user_profile.height) + " cm"
+    PRINT "Kilo: " + STR$(user_profile.weight) + " kg"
+    PRINT "Aktivite seviyesi: " + user_profile.activity_level
+    PRINT "Hedef: " + user_profile.goal_type
+    
+    REM VKİ hesapla
+    DIM bmi AS DOUBLE
+    bmi = user_profile.weight / ((user_profile.height / 100) ^ 2)
+    PRINT "VKİ (Vücut Kitle İndeksi): " + STR$(ROUND(bmi, 2))
+    
+    DIM bmi_category AS STRING
+    IF bmi < 18.5 THEN
+        bmi_category = "Zayıf"
+    ELSEIF bmi < 25 THEN
+        bmi_category = "Normal"
+    ELSEIF bmi < 30 THEN
+        bmi_category = "Fazla kilolu"
+    ELSE
+        bmi_category = "Obez"
+    END IF
+    PRINT "VKİ kategorisi: " + bmi_category
+END SUB
+
+DEF SUB daily_tracking()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ GÜNLÜK TAKİP ═══"
+        PRINT "1. Besin Kaydet"
+        PRINT "2. Egzersiz Kaydet"
+        PRINT "3. Su Tüketimi Kaydet"
+        PRINT "4. Kilo Ölçümü Kaydet"
+        PRINT "5. Bugünkü Özet"
+        PRINT "6. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call log_food()
+            CASE 2: call log_exercise()
+            CASE 3: call log_water()
+            CASE 4: call log_weight()
+            CASE 5: call daily_summary()
+            CASE 6: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB log_food()
+    PRINT
+    PRINT "BESİN KAYDET:"
+    
+    PRINT "Mevcut besinler:"
+    FOR i = 0 TO LEN(foods) - 1
+        PRINT STR$(i + 1) + ". " + foods(i).name + " (" + STR$(foods(i).calorie) + " kal/100g)"
+    NEXT i
+    
+    INPUT "Besin numarası (0 = kendi besini ekle): ", food_choice
+    
+    DIM selected_food AS OBJECT
+    IF food_choice = 0 THEN
+        INPUT "Besin adı: ", selected_food.name
+        INPUT "Kalori (100g başına): ", selected_food.calorie
+        INPUT "Protein (g): ", selected_food.protein
+        INPUT "Karbonhidrat (g): ", selected_food.carb
+        INPUT "Yağ (g): ", selected_food.fat
+    ELSE
+        IF food_choice >= 1 AND food_choice <= LEN(foods) THEN
+            selected_food = foods(food_choice - 1)
+        ELSE
+            PRINT "Geçersiz seçim!"
+            EXIT SUB
+        END IF
+    END IF
+    
+    INPUT "Miktar (gram): ", amount
+    
+    REM Günlük kayıt oluştur
+    DIM food_log AS OBJECT
+    food_log.type = "besin"
+    food_log.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    food_log.time = FORMAT$(NOW(), "hh:nn")
+    food_log.food_name = selected_food.name
+    food_log.amount = amount
+    food_log.calories = (selected_food.calorie * amount) / 100
+    food_log.protein = (selected_food.protein * amount) / 100
+    food_log.carb = (selected_food.carb * amount) / 100
+    food_log.fat = (selected_food.fat * amount) / 100
+    
+    INSERT(daily_logs, food_log)
+    
+    PRINT "Besin kaydedildi: " + STR$(ROUND(food_log.calories, 0)) + " kalori"
+END SUB
+
+DEF SUB log_exercise()
+    PRINT
+    PRINT "EGZERSİZ KAYDET:"
+    
+    PRINT "Mevcut egzersizler:"
+    FOR i = 0 TO LEN(exercises) - 1
+        PRINT STR$(i + 1) + ". " + exercises(i).name + " (" + exercises(i).category + 
+              ", " + STR$(exercises(i).calorie_per_min) + " kal/dk)"
+    NEXT i
+    
+    INPUT "Egzersiz numarası (0 = kendi egzersizi ekle): ", exercise_choice
+    
+    DIM selected_exercise AS OBJECT
+    IF exercise_choice = 0 THEN
+        INPUT "Egzersiz adı: ", selected_exercise.name
+        INPUT "Kategori: ", selected_exercise.category
+        INPUT "Dakika başı kalori yakımı: ", selected_exercise.calorie_per_min
+        selected_exercise.difficulty = "orta"
+    ELSE
+        IF exercise_choice >= 1 AND exercise_choice <= LEN(exercises) THEN
+            selected_exercise = exercises(exercise_choice - 1)
+        ELSE
+            PRINT "Geçersiz seçim!"
+            EXIT SUB
+        END IF
+    END IF
+    
+    INPUT "Süre (dakika): ", duration
+    
+    REM Egzersiz kaydı oluştur
+    DIM exercise_log AS OBJECT
+    exercise_log.type = "egzersiz"
+    exercise_log.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    exercise_log.time = FORMAT$(NOW(), "hh:nn")
+    exercise_log.exercise_name = selected_exercise.name
+    exercise_log.duration = duration
+    exercise_log.calories_burned = selected_exercise.calorie_per_min * duration
+    exercise_log.category = selected_exercise.category
+    
+    INSERT(daily_logs, exercise_log)
+    
+    PRINT "Egzersiz kaydedildi: " + STR$(ROUND(exercise_log.calories_burned, 0)) + " kalori yakıldı"
+END SUB
+
+DEF SUB log_water()
+    PRINT
+    PRINT "SU TÜKETİMİ KAYDET:"
+    INPUT "Su miktarı (ml): ", water_amount
+    
+    DIM water_log AS OBJECT
+    water_log.type = "su"
+    water_log.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    water_log.time = FORMAT$(NOW(), "hh:nn")
+    water_log.amount = water_amount
+    
+    INSERT(daily_logs, water_log)
+    
+    PRINT STR$(water_amount) + " ml su tüketimi kaydedildi"
+END SUB
+
+DEF SUB log_weight()
+    INPUT "Kilo (kg): ", weight_measurement
+    INPUT "Not (isteğe bağlı): ", note
+    
+    DIM weight_log AS OBJECT
+    weight_log.type = "kilo"
+    weight_log.date = FORMAT$(NOW(), "yyyy-mm-dd")
+    weight_log.weight = weight_measurement
+    weight_log.note = note
+    
+    INSERT(measurements, weight_log)
+    
+    PRINT "Kilo ölçümü kaydedildi: " + STR$(weight_measurement) + " kg"
+    
+    REM Profildeki kiloyu güncelle
+    user_profile.weight = weight_measurement
+END SUB
+
+DEF SUB daily_summary()
+    DIM today AS STRING
+    today = FORMAT$(NOW(), "yyyy-mm-dd")
+    
+    PRINT
+    PRINT "═══ BUGÜNKÜ ÖZET (" + today + ") ═══"
+    
+    REM Bugünkü kayıtları filtrele
+    DIM total_calories AS DOUBLE
+    DIM total_protein AS DOUBLE
+    DIM total_exercise_time AS INTEGER
+    DIM total_calories_burned AS DOUBLE
+    DIM total_water AS INTEGER
+    
+    total_calories = 0
+    total_protein = 0
+    total_exercise_time = 0
+    total_calories_burned = 0
+    total_water = 0
+    
+    FOR i = 0 TO LEN(daily_logs) - 1
+        DIM log AS OBJECT
+        log = daily_logs(i)
+        
+        IF log.date = today THEN
+            SELECT CASE log.type
+                CASE "besin"
+                    total_calories = total_calories + log.calories
+                    total_protein = total_protein + log.protein
+                CASE "egzersiz"
+                    total_exercise_time = total_exercise_time + log.duration
+                    total_calories_burned = total_calories_burned + log.calories_burned
+                CASE "su"
+                    total_water = total_water + log.amount
+            END SELECT
+        END IF
+    NEXT i
+    
+    PRINT "BESLENME:"
+    PRINT "Alınan kalori: " + STR$(ROUND(total_calories, 0)) + " / " + STR$(ROUND(goals.daily_calorie, 0))
+    PRINT "Alınan protein: " + STR$(ROUND(total_protein, 1)) + "g / " + STR$(ROUND(goals.daily_protein, 0)) + "g"
+    
+    PRINT
+    PRINT "EGZERSİZ:"
+    PRINT "Egzersiz süresi: " + STR$(total_exercise_time) + " dakika"
+    PRINT "Yakılan kalori: " + STR$(ROUND(total_calories_burned, 0))
+    
+    PRINT
+    PRINT "SU TÜKETİMİ:"
+    PRINT "İçilen su: " + STR$(total_water) + " ml"
+    
+    REM Net kalori hesapla
+    DIM net_calories AS DOUBLE
+    net_calories = total_calories - total_calories_burned
+    
+    PRINT
+    PRINT "NET KALORİ:"
+    PRINT STR$(ROUND(net_calories, 0)) + " kalori"
+    
+    IF net_calories > goals.daily_calorie THEN
+        PRINT "⚠️  Kalori hedefinizi aştınız!"
+    ELSEIF net_calories < (goals.daily_calorie - 200) THEN
+        PRINT "⚠️  Çok az kalori aldınız!"
+    ELSE
+        PRINT "✅ Kalori hedefi uygun!"
+    END IF
+END SUB
+
+DEF SUB exercise_planning()
+    PRINT
+    PRINT "═══ EGZERSİZ PLANLAMA ═══"
+    PRINT "1. Hızlı Egzersiz Planı Oluştur"
+    PRINT "2. Kategori Bazlı Plan"
+    PRINT "3. Kalori Hedefli Plan"
+    PRINT "4. Kişiselleştirilmiş Plan"
+    
+    INPUT "Seçiminiz: ", plan_type
+    
+    SELECT CASE plan_type
+        CASE 1: call quick_exercise_plan()
+        CASE 2: call category_exercise_plan()
+        CASE 3: call calorie_target_plan()
+        CASE 4: call personalized_plan()
+    END SELECT
+END SUB
+
+DEF SUB quick_exercise_plan()
+    INPUT "Kaç dakika egzersiz yapabilirsiniz? ", available_time
+    
+    PRINT
+    PRINT "ÖNERİLEN EGZERSİZ PLANI (" + STR$(available_time) + " dakika):"
+    
+    IF available_time >= 30 THEN
+        PRINT "• 10 dakika ısınma (yürüyüş)"
+        PRINT "• 15 dakika kardiyovasküler (koşu veya bisiklet)"
+        PRINT "• 5 dakika güç antrenmanı (şınav, mekik)"
+        
+        IF available_time >= 45 THEN
+            PRINT "• 10 dakika ek güç antrenmanı"
+            PRINT "• 5 dakika soğuma (yoga)"
+        END IF
+    ELSEIF available_time >= 15 THEN
+        PRINT "• 5 dakika ısınma"
+        PRINT "• 8 dakika yoğun egzersiz (interval)"
+        PRINT "• 2 dakika soğuma"
+    ELSE
+        PRINT "• Hızlı 7 dakika workout:"
+        PRINT "  - 30 saniye şınav"
+        PRINT "  - 30 saniye mekik"
+        PRINT "  - 30 saniye squat"
+        PRINT "  - 30 saniye plank"
+        PRINT "  (Döngüyü tekrarla)"
+    END IF
+END SUB
+
+DEF SUB health_calculations()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ SAĞLIK HESAPLAMALARI ═══"
+        PRINT "1. VKİ Hesaplama"
+        PRINT "2. Temel Metabolizma Hızı"
+        PRINT "3. İdeal Kilo Aralığı"
+        PRINT "4. Günlük Su İhtiyacı"
+        PRINT "5. Kalori İhtiyacı"
+        PRINT "6. Vücut Yağ Oranı"
+        PRINT "7. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call calculate_bmi()
+            CASE 2: call calculate_bmr()
+            CASE 3: call calculate_ideal_weight()
+            CASE 4: call calculate_water_need()
+            CASE 5: call calculate_calorie_need()
+            CASE 6: call calculate_body_fat()
+            CASE 7: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB calculate_bmi()
+    INPUT "Boy (cm): ", height
+    INPUT "Kilo (kg): ", weight
+    
+    DIM bmi AS DOUBLE
+    bmi = weight / ((height / 100) ^ 2)
+    
+    PRINT
+    PRINT "VKİ SONUCU:"
+    PRINT "VKİ: " + STR$(ROUND(bmi, 2))
+    
+    DIM category AS STRING
+    DIM advice AS STRING
+    
+    IF bmi < 18.5 THEN
+        category = "Zayıf"
+        advice = "Sağlıklı kilo almaya odaklanın"
+    ELSEIF bmi < 25 THEN
+        category = "Normal"
+        advice = "Harika! Kilonuzu koruyun"
+    ELSEIF bmi < 30 THEN
+        category = "Fazla kilolu"
+        advice = "Sağlıklı beslenme ve egzersizle kilo verin"
+    ELSE
+        category = "Obez"
+        advice = "Mutlaka bir uzmana danışın"
+    END IF
+    
+    PRINT "Kategori: " + category
+    PRINT "Tavsiye: " + advice
+END SUB
+
+DEF SUB progress_reports()
+    PRINT
+    PRINT "═══ İLERLEME RAPORU ═══"
+    
+    IF LEN(measurements) = 0 THEN
+        PRINT "Henüz kilo ölçümü yapılmamış!"
+        EXIT SUB
+    END IF
+    
+    PRINT "KİLO İLERLEME GRAFİĞİ:"
+    PRINT STRING$(50, "=")
+    
+    REM Son 10 ölçümü göster
+    DIM start_idx AS INTEGER
+    start_idx = MAX(0, LEN(measurements) - 10)
+    
+    FOR i = start_idx TO LEN(measurements) - 1
+        DIM m AS OBJECT
+        m = measurements(i)
+        
+        PRINT m.date + " | " + STR$(m.weight) + " kg"
+        
+        IF i > start_idx THEN
+            DIM change AS DOUBLE
+            change = m.weight - measurements(i-1).weight
+            
+            IF change > 0 THEN
+                PRINT "         ↗ +" + STR$(ROUND(change, 1)) + " kg"
+            ELSEIF change < 0 THEN
+                PRINT "         ↘ " + STR$(ROUND(change, 1)) + " kg"
+            ELSE
+                PRINT "         → Değişiklik yok"
+            END IF
+        END IF
+        PRINT
+    NEXT i
+    
+    REM İstatistikler
+    IF LEN(measurements) > 1 THEN
+        DIM first_weight AS DOUBLE
+        DIM last_weight AS DOUBLE
+        first_weight = measurements(0).weight
+        last_weight = measurements(LEN(measurements) - 1).weight
+        
+        PRINT "İSTATİSTİKLER:"
+        PRINT "Başlangıç kilosu: " + STR$(first_weight) + " kg"
+        PRINT "Mevcut kilo: " + STR$(last_weight) + " kg"
+        PRINT "Toplam değişim: " + STR$(ROUND(last_weight - first_weight, 1)) + " kg"
+        
+        DIM days_passed AS INTEGER
+        days_passed = DATEDIFF("d", measurements(0).date, measurements(LEN(measurements) - 1).date)
+        IF days_passed > 0 THEN
+            DIM weekly_change AS DOUBLE
+            weekly_change = ((last_weight - first_weight) / days_passed) * 7
+            PRINT "Haftalık ortalama değişim: " + STR$(ROUND(weekly_change, 2)) + " kg"
+        END IF
+    END IF
+END SUB
+
+DEF SUB motivation_tips()
+    PRINT
+    PRINT "═══ MOTİVASYON VE İPUÇLARI ═══"
+    
+    DIM tips AS ARRAY
+    tips = [
+        "💪 Her gün biraz daha güçlü oluyorsun!",
+        "🏃‍♂️ Yavaş ilerlemek hiç ilerlememeekten iyidir.",
+        "🥗 Sağlıklı beslenme bir yaşam tarzıdır, diet değil.",
+        "💧 Bol su iç! Vücut ağırlığının %60'ı sudur.",
+        "😴 Kaliteli uyku kas gelişimi için çok önemli.",
+        "📈 İlerleme kaydı tutmak motivasyonu artırır.",
+        "🎯 Küçük hedefler belirle ve başarmanın keyfini çıkar.",
+        "🤝 Arkadaşlarınla birlikte egzersiz daha eğlenceli.",
+        "🍎 Doğal besinleri tercih et, işlenmiş gıdalardan kaçın.",
+        "🧘‍♀️ Zihinsel sağlık fiziksel sağlık kadar önemli."
+    ]
+    
+    DIM random_tip AS INTEGER
+    random_tip = RND(0, LEN(tips) - 1)
+    
+    PRINT "GÜNÜN İPUCU:"
+    PRINT tips(random_tip)
+    
+    PRINT
+    PRINT "HAFTALIK CHALLENGE:"
+    
+    DIM challenges AS ARRAY
+    challenges = [
+        "Bu hafta her gün 8 bardak su içmeye odaklan",
+        "Her gün en az 30 dakika yürüyüş yap",
+        "Bu hafta şeker alımını minimize et",
+        "Her gün 5 dakika meditasyon yap",
+        "Merdiven kullanmayı tercih et",
+        "Her öğünde sebze tüketmeye dikkat et",
+        "Erken yatıp erken kalk rutini oluştur"
+    ]
+    
+    DIM random_challenge AS INTEGER
+    random_challenge = RND(0, LEN(challenges) - 1)
+    
+    PRINT challenges(random_challenge)
+    
+    PRINT
+    PRINT "BAŞARI HİKAYESİ:"
+    PRINT "Hatırla: Her büyük başarı küçük adımlarla başlar."
+    PRINT "Bugün attığın her adım, yarının daha sağlıklı haline giden yolda bir kilometre taşıdır."
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-10): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            profile_management()
+        CASE 2
+            daily_tracking()
+        CASE 3
+            exercise_planning()
+        CASE 4
+            PRINT "Beslenme planı modülü geliştirme aşamasında..."
+        CASE 5
+            progress_reports()
+        CASE 6
+            PRINT "Hedef belirleme modülü geliştirme aşamasında..."
+        CASE 7
+            health_calculations()
+        CASE 8
+            PRINT "İstatistik modülü geliştirme aşamasında..."
+        CASE 9
+            motivation_tips()
+        CASE 10
+            running = False
+            PRINT "Sağlık takip sistemi kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Sağlık ve fitness sistemi kapatıldı."
