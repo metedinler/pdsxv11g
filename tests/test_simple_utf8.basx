@@ -1,0 +1,19 @@
+DIM EXCELLENT AS INTEGER
+DIM GOOD AS INTEGER
+DIM OTHER AS INTEGER
+DIM msg AS STRING
+LET msg = "Hello World"
+PRINT msg
+
+' SELECT CASE testi
+DIM grade AS STRING
+LET grade = "A"
+
+SELECT CASE grade
+CASE "A"
+PRINT "Excellent"
+CASE "B"
+PRINT "Good"
+CASE ELSE
+PRINT "Other grade"
+END SELECT
