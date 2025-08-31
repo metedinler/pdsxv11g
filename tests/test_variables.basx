@@ -1,0 +1,10 @@
+REM Test degisken atamalari
+DIM A AS INTEGER
+A = 10
+DIM B AS INTEGER
+B = 20
+DIM C AS INTEGER
+C = A + B
+PRINT "A =", A
+PRINT "B =", B
+PRINT "C =", C
