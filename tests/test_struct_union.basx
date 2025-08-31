@@ -1,0 +1,45 @@
+' Test STRUCT/UNION nested field access
+STRUCT Address
+    street AS STRING
+    city AS STRING
+    zipcode AS STRING
+END STRUCT
+
+STRUCT Person
+    name AS STRING
+    age AS INTEGER
+    address AS Address
+END STRUCT
+
+UNION Contact
+    email AS STRING
+    phone AS STRING
+END UNION
+
+' DIM ile tipleri tanımla
+DIM person AS Person
+DIM contact AS Contact
+
+' Basic field access
+person.name = "John Doe"
+person.age = 30
+
+' Nested field access - Address objesini initialize et
+DIM temp_address AS Address
+temp_address.street = "123 Main St"
+temp_address.city = "Springfield"
+temp_address.zipcode = "12345"
+person.address = temp_address
+
+' Union field access
+contact.email = "john@example.com"
+
+' Print values
+PRINT "Name: "; person.name
+PRINT "Age: "; person.age
+PRINT "Street: "; person.address.street
+PRINT "City: "; person.address.city
+PRINT "Zipcode: "; person.address.zipcode
+PRINT "Email: "; contact.email
+
+END
