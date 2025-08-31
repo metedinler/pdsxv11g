@@ -1,0 +1,460 @@
+REM Oyun 4: Tic-Tac-Toe (XOX)
+REM Klasik 3x3 XOX oyunu - İnsan vs Bilgisayar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║             TIC-TAC-TOE              ║"
+PRINT "║            (XOX Oyunu)               ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global değişkenler
+DIM board AS ARRAY
+DIM player_turn AS STRING
+DIM computer_turn AS STRING
+DIM current_player AS STRING
+DIM game_mode AS STRING
+DIM human_wins AS INTEGER
+DIM computer_wins AS INTEGER
+DIM draws AS INTEGER
+DIM game_count AS INTEGER
+
+REM Oyunu başlat
+call show_welcome_screen()
+
+DEF SUB show_welcome_screen()
+    PRINT "TIC-TAC-TOE Oyununa Hoş Geldiniz!"
+    PRINT
+    PRINT "OYUN MODLARI:"
+    PRINT "1. İnsan vs Bilgisayar (Kolay)"
+    PRINT "2. İnsan vs Bilgisayar (Zor)"
+    PRINT "3. İki İnsan"
+    PRINT "4. Çıkış"
+    PRINT
+    
+    DIM mode_choice AS INTEGER
+    INPUT "Oyun modunu seçin (1-4): ", mode_choice
+    
+    SELECT CASE mode_choice
+        CASE 1
+            game_mode = "EASY"
+            player_turn = "X"
+            computer_turn = "O"
+            current_player = "X"
+            call start_game()
+            
+        CASE 2
+            game_mode = "HARD"
+            player_turn = "X"
+            computer_turn = "O"
+            current_player = "X"
+            call start_game()
+            
+        CASE 3
+            game_mode = "HUMAN"
+            player_turn = "X"
+            computer_turn = "O"
+            current_player = "X"
+            call start_game()
+            
+        CASE 4
+            PRINT "Oyundan çıkılıyor... İyi günler!"
+            END
+            
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+            call show_welcome_screen()
+    END SELECT
+END SUB
+
+DEF SUB start_game()
+    REM İstatistikleri sıfırla
+    human_wins = 0
+    computer_wins = 0
+    draws = 0
+    game_count = 0
+    
+    REM Ana oyun döngüsü
+    DIM playing AS BOOLEAN
+    playing = True
+    
+    WHILE playing
+        call initialize_board()
+        current_player = "X"  ' X her zaman başlar
+        
+        PRINT
+        PRINT "═══════════════ YENİ OYUN ═══════════════"
+        call show_game_info()
+        
+        DIM game_result AS STRING
+        game_result = play_single_game()
+        
+        REM Sonucu kaydet
+        SELECT CASE game_result
+            CASE "X_WIN"
+                IF game_mode = "HUMAN" THEN
+                    human_wins = human_wins + 1
+                    PRINT "🏆 Oyuncu 1 (X) kazandı!"
+                ELSE
+                    human_wins = human_wins + 1
+                    PRINT "🏆 Tebrikler! Sen kazandın!"
+                END IF
+                
+            CASE "O_WIN"
+                IF game_mode = "HUMAN" THEN
+                    computer_wins = computer_wins + 1
+                    PRINT "🏆 Oyuncu 2 (O) kazandı!"
+                ELSE
+                    computer_wins = computer_wins + 1
+                    PRINT "🤖 Bilgisayar kazandı!"
+                END IF
+                
+            CASE "DRAW"
+                draws = draws + 1
+                PRINT "🤝 Berabere!"
+        END SELECT
+        
+        game_count = game_count + 1
+        call show_statistics()
+        
+        PRINT
+        INPUT "Tekrar oynamak ister misiniz? (E/H): ", play_again
+        IF UPPER$(play_again) <> "E" THEN
+            playing = False
+        END IF
+    WEND
+    
+    call show_welcome_screen()
+END SUB
+
+DEF SUB initialize_board()
+    board = []
+    FOR i = 0 TO 2
+        DIM row AS ARRAY
+        row = []
+        FOR j = 0 TO 2
+            INSERT(row, " ")
+        NEXT j
+        INSERT(board, row)
+    NEXT i
+END SUB
+
+DEF SUB show_board()
+    PRINT
+    PRINT "   1   2   3"
+    PRINT "1  " + board(0)(0) + " | " + board(0)(1) + " | " + board(0)(2)
+    PRINT "  ---|---|---"
+    PRINT "2  " + board(1)(0) + " | " + board(1)(1) + " | " + board(1)(2)
+    PRINT "  ---|---|---"
+    PRINT "3  " + board(2)(0) + " | " + board(2)(1) + " | " + board(2)(2)
+    PRINT
+END SUB
+
+DEF SUB show_game_info()
+    SELECT CASE game_mode
+        CASE "EASY"
+            PRINT "Mod: İnsan vs Bilgisayar (Kolay)"
+            PRINT "Sen: X, Bilgisayar: O"
+            
+        CASE "HARD"
+            PRINT "Mod: İnsan vs Bilgisayar (Zor)"
+            PRINT "Sen: X, Bilgisayar: O"
+            
+        CASE "HUMAN"
+            PRINT "Mod: İki İnsan"
+            PRINT "Oyuncu 1: X, Oyuncu 2: O"
+    END SELECT
+    
+    PRINT "Sıra: " + current_player
+    PRINT
+END SUB
+
+DEF FUNCTION play_single_game() AS STRING
+    WHILE True
+        call show_board()
+        
+        IF current_player = "X" THEN
+            IF game_mode = "HUMAN" THEN
+                PRINT "Oyuncu 1'in sırası (X)"
+            ELSE
+                PRINT "Sizin sıranız (X)"
+            END IF
+            call human_move()
+        ELSE
+            IF game_mode = "HUMAN" THEN
+                PRINT "Oyuncu 2'nin sırası (O)"
+                call human_move()
+            ELSE
+                PRINT "Bilgisayarın sırası (O)"
+                call computer_move()
+            END IF
+        END IF
+        
+        REM Kazanan var mı kontrol et
+        DIM winner AS STRING
+        winner = check_winner()
+        
+        IF winner <> "" THEN
+            call show_board()
+            RETURN winner + "_WIN"
+        END IF
+        
+        REM Tahta dolu mu kontrol et
+        IF is_board_full() THEN
+            call show_board()
+            RETURN "DRAW"
+        END IF
+        
+        REM Sırayı değiştir
+        IF current_player = "X" THEN
+            current_player = "O"
+        ELSE
+            current_player = "X"
+        END IF
+    WEND
+END FUNCTION
+
+DEF SUB human_move()
+    DIM valid_move AS BOOLEAN
+    valid_move = False
+    
+    WHILE NOT valid_move
+        DIM row, col AS INTEGER
+        PRINT "Hamlenizi yapın (satır sütun, örn: 1 2): "
+        INPUT "", move_input
+        
+        REM Girdiyi ayrıştır
+        DIM parts AS ARRAY
+        parts = SPLIT(move_input, " ")
+        
+        IF LEN(parts) >= 2 THEN
+            row = VAL(parts(0)) - 1
+            col = VAL(parts(1)) - 1
+            
+            IF row >= 0 AND row <= 2 AND col >= 0 AND col <= 2 THEN
+                IF board(row)(col) = " " THEN
+                    board(row)(col) = current_player
+                    valid_move = True
+                ELSE
+                    PRINT "❌ Bu pozisyon dolu! Başka bir pozisyon seçin."
+                END IF
+            ELSE
+                PRINT "❌ Geçersiz pozisyon! 1-3 arası değer girin."
+            END IF
+        ELSE
+            PRINT "❌ Geçersiz format! Satır ve sütun numarasını girin (örn: 1 2)."
+        END IF
+    WEND
+END SUB
+
+DEF SUB computer_move()
+    IF game_mode = "EASY" THEN
+        call computer_move_easy()
+    ELSE
+        call computer_move_hard()
+    END IF
+END SUB
+
+DEF SUB computer_move_easy()
+    REM Kolay mod: Rastgele hamle
+    DIM moved AS BOOLEAN
+    moved = False
+    
+    WHILE NOT moved
+        DIM row, col AS INTEGER
+        row = RND(0, 2)
+        col = RND(0, 2)
+        
+        IF board(row)(col) = " " THEN
+            board(row)(col) = computer_turn
+            moved = True
+            PRINT "Bilgisayar hamle yaptı: " + STR$(row + 1) + " " + STR$(col + 1)
+        END IF
+    WEND
+END SUB
+
+DEF SUB computer_move_hard()
+    REM Zor mod: Minimax algoritması
+    DIM best_score AS INTEGER
+    best_score = -1000
+    DIM best_row, best_col AS INTEGER
+    best_row = -1
+    best_col = -1
+    
+    FOR row = 0 TO 2
+        FOR col = 0 TO 2
+            IF board(row)(col) = " " THEN
+                REM Hamleyi dene
+                board(row)(col) = computer_turn
+                
+                DIM score AS INTEGER
+                score = minimax(0, False)
+                
+                REM Hamleyi geri al
+                board(row)(col) = " "
+                
+                IF score > best_score THEN
+                    best_score = score
+                    best_row = row
+                    best_col = col
+                END IF
+            END IF
+        NEXT col
+    NEXT row
+    
+    REM En iyi hamleyi yap
+    board(best_row)(best_col) = computer_turn
+    PRINT "Bilgisayar hamle yaptı: " + STR$(best_row + 1) + " " + STR$(best_col + 1)
+END SUB
+
+DEF FUNCTION minimax(depth AS INTEGER, is_maximizing AS BOOLEAN) AS INTEGER
+    DIM result AS STRING
+    result = check_winner()
+    
+    REM Terminal durumları
+    IF result = computer_turn THEN
+        RETURN 10 - depth
+    ELSEIF result = player_turn THEN
+        RETURN depth - 10
+    ELSEIF is_board_full() THEN
+        RETURN 0
+    END IF
+    
+    IF is_maximizing THEN
+        DIM max_eval AS INTEGER
+        max_eval = -1000
+        
+        FOR row = 0 TO 2
+            FOR col = 0 TO 2
+                IF board(row)(col) = " " THEN
+                    board(row)(col) = computer_turn
+                    DIM eval AS INTEGER
+                    eval = minimax(depth + 1, False)
+                    board(row)(col) = " "
+                    
+                    IF eval > max_eval THEN
+                        max_eval = eval
+                    END IF
+                END IF
+            NEXT col
+        NEXT row
+        
+        RETURN max_eval
+    ELSE
+        DIM min_eval AS INTEGER
+        min_eval = 1000
+        
+        FOR row = 0 TO 2
+            FOR col = 0 TO 2
+                IF board(row)(col) = " " THEN
+                    board(row)(col) = player_turn
+                    DIM eval AS INTEGER
+                    eval = minimax(depth + 1, True)
+                    board(row)(col) = " "
+                    
+                    IF eval < min_eval THEN
+                        min_eval = eval
+                    END IF
+                END IF
+            NEXT col
+        NEXT row
+        
+        RETURN min_eval
+    END IF
+END FUNCTION
+
+DEF FUNCTION check_winner() AS STRING
+    REM Satırları kontrol et
+    FOR i = 0 TO 2
+        IF board(i)(0) <> " " AND board(i)(0) = board(i)(1) AND board(i)(1) = board(i)(2) THEN
+            RETURN board(i)(0)
+        END IF
+    NEXT i
+    
+    REM Sütunları kontrol et
+    FOR j = 0 TO 2
+        IF board(0)(j) <> " " AND board(0)(j) = board(1)(j) AND board(1)(j) = board(2)(j) THEN
+            RETURN board(0)(j)
+        END IF
+    NEXT j
+    
+    REM Çaprazları kontrol et
+    IF board(0)(0) <> " " AND board(0)(0) = board(1)(1) AND board(1)(1) = board(2)(2) THEN
+        RETURN board(0)(0)
+    END IF
+    
+    IF board(0)(2) <> " " AND board(0)(2) = board(1)(1) AND board(1)(1) = board(2)(0) THEN
+        RETURN board(0)(2)
+    END IF
+    
+    RETURN ""
+END FUNCTION
+
+DEF FUNCTION is_board_full() AS BOOLEAN
+    FOR i = 0 TO 2
+        FOR j = 0 TO 2
+            IF board(i)(j) = " " THEN
+                RETURN False
+            END IF
+        NEXT j
+    NEXT i
+    RETURN True
+END FUNCTION
+
+DEF SUB show_statistics()
+    PRINT
+    PRINT "═══════════════ İSTATİSTİKLER ═══════════════"
+    PRINT "Toplam Oyun: " + STR$(game_count)
+    
+    IF game_mode = "HUMAN" THEN
+        PRINT "Oyuncu 1 (X) Galibiyetleri: " + STR$(human_wins)
+        PRINT "Oyuncu 2 (O) Galibiyetleri: " + STR$(computer_wins)
+    ELSE
+        PRINT "Sizin Galibiyetleriniz: " + STR$(human_wins)
+        PRINT "Bilgisayar Galibiyetleri: " + STR$(computer_wins)
+    END IF
+    
+    PRINT "Beraberlikler: " + STR$(draws)
+    
+    IF game_count > 0 THEN
+        DIM win_rate AS DOUBLE
+        win_rate = (human_wins * 100.0) / game_count
+        PRINT "Kazanma Oranınız: %" + STR$(ROUND(win_rate, 1))
+    END IF
+    
+    PRINT "════════════════════════════════════════════"
+END SUB
+
+DEF SUB show_rules()
+    PRINT
+    PRINT "═══════════════ OYUN KURALLARI ═══════════════"
+    PRINT
+    PRINT "🎯 HEDEF:"
+    PRINT "   3x3 tahtada, yatay, dikey veya çapraz olarak"
+    PRINT "   3 aynı işareti (X veya O) yan yana getirin!"
+    PRINT
+    PRINT "🎮 NASIL OYNANIR:"
+    PRINT "   1. Sırasıyla X ve O işaretlerini yerleştirin"
+    PRINT "   2. Hamle yapmak için satır ve sütun numarası girin"
+    PRINT "   3. Örnek: '1 2' -> 1. satır, 2. sütun"
+    PRINT
+    PRINT "🏆 KAZANMA KOŞULLARI:"
+    PRINT "   • 3 işaretinizi yatay sıralayın"
+    PRINT "   • 3 işaretinizi dikey sıralayın"
+    PRINT "   • 3 işaretinizi çapraz sıralayın"
+    PRINT
+    PRINT "🤝 BERABERLIK:"
+    PRINT "   Tahta dolduğunda kimse kazanamazsa berabere!"
+    PRINT
+    PRINT "💡 STRATEJİ İPUÇLARI:"
+    PRINT "   • Merkez (2,2) en güçlü pozisyondur"
+    PRINT "   • Köşeler (1,1), (1,3), (3,1), (3,3) önemlidir"
+    PRINT "   • Rakibin 3'lü yapmasını engelleyin"
+    PRINT "   • İki yönden saldırı kurun"
+    PRINT
+    PRINT "════════════════════════════════════════════════"
+    PRINT
+END SUB
+
+REM Oyun kurallarını göster
+call show_rules()
