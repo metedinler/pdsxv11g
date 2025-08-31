@@ -1,0 +1,12 @@
+DIM FACTORIAL AS INTEGER
+REM Factorial function test
+DEF FUNCTION factorial(n)
+DIM result AS INTEGER
+IF n <= 1 THEN result = 1
+IF n > 1 THEN result = n * factorial(n - 1)
+RETURN result
+END FUNCTION
+
+DIM f5 AS INTEGER
+f5 = factorial(5)
+PRINT "factorial(5) =", f5
