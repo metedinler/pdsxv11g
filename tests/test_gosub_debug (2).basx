@@ -1,0 +1,12 @@
+REM Debug GOSUB
+RUN
+PRINT "1. Baslangic"
+
+PRINT "2. GOSUB oncesi"
+GOSUB TestSub
+PRINT "4. GOSUB sonrasi"
+END
+
+LABEL TestSub
+PRINT "3. GOSUB icinde"
+RETURN
