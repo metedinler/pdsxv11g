@@ -1,0 +1,14 @@
+PRINT "=== SELECT CASE Test ==="
+DIM test AS INTEGER
+test = 42
+
+SELECT CASE test
+CASE 1
+    PRINT "Bir"
+CASE 42
+    PRINT "Kırk İki - Doğru!"
+CASE ELSE
+    PRINT "Diğer"
+END SELECT
+
+PRINT "Test tamamlandı."
