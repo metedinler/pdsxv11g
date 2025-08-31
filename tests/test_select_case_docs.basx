@@ -1,0 +1,15 @@
+DIM BILINMEYEN AS INTEGER
+DIM DENDI AS INTEGER
+DIM HOSCAKAL AS INTEGER
+DIM KELIME AS INTEGER
+DIM MERHABA AS INTEGER
+DIM test AS STRING
+test = "hello"
+SELECT CASE test
+CASE "hello", "hi"
+PRINT "Merhaba dendi"
+CASE "bye", "goodbye"
+PRINT "Hoscakal dendi"
+CASE ELSE
+PRINT "Bilinmeyen kelime"
+END SELECT
