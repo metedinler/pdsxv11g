@@ -1,0 +1,1230 @@
+{
+  "interpreter_info": {
+    "name": "pdsXv11 Modern BASIC Interpreter",
+    "version": "11.0",
+    "description": "Modern BASIC yorumlayıcısı - Gelişmiş veri işleme, bilimsel hesaplama ve dosya işlemleri desteği",
+    "features": [
+      "Sanal ortam yönetimi",
+      "Otomatik bağımlılık kurulumu",
+      "Numpy/Pandas/Scipy entegrasyonu",
+      "PDF işleme desteği",
+      "Web scraping",
+      "Veritabanı bağlantıları",
+      "Dosya I/O işlemleri",
+      "Bellek yönetimi",
+      "Hata ayıklama araçları"
+    ]
+  },
+  "commands": {
+    "basic_commands": {
+      "PRINT": {
+        "description": "Ekrana değer yazdırır",
+        "syntax": "PRINT <değer1> [, <değer2>, ...]",
+        "examples": [
+          "PRINT \"Merhaba Dünya\"",
+          "PRINT x, y, z",
+          "PRINT \"Sonuç:\", result"
+        ],
+        "parameters": {
+          "değer": "Yazdırılacak ifade, değişken veya string"
+        }
+      },
+      "INPUT": {
+        "description": "Kullanıcıdan veri girişi alır",
+        "syntax": "INPUT \"<mesaj>\", <değişken>",
+        "examples": [
+          "INPUT \"Adınız: \", name",
+          "INPUT \"Yaşınız: \", age"
+        ],
+        "parameters": {
+          "mesaj": "Kullanıcıya gösterilecek bilgi mesajı",
+          "değişken": "Girilen değerin atanacağı değişken"
+        }
+      },
+      "LET": {
+        "description": "Değişkene değer atar",
+        "syntax": "LET <değişken> = <değer>",
+        "examples": [
+          "LET x = 10",
+          "LET name = \"Ahmet\"",
+          "LET result = x + y * 2"
+        ],
+        "parameters": {
+          "değişken": "Değer atanacak değişken adı",
+          "değer": "Atanacak değer veya ifade"
+        }
+      },
+      "DIM": {
+        "description": "Değişken tanımlar ve tip belirtir",
+        "syntax": "DIM <değişken> AS <tip>",
+        "examples": [
+          "DIM age AS INTEGER",
+          "DIM name AS STRING",
+          "DIM data AS ARRAY",
+          "DIM person AS STRUCT"
+        ],
+        "parameters": {
+          "değişken": "Tanımlanacak değişken adı",
+          "tip": "STRING, INTEGER, DOUBLE, ARRAY, STRUCT, UNION, LIST, DICT vb."
+        }
+      }
+    },
+    "control_flow": {
+      "IF": {
+        "description": "Koşullu çalıştırma",
+        "syntax": "IF <koşul> THEN <komut>",
+        "examples": [
+          "IF x > 10 THEN PRINT \"Büyük\"",
+          "IF name = \"admin\" THEN PRINT \"Hoşgeldin\""
+        ],
+        "parameters": {
+          "koşul": "Değerlendirilen mantıksal ifade",
+          "komut": "Koşul doğruysa çalışacak komut"
+        }
+      },
+      "FOR": {
+        "description": "Sayaçlı döngü",
+        "syntax": "FOR <değişken> = <başlangıç> TO <bitiş> [STEP <adım>]",
+        "examples": [
+          "FOR i = 1 TO 10",
+          "FOR x = 0 TO 100 STEP 5",
+          "FOR j = 10 TO 1 STEP -1"
+        ],
+        "parameters": {
+          "değişken": "Döngü sayacı",
+          "başlangıç": "Başlangıç değeri",
+          "bitiş": "Bitiş değeri",
+          "adım": "Artış miktarı (varsayılan: 1)"
+        }
+      },
+      "NEXT": {
+        "description": "FOR döngüsünü sonlandırır",
+        "syntax": "NEXT [<değişken>]",
+        "examples": [
+          "NEXT",
+          "NEXT i"
+        ],
+        "parameters": {
+          "değişken": "İsteğe bağlı döngü değişkeni"
+        }
+      },
+      "WHILE": {
+        "description": "Koşullu döngü",
+        "syntax": "WHILE <koşul>",
+        "examples": [
+          "WHILE x < 100",
+          "WHILE NOT EOF(1)"
+        ],
+        "parameters": {
+          "koşul": "Döngü koşulu"
+        }
+      },
+      "WEND": {
+        "description": "WHILE döngüsünü sonlandırır",
+        "syntax": "WEND",
+        "examples": ["WEND"],
+        "parameters": {}
+      },
+      "DO": {
+        "description": "DO-LOOP döngüsü başlatır",
+        "syntax": "DO [WHILE <koşul>] / DO [UNTIL <koşul>]",
+        "examples": [
+          "DO WHILE x < 10",
+          "DO UNTIL found = TRUE",
+          "DO"
+        ],
+        "parameters": {
+          "koşul": "İsteğe bağlı döngü koşulu"
+        }
+      },
+      "LOOP": {
+        "description": "DO döngüsünü sonlandırır",
+        "syntax": "LOOP [WHILE <koşul>] / LOOP [UNTIL <koşul>]",
+        "examples": [
+          "LOOP",
+          "LOOP WHILE x > 0",
+          "LOOP UNTIL found"
+        ],
+        "parameters": {
+          "koşul": "İsteğe bağlı çıkış koşulu"
+        }
+      }
+    },
+    "program_flow": {
+      "GOTO": {
+        "description": "Belirtilen etikete atlar",
+        "syntax": "GOTO <etiket>",
+        "examples": [
+          "GOTO start_label",
+          "GOTO error_handler"
+        ],
+        "parameters": {
+          "etiket": "Atlanacak etiket adı"
+        }
+      },
+      "GOSUB": {
+        "description": "Alt rutine gider ve geri döner",
+        "syntax": "GOSUB <etiket>",
+        "examples": [
+          "GOSUB calculate",
+          "GOSUB print_results"
+        ],
+        "parameters": {
+          "etiket": "Çağrılacak alt rutin etiketi"
+        }
+      },
+      "RETURN": {
+        "description": "GOSUB'dan döner",
+        "syntax": "RETURN",
+        "examples": ["RETURN"],
+        "parameters": {}
+      },
+      "EXIT FOR": {
+        "description": "FOR döngüsünden çıkar",
+        "syntax": "EXIT FOR",
+        "examples": ["EXIT FOR"],
+        "parameters": {}
+      },
+      "EXIT DO": {
+        "description": "DO döngüsünden çıkar",
+        "syntax": "EXIT DO",
+        "examples": ["EXIT DO"],
+        "parameters": {}
+      },
+      "CONTINUE FOR": {
+        "description": "FOR döngüsünün bir sonraki iterasyonuna geçer",
+        "syntax": "CONTINUE FOR",
+        "examples": ["CONTINUE FOR"],
+        "parameters": {}
+      },
+      "CONTINUE DO": {
+        "description": "DO döngüsünün bir sonraki iterasyonuna geçer",
+        "syntax": "CONTINUE DO",
+        "examples": ["CONTINUE DO"],
+        "parameters": {}
+      }
+    },
+    "error_handling": {
+      "ON ERROR GOTO": {
+        "description": "Hata durumunda belirtilen etikete gider",
+        "syntax": "ON ERROR GOTO <etiket>",
+        "examples": [
+          "ON ERROR GOTO error_handler"
+        ],
+        "parameters": {
+          "etiket": "Hata durumunda gidilecek etiket"
+        }
+      },
+      "TRY": {
+        "description": "Hata yakalama bloğu",
+        "syntax": "TRY <komut> CATCH <hata_değişkeni> DO <hata_komutu>",
+        "examples": [
+          "TRY OPEN \"data.txt\" FOR INPUT AS #1 CATCH err DO PRINT \"Dosya açılamadı:\", err"
+        ],
+        "parameters": {
+          "komut": "Deneme komutu",
+          "hata_değişkeni": "Hata mesajının atanacağı değişken",
+          "hata_komutu": "Hata durumunda çalışacak komut"
+        }
+      }
+    },
+    "file_operations": {
+      "OPEN": {
+        "description": "Dosya açar",
+        "syntax": "OPEN <dosya_adı> FOR <mod> AS #<numara>",
+        "examples": [
+          "OPEN \"data.txt\" FOR INPUT AS #1",
+          "OPEN \"output.txt\" FOR OUTPUT AS #2",
+          "OPEN \"log.txt\" FOR APPEND AS #3"
+        ],
+        "parameters": {
+          "dosya_adı": "Açılacak dosyanın adı",
+          "mod": "INPUT, OUTPUT, APPEND",
+          "numara": "Dosya numarası (1-255)"
+        }
+      },
+      "CLOSE": {
+        "description": "Dosyayı kapatır",
+        "syntax": "CLOSE [#<numara>]",
+        "examples": [
+          "CLOSE #1",
+          "CLOSE"
+        ],
+        "parameters": {
+          "numara": "Kapatılacak dosya numarası"
+        }
+      },
+      "READ": {
+        "description": "Dosyadan veri okur",
+        "syntax": "READ #<numara>, <değişken>",
+        "examples": [
+          "READ #1, data",
+          "READ #2, name, age"
+        ],
+        "parameters": {
+          "numara": "Dosya numarası",
+          "değişken": "Okunan verinin atanacağı değişken"
+        }
+      },
+      "WRITE": {
+        "description": "Dosyaya veri yazar",
+        "syntax": "WRITE #<numara>, <değer>",
+        "examples": [
+          "WRITE #1, \"Hello World\"",
+          "WRITE #2, name, age"
+        ],
+        "parameters": {
+          "numara": "Dosya numarası",
+          "değer": "Yazılacak değer"
+        }
+      }
+    },
+    "database_operations": {
+      "CONNECT": {
+        "description": "Veritabanı bağlantısı kurar",
+        "syntax": "CONNECT TO <veritabanı> AS <bağlantı_adı>",
+        "examples": [
+          "CONNECT TO \"sqlite:data.db\" AS db1",
+          "CONNECT TO \"mysql://user:pass@localhost/mydb\" AS mysql_db"
+        ],
+        "parameters": {
+          "veritabanı": "Veritabanı bağlantı string'i",
+          "bağlantı_adı": "Bağlantı için kullanılacak ad"
+        }
+      },
+      "EXECUTE": {
+        "description": "SQL sorgusu çalıştırır",
+        "syntax": "EXECUTE <sorgu> ON <bağlantı>",
+        "examples": [
+          "EXECUTE \"SELECT * FROM users\" ON db1",
+          "EXECUTE \"INSERT INTO products VALUES ('PC', 1500)\" ON mysql_db"
+        ],
+        "parameters": {
+          "sorgu": "Çalıştırılacak SQL sorgusu",
+          "bağlantı": "Kullanılacak veritabanı bağlantısı"
+        }
+      },
+      "DISCONNECT": {
+        "description": "Veritabanı bağlantısını kapatır",
+        "syntax": "DISCONNECT <bağlantı_adı>",
+        "examples": [
+          "DISCONNECT db1",
+          "DISCONNECT mysql_db"
+        ],
+        "parameters": {
+          "bağlantı_adı": "Kapatılacak bağlantı adı"
+        }
+      }
+    },
+    "debug_commands": {
+      "DEBUG ON": {
+        "description": "Hata ayıklama modunu açar",
+        "syntax": "DEBUG ON",
+        "examples": ["DEBUG ON"],
+        "parameters": {}
+      },
+      "DEBUG OFF": {
+        "description": "Hata ayıklama modunu kapatır",
+        "syntax": "DEBUG OFF",
+        "examples": ["DEBUG OFF"],
+        "parameters": {}
+      },
+      "TRACE ON": {
+        "description": "İz sürme modunu açar",
+        "syntax": "TRACE ON",
+        "examples": ["TRACE ON"],
+        "parameters": {}
+      },
+      "TRACE OFF": {
+        "description": "İz sürme modunu kapatır",
+        "syntax": "TRACE OFF",
+        "examples": ["TRACE OFF"],
+        "parameters": {}
+      },
+      "STEP DEBUG": {
+        "description": "Adım adım hata ayıklama",
+        "syntax": "STEP DEBUG",
+        "examples": ["STEP DEBUG"],
+        "parameters": {}
+      },
+      "PERFORMANCE": {
+        "description": "Performans bilgilerini gösterir",
+        "syntax": "PERFORMANCE",
+        "examples": ["PERFORMANCE"],
+        "parameters": {}
+      }
+    },
+    "memory_commands": {
+      "NEW": {
+        "description": "Bellek alanı ayırır",
+        "syntax": "NEW(<boyut>)",
+        "examples": [
+          "ptr = NEW(1024)"
+        ],
+        "parameters": {
+          "boyut": "Ayırılacak bellek boyutu (byte)"
+        }
+      },
+      "DELETE": {
+        "description": "Bellek alanını serbest bırakır",
+        "syntax": "DELETE(<pointer>)",
+        "examples": [
+          "DELETE(ptr)"
+        ],
+        "parameters": {
+          "pointer": "Serbest bırakılacak bellek işaretçisi"
+        }
+      },
+      "SIZEOF": {
+        "description": "Değişkenin bellek boyutunu döndürür",
+        "syntax": "SIZEOF(<değişken>)",
+        "examples": [
+          "size = SIZEOF(myArray)"
+        ],
+        "parameters": {
+          "değişken": "Boyutu ölçülecek değişken"
+        }
+      }
+    },
+    "import_commands": {
+      "IMPORT": {
+        "description": "Modül veya kütüphane import eder",
+        "syntax": "IMPORT <dosya> [AS <ad>]",
+        "examples": [
+          "IMPORT \"math_utils.libx\"",
+          "IMPORT \"data_processing.hz\" AS dataproc"
+        ],
+        "parameters": {
+          "dosya": "Import edilecek dosya (.libx, .hz, .hx)",
+          "ad": "İsteğe bağlı takma ad"
+        }
+      }
+    },
+    "special_commands": {
+      "CLS": {
+        "description": "Ekranı temizler",
+        "syntax": "CLS",
+        "examples": ["CLS"],
+        "parameters": {}
+      },
+      "EXIT": {
+        "description": "Programdan çıkar",
+        "syntax": "EXIT",
+        "examples": ["EXIT"],
+        "parameters": {}
+      },
+      "HELP": {
+        "description": "Yardım bilgilerini gösterir",
+        "syntax": "HELP [<komut>]",
+        "examples": [
+          "HELP",
+          "HELP PRINT",
+          "HELP FOR"
+        ],
+        "parameters": {
+          "komut": "İsteğe bağlı özel komut yardımı"
+        }
+      }
+    },
+    "keyboard_input": {
+      "KEY": {
+        "description": "Non-blocking tuş kontrolü - Tuşa basılıp basılmadığını kontrol eder",
+        "syntax": "KEY([<tuş>])",
+        "examples": [
+          "pressed_key = KEY()",
+          "IF KEY(\"A\") THEN PRINT \"A tuşuna basıldı\"",
+          "IF KEY(\"<YUKARIOK>\") THEN move_up()"
+        ],
+        "parameters": {
+          "tuş": "İsteğe bağlı - Kontrol edilecek belirli tuş. Boş bırakılırsa herhangi bir tuş kontrolü yapar"
+        }
+      },
+      "GETKEY": {
+        "description": "Tuş bekle - Belirtilen tuşlardan birine basılmasını bekler",
+        "syntax": "GETKEY([<tuş_listesi>])",
+        "examples": [
+          "key = GETKEY()",
+          "choice = GETKEY(\"A,B,C\")",
+          "direction = GETKEY(\"<YUKARIOK>,<ASAGIOK>,<SOLOK>,<SAGOK>\")",
+          "action = GETKEY(\"<ENTER>,<ESC>\")"
+        ],
+        "parameters": {
+          "tuş_listesi": "İsteğe bağlı - Virgülle ayrılmış tuş listesi. Boş bırakılırsa herhangi bir tuşu bekler"
+        },
+        "special_keys": {
+          "<YUKARIOK>": "Yukarı ok tuşu",
+          "<ASAGIOK>": "Aşağı ok tuşu", 
+          "<SOLOK>": "Sol ok tuşu",
+          "<SAGOK>": "Sağ ok tuşu",
+          "<ENTER>": "Enter tuşu",
+          "<ESC>": "Escape tuşu",
+          "<SPACE>": "Boşluk tuşu"
+        }
+      }
+    },
+    "repl_file_commands": {
+      "REPL": {
+        "description": "REPL (Read-Eval-Print-Loop) etkileşimli modunu başlatır",
+        "syntax": "REPL",
+        "examples": ["REPL"],
+        "parameters": {},
+        "repl_commands": {
+          "LIST": "Mevcut programı listeler",
+          "NEW": "Programı temizler",
+          "EDIT <no>": "Belirli satırı düzenler",
+          "DELETE <no>": "Belirli satırı siler",
+          "RUN": "Mevcut programı çalıştırır",
+          "SAVE <dosya>": "Programı dosyaya kaydeder",
+          "LOAD <dosya>": "Dosyadan program yükler",
+          "EXIT": "REPL'den çıkar"
+        }
+      },
+      "SAVE": {
+        "description": "Mevcut programı dosyaya kaydeder",
+        "syntax": "SAVE <dosya_adı>",
+        "examples": [
+          "SAVE \"myprogram.pdsx\"",
+          "SAVE \"game.pdsx\""
+        ],
+        "parameters": {
+          "dosya_adı": "Kaydedilecek dosyanın adı (.pdsx uzantısı otomatik eklenir)"
+        }
+      },
+      "LOAD": {
+        "description": "Dosyadan program yükler",
+        "syntax": "LOAD <dosya_adı>",
+        "examples": [
+          "LOAD \"myprogram.pdsx\"",
+          "LOAD \"saved_game.pdsx\""
+        ],
+        "parameters": {
+          "dosya_adı": "Yüklenecek dosyanın adı"
+        }
+      },
+      "RUN": {
+        "description": "Program çalıştırır - Dosya adı verilirse o dosyayı yükleyip çalıştırır",
+        "syntax": "RUN [<dosya_adı>]",
+        "examples": [
+          "RUN",
+          "RUN \"program.pdsx\""
+        ],
+        "parameters": {
+          "dosya_adı": "İsteğe bağlı - Çalıştırılacak dosya adı. Boş bırakılırsa mevcut program çalıştırılır"
+        }
+      }
+    }
+  },
+  "functions": {
+    "string_functions": {
+      "MID$": {
+        "description": "String'in ortasından karakterler alır",
+        "syntax": "MID$(<string>, <başlangıç>, <uzunluk>)",
+        "examples": [
+          "result = MID$(\"Hello World\", 7, 5)"
+        ],
+        "parameters": {
+          "string": "Kaynak string",
+          "başlangıç": "Başlangıç pozisyonu (1'den başlar)",
+          "uzunluk": "Alınacak karakter sayısı"
+        }
+      },
+      "LEFT$": {
+        "description": "String'in solundan karakterler alır",
+        "syntax": "LEFT$(<string>, <uzunluk>)",
+        "examples": [
+          "first_name = LEFT$(full_name, 5)"
+        ],
+        "parameters": {
+          "string": "Kaynak string",
+          "uzunluk": "Alınacak karakter sayısı"
+        }
+      },
+      "RIGHT$": {
+        "description": "String'in sağından karakterler alır",
+        "syntax": "RIGHT$(<string>, <uzunluk>)",
+        "examples": [
+          "extension = RIGHT$(filename, 3)"
+        ],
+        "parameters": {
+          "string": "Kaynak string",
+          "uzunluk": "Alınacak karakter sayısı"
+        }
+      },
+      "LEN": {
+        "description": "String uzunluğunu döndürür",
+        "syntax": "LEN(<string>)",
+        "examples": [
+          "length = LEN(\"Hello\")"
+        ],
+        "parameters": {
+          "string": "Uzunluğu ölçülecek string"
+        }
+      },
+      "UCASE$": {
+        "description": "String'i büyük harfe çevirir",
+        "syntax": "UCASE$(<string>)",
+        "examples": [
+          "upper = UCASE$(\"hello\")"
+        ],
+        "parameters": {
+          "string": "Çevrilecek string"
+        }
+      },
+      "LCASE$": {
+        "description": "String'i küçük harfe çevirir",
+        "syntax": "LCASE$(<string>)",
+        "examples": [
+          "lower = LCASE$(\"HELLO\")"
+        ],
+        "parameters": {
+          "string": "Çevrilecek string"
+        }
+      },
+      "LTRIM$": {
+        "description": "String'in solundaki boşlukları kaldırır",
+        "syntax": "LTRIM$(<string>)",
+        "examples": [
+          "trimmed = LTRIM$(\"  hello\")"
+        ],
+        "parameters": {
+          "string": "Temizlenecek string"
+        }
+      },
+      "RTRIM$": {
+        "description": "String'in sağındaki boşlukları kaldırır",
+        "syntax": "RTRIM$(<string>)",
+        "examples": [
+          "trimmed = RTRIM$(\"hello  \")"
+        ],
+        "parameters": {
+          "string": "Temizlenecek string"
+        }
+      },
+      "INSTR": {
+        "description": "String içinde arama yapar",
+        "syntax": "INSTR(<başlangıç>, <kaynak>, <aranan>)",
+        "examples": [
+          "pos = INSTR(1, \"Hello World\", \"World\")"
+        ],
+        "parameters": {
+          "başlangıç": "Aramaya başlanacak pozisyon",
+          "kaynak": "Arama yapılacak string",
+          "aranan": "Aranan substring"
+        }
+      },
+      "STR$": {
+        "description": "Sayıyı string'e çevirir",
+        "syntax": "STR$(<sayı>)",
+        "examples": [
+          "text = STR$(123)"
+        ],
+        "parameters": {
+          "sayı": "Çevrilecek sayı"
+        }
+      },
+      "VAL": {
+        "description": "String'i sayıya çevirir",
+        "syntax": "VAL(<string>)",
+        "examples": [
+          "number = VAL(\"123.45\")"
+        ],
+        "parameters": {
+          "string": "Çevrilecek string"
+        }
+      },
+      "CHR$": {
+        "description": "ASCII kodunu karaktere çevirir",
+        "syntax": "CHR$(<kod>)",
+        "examples": [
+          "char = CHR$(65)"
+        ],
+        "parameters": {
+          "kod": "ASCII karakter kodu"
+        }
+      },
+      "ASC": {
+        "description": "Karakteri ASCII koduna çevirir",
+        "syntax": "ASC(<karakter>)",
+        "examples": [
+          "code = ASC(\"A\")"
+        ],
+        "parameters": {
+          "karakter": "ASCII kodu alınacak karakter"
+        }
+      }
+    },
+    "math_functions": {
+      "ABS": {
+        "description": "Mutlak değer",
+        "syntax": "ABS(<sayı>)",
+        "examples": [
+          "result = ABS(-5)"
+        ],
+        "parameters": {
+          "sayı": "Mutlak değeri alınacak sayı"
+        }
+      },
+      "SQR": {
+        "description": "Karekök",
+        "syntax": "SQR(<sayı>)",
+        "examples": [
+          "result = SQR(16)"
+        ],
+        "parameters": {
+          "sayı": "Karekökü alınacak sayı"
+        }
+      },
+      "SIN": {
+        "description": "Sinüs (radyan)",
+        "syntax": "SIN(<açı>)",
+        "examples": [
+          "result = SIN(1.57)"
+        ],
+        "parameters": {
+          "açı": "Radyan cinsinden açı"
+        }
+      },
+      "COS": {
+        "description": "Kosinüs (radyan)",
+        "syntax": "COS(<açı>)",
+        "examples": [
+          "result = COS(0)"
+        ],
+        "parameters": {
+          "açı": "Radyan cinsinden açı"
+        }
+      },
+      "TAN": {
+        "description": "Tanjant (radyan)",
+        "syntax": "TAN(<açı>)",
+        "examples": [
+          "result = TAN(0.785)"
+        ],
+        "parameters": {
+          "açı": "Radyan cinsinden açı"
+        }
+      },
+      "LOG": {
+        "description": "Doğal logaritma",
+        "syntax": "LOG(<sayı>)",
+        "examples": [
+          "result = LOG(2.718)"
+        ],
+        "parameters": {
+          "sayı": "Logaritması alınacak sayı"
+        }
+      },
+      "EXP": {
+        "description": "e üssü",
+        "syntax": "EXP(<üs>)",
+        "examples": [
+          "result = EXP(1)"
+        ],
+        "parameters": {
+          "üs": "e tabanının üssü"
+        }
+      },
+      "INT": {
+        "description": "Tam sayı kısmı",
+        "syntax": "INT(<sayı>)",
+        "examples": [
+          "result = INT(3.14)"
+        ],
+        "parameters": {
+          "sayı": "Tam kısmı alınacak sayı"
+        }
+      },
+      "RND": {
+        "description": "0-1 arası rastgele sayı",
+        "syntax": "RND()",
+        "examples": [
+          "random_num = RND()"
+        ],
+        "parameters": {}
+      },
+      "MIN": {
+        "description": "Minimum değer",
+        "syntax": "MIN(<sayı1>, <sayı2>, ...)",
+        "examples": [
+          "result = MIN(5, 3, 8, 1)"
+        ],
+        "parameters": {
+          "sayılar": "Karşılaştırılacak sayılar"
+        }
+      },
+      "MAX": {
+        "description": "Maksimum değer",
+        "syntax": "MAX(<sayı1>, <sayı2>, ...)",
+        "examples": [
+          "result = MAX(5, 3, 8, 1)"
+        ],
+        "parameters": {
+          "sayılar": "Karşılaştırılacak sayılar"
+        }
+      },
+      "ROUND": {
+        "description": "Yuvarlama",
+        "syntax": "ROUND(<sayı>, <basamak>)",
+        "examples": [
+          "result = ROUND(3.14159, 2)"
+        ],
+        "parameters": {
+          "sayı": "Yuvarlanacak sayı",
+          "basamak": "Ondalık basamak sayısı"
+        }
+      }
+    },
+    "array_functions": {
+      "ZEROS": {
+        "description": "Sıfırlardan oluşan dizi oluşturur",
+        "syntax": "ZEROS(<boyut>)",
+        "examples": [
+          "arr = ZEROS(10)"
+        ],
+        "parameters": {
+          "boyut": "Dizi boyutu"
+        }
+      },
+      "ONES": {
+        "description": "Birlerden oluşan dizi oluşturur",
+        "syntax": "ONES(<boyut>)",
+        "examples": [
+          "arr = ONES(5)"
+        ],
+        "parameters": {
+          "boyut": "Dizi boyutu"
+        }
+      },
+      "ARANGE": {
+        "description": "Aralıklı sayı dizisi oluşturur",
+        "syntax": "ARANGE(<başlangıç>, <bitiş>, <adım>)",
+        "examples": [
+          "arr = ARANGE(0, 10, 0.5)"
+        ],
+        "parameters": {
+          "başlangıç": "Başlangıç değeri",
+          "bitiş": "Bitiş değeri",
+          "adım": "Artış miktarı"
+        }
+      },
+      "LINSPACE": {
+        "description": "Doğrusal aralıklı sayı dizisi",
+        "syntax": "LINSPACE(<başlangıç>, <bitiş>, <nokta_sayısı>)",
+        "examples": [
+          "arr = LINSPACE(0, 1, 100)"
+        ],
+        "parameters": {
+          "başlangıç": "Başlangıç değeri",
+          "bitiş": "Bitiş değeri",
+          "nokta_sayısı": "Oluşturulacak nokta sayısı"
+        }
+      },
+      "RESHAPE": {
+        "description": "Diziyi yeniden şekillendirir",
+        "syntax": "RESHAPE(<dizi>, <şekil>)",
+        "examples": [
+          "new_arr = RESHAPE(arr, (3, 4))"
+        ],
+        "parameters": {
+          "dizi": "Şekli değiştirilecek dizi",
+          "şekil": "Yeni şekil (tuple)"
+        }
+      },
+      "SUM": {
+        "description": "Dizi elemanlarının toplamı",
+        "syntax": "SUM(<dizi>)",
+        "examples": [
+          "total = SUM([1, 2, 3, 4, 5])"
+        ],
+        "parameters": {
+          "dizi": "Toplanacak dizi"
+        }
+      },
+      "MEAN": {
+        "description": "Ortalama değer",
+        "syntax": "MEAN(<dizi>)",
+        "examples": [
+          "average = MEAN(data)"
+        ],
+        "parameters": {
+          "dizi": "Ortalaması alınacak dizi"
+        }
+      },
+      "MEDIAN": {
+        "description": "Medyan değer",
+        "syntax": "MEDIAN(<dizi>)",
+        "examples": [
+          "med = MEDIAN(scores)"
+        ],
+        "parameters": {
+          "dizi": "Medyanı bulunacak dizi"
+        }
+      },
+      "STD": {
+        "description": "Standart sapma",
+        "syntax": "STD(<dizi>)",
+        "examples": [
+          "deviation = STD(measurements)"
+        ],
+        "parameters": {
+          "dizi": "Standart sapması bulunacak dizi"
+        }
+      }
+    },
+    "date_time_functions": {
+      "DATE$": {
+        "description": "Geçerli tarihi döndürür",
+        "syntax": "DATE$()",
+        "examples": [
+          "today = DATE$()"
+        ],
+        "parameters": {}
+      },
+      "TIME$": {
+        "description": "Geçerli saati döndürür",
+        "syntax": "TIME$()",
+        "examples": [
+          "now = TIME$()"
+        ],
+        "parameters": {}
+      },
+      "TIMER": {
+        "description": "Sistem zamanını saniye olarak döndürür",
+        "syntax": "TIMER()",
+        "examples": [
+          "timestamp = TIMER()"
+        ],
+        "parameters": {}
+      }
+    },
+    "file_functions": {
+      "EOF": {
+        "description": "Dosya sonu kontrolü",
+        "syntax": "EOF(<dosya_no>)",
+        "examples": [
+          "IF EOF(1) THEN PRINT \"Dosya sonu\""
+        ],
+        "parameters": {
+          "dosya_no": "Kontrol edilecek dosya numarası"
+        }
+      },
+      "LOC": {
+        "description": "Dosyada geçerli pozisyon",
+        "syntax": "LOC(<dosya_no>)",
+        "examples": [
+          "pos = LOC(1)"
+        ],
+        "parameters": {
+          "dosya_no": "Pozisyonu alınacak dosya numarası"
+        }
+      },
+      "LOF": {
+        "description": "Dosya boyutu",
+        "syntax": "LOF(<dosya_no>)",
+        "examples": [
+          "size = LOF(1)"
+        ],
+        "parameters": {
+          "dosya_no": "Boyutu alınacak dosya numarası"
+        }
+      },
+      "FREEFILE": {
+        "description": "Boş dosya numarası döndürür",
+        "syntax": "FREEFILE()",
+        "examples": [
+          "file_num = FREEFILE()"
+        ],
+        "parameters": {}
+      }
+    },
+    "pdf_functions": {
+      "PDF_READ_TEXT": {
+        "description": "PDF dosyasından metin okur",
+        "syntax": "PDF_READ_TEXT(<dosya_yolu>)",
+        "examples": [
+          "content = PDF_READ_TEXT(\"document.pdf\")"
+        ],
+        "parameters": {
+          "dosya_yolu": "PDF dosyasının yolu"
+        }
+      },
+      "PDF_EXTRACT_TABLES": {
+        "description": "PDF'den tablo çıkarır",
+        "syntax": "PDF_EXTRACT_TABLES(<dosya_yolu>)",
+        "examples": [
+          "tables = PDF_EXTRACT_TABLES(\"report.pdf\")"
+        ],
+        "parameters": {
+          "dosya_yolu": "PDF dosyasının yolu"
+        }
+      }
+    },
+    "web_functions": {
+      "WEB_GET": {
+        "description": "Web sayfasından veri çeker",
+        "syntax": "WEB_GET(<url>)",
+        "examples": [
+          "content = WEB_GET(\"https://example.com\")"
+        ],
+        "parameters": {
+          "url": "Çekilecek web sayfasının URL'i"
+        }
+      }
+    },
+    "system_functions": {
+      "ENVIRON$": {
+        "description": "Sistem çevre değişkeni",
+        "syntax": "ENVIRON$(<değişken_adı>)",
+        "examples": [
+          "path = ENVIRON$(\"PATH\")"
+        ],
+        "parameters": {
+          "değişken_adı": "Çevre değişkeni adı"
+        }
+      },
+      "COMMAND$": {
+        "description": "Komut satırı argümanları",
+        "syntax": "COMMAND$()",
+        "examples": [
+          "args = COMMAND$()"
+        ],
+        "parameters": {}
+      }
+    }
+  },
+  "operators": {
+    "arithmetic": {
+      "+": "Toplama",
+      "-": "Çıkarma",
+      "*": "Çarpma", 
+      "/": "Bölme",
+      "%": "Modül (kalan)",
+      "^": "Üs alma"
+    },
+    "comparison": {
+      "=": "Eşittir",
+      "<>": "Eşit değildir",
+      "<": "Küçüktür",
+      ">": "Büyüktür",
+      "<=": "Küçük eşittir",
+      ">=": "Büyük eşittir"
+    },
+    "logical": {
+      "AND": "Mantıksal VE",
+      "OR": "Mantıksal VEYA",
+      "NOT": "Mantıksal DEĞİL",
+      "XOR": "Mantıksal Özel VEYA"
+    },
+    "bitwise": {
+      "&": "Bitwise VE",
+      "|": "Bitwise VEYA",
+      "^": "Bitwise XOR",
+      "~": "Bitwise DEĞİL",
+      "<<": "Sola kaydırma",
+      ">>": "Sağa kaydırma"
+    },
+    "assignment": {
+      "=": "Atama",
+      "+=": "Toplama ataması",
+      "-=": "Çıkarma ataması",
+      "*=": "Çarpma ataması",
+      "/=": "Bölme ataması",
+      "%=": "Modül ataması"
+    },
+    "increment_decrement": {
+      "++": "Artırma",
+      "--": "Azaltma"
+    }
+  },
+  "data_types": {
+    "INTEGER": {
+      "description": "Tam sayı",
+      "range": "-2147483648 to 2147483647",
+      "example": "DIM age AS INTEGER"
+    },
+    "LONG": {
+      "description": "Uzun tam sayı",
+      "range": "-9223372036854775808 to 9223372036854775807",
+      "example": "DIM big_number AS LONG"
+    },
+    "SINGLE": {
+      "description": "Tek hassaslık ondalık",
+      "range": "±1.5e-45 to ±3.4e38",
+      "example": "DIM temperature AS SINGLE"
+    },
+    "DOUBLE": {
+      "description": "Çift hassaslık ondalık",
+      "range": "±5.0e-324 to ±1.7e308",
+      "example": "DIM precision_value AS DOUBLE"
+    },
+    "STRING": {
+      "description": "Metin verisi",
+      "range": "0 to 2^31 karaktere kadar",
+      "example": "DIM name AS STRING"
+    },
+    "BOOLEAN": {
+      "description": "Mantıksal değer",
+      "range": "TRUE veya FALSE",
+      "example": "DIM is_valid AS BOOLEAN"
+    },
+    "ARRAY": {
+      "description": "Numpy dizisi",
+      "range": "Bellek sınırına kadar",
+      "example": "DIM data AS ARRAY"
+    },
+    "LIST": {
+      "description": "Dinamik liste",
+      "range": "Bellek sınırına kadar",
+      "example": "DIM items AS LIST"
+    },
+    "DICT": {
+      "description": "Sözlük (key-value)",
+      "range": "Bellek sınırına kadar",
+      "example": "DIM config AS DICT"
+    },
+    "DATAFRAME": {
+      "description": "Pandas DataFrame",
+      "range": "Bellek sınırına kadar",
+      "example": "DIM table AS DATAFRAME"
+    },
+    "STRUCT": {
+      "description": "Yapı (struct)",
+      "range": "Tanımlanan alanlar",
+      "example": "DIM person AS STRUCT"
+    },
+    "UNION": {
+      "description": "Birleşim (union)",
+      "range": "En büyük alan boyutu",
+      "example": "DIM variant AS UNION"
+    }
+  },
+  "examples": {
+    "hello_world": {
+      "description": "Basit Merhaba Dünya programı",
+      "code": [
+        "PRINT \"Merhaba Dünya!\"",
+        "INPUT \"Adınız: \", name",
+        "PRINT \"Merhaba \", name"
+      ]
+    },
+    "loop_example": {
+      "description": "Döngü örneği",
+      "code": [
+        "FOR i = 1 TO 10",
+        "  PRINT \"Sayı: \", i",
+        "NEXT i"
+      ]
+    },
+    "array_processing": {
+      "description": "Dizi işleme örneği",
+      "code": [
+        "DIM data AS ARRAY",
+        "data = ARANGE(1, 11, 1)",
+        "PRINT \"Ortalama: \", MEAN(data)",
+        "PRINT \"Toplam: \", SUM(data)"
+      ]
+    },
+    "file_processing": {
+      "description": "Dosya işleme örneği",
+      "code": [
+        "OPEN \"data.txt\" FOR INPUT AS #1",
+        "WHILE NOT EOF(1)",
+        "  READ_line = INPUT$(LOC(1), #1)",
+        "  PRINT read_line",
+        "WEND",
+        "CLOSE #1"
+      ]
+    },
+    "pdf_processing": {
+      "description": "PDF işleme örneği",
+      "code": [
+        "content = PDF_READ_TEXT(\"document.pdf\")",
+        "PRINT \"PDF içeriği:\"",
+        "PRINT content",
+        "",
+        "tables = PDF_EXTRACT_TABLES(\"report.pdf\")",
+        "FOR i = 0 TO LEN(tables) - 1",
+        "  PRINT \"Tablo \", i + 1, \": \", tables[i]",
+        "NEXT i"
+      ]
+    },
+    "database_example": {
+      "description": "Veritabanı örneği",
+      "code": [
+        "CONNECT TO \"sqlite:example.db\" AS db",
+        "EXECUTE \"CREATE TABLE users (id INTEGER, name TEXT)\" ON db",
+        "EXECUTE \"INSERT INTO users VALUES (1, 'Ali')\" ON db",
+        "result = EXECUTE \"SELECT * FROM users\" ON db",
+        "PRINT result",
+        "DISCONNECT db"
+      ]
+    },
+    "keyboard_example": {
+      "description": "Klavye girişi örneği",
+      "code": [
+        "PRINT \"Herhangi bir tuşa basın...\"",
+        "key = GETKEY()",
+        "PRINT \"Basılan tuş: \", key",
+        "",
+        "WHILE TRUE",
+        "  IF KEY() THEN",
+        "    k = GETKEY()",
+        "    IF k = \"q\" THEN EXIT",
+        "    PRINT \"Tuş: \", k",
+        "  END IF",
+        "END WHILE"
+      ]
+    },
+    "repl_example": {
+      "description": "REPL komutları örneği",
+      "code": [
+        "' Program içinde REPL kullanma",
+        "x = 10",
+        "y = 20",
+        "",
+        "REPL ' Debug için REPL'e geç",
+        "",
+        "' REPL'te çalıştırılacak:",
+        "' PRINT x + y",
+        "' VAR",
+        "' EXIT"
+      ]
+    },
+    "file_operations_example": {
+      "description": "Dosya işlemleri örneği",
+      "code": [
+        "' Program kaydetme",
+        "x = 10",
+        "y = 20",
+        "SAVE \"test_program.pdsx\"",
+        "",
+        "' Program yükleme ve çalıştırma",
+        "LOAD \"test_program.pdsx\"",
+        "RUN",
+        "",
+        "' Başka bir program çalıştırma",
+        "RUN \"another_program.pdsx\""
+      ]
+    }
+  },
+  "cli_options": {
+    "basic_usage": "python pdsxv11g.py [options] [file]",
+    "options": {
+      "file": "Çalıştırılacak .basx dosyası",
+      "-i, --interactive": "Etkileşimli REPL modunu zorla",
+      "--setup-venv": "Sanal ortamı kur ve gereksinimleri yükle",
+      "--check-deps": "Bağımlılıkları kontrol et",
+      "--debug": "Hata ayıklama modunu etkinleştir",
+      "--trace": "İz sürme modunu etkinleştir",
+      "--no-venv": "Sanal ortam kontrolünü atla (dahili kullanım)"
+    },
+    "examples": [
+      "python pdsxv11g.py                    # Etkileşimli REPL modu",
+      "python pdsxv11g.py program.basx       # Dosya çalıştır",
+      "python pdsxv11g.py -i                 # Zorla etkileşimli mod",
+      "python pdsxv11g.py --setup-venv       # Sanal ortamı kur",
+      "python pdsxv11g.py --check-deps       # Bağımlılıkları kontrol et",
+      "python pdsxv11g.py --debug program.basx  # Hata ayıklama ile çalıştır"
+    ]
+  }
+}
