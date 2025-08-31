@@ -1,0 +1,55 @@
+REM Test 1: Değişken tanımlama ve atama testleri
+REM Bu program farklı veri tipi tanımlamalarını test eder
+
+PRINT "=== Değişken Tanımlama ve Atama Testleri ==="
+PRINT
+
+REM String değişkenler
+DIM name AS STRING
+DIM surname AS STRING
+LET name = "Ahmet"
+LET surname = "Yılmaz"
+PRINT "Ad Soyad:", name, surname
+
+REM Sayısal değişkenler
+DIM age AS INTEGER
+DIM salary AS DOUBLE
+DIM height AS SINGLE
+age = 25
+salary = 5500.75
+height = 1.75
+
+PRINT "Yaş:", age
+PRINT "Maaş:", salary
+PRINT "Boy:", height
+
+REM Boolean değişken
+DIM is_married AS BOOLEAN
+is_married = False
+PRINT "Evli mi:", is_married
+
+REM Dizi tanımlama
+DIM numbers(5) AS INTEGER
+numbers(0) = 10
+numbers(1) = 20
+numbers(2) = 30
+numbers(3) = 40
+numbers(4) = 50
+
+PRINT "Dizinin elemanları:"
+FOR i = 0 TO 4
+    PRINT "numbers(" + STR$(i) + ") =", numbers(i)
+NEXT i
+
+REM Liste tanımlama
+DIM my_list AS LIST
+my_list = [1, 2, 3, 4, 5]
+PRINT "Liste:", my_list
+
+REM Sözlük tanımlama
+DIM my_dict AS DICT
+my_dict = {"isim": "Ali", "yaş": 30}
+PRINT "Sözlük:", my_dict
+
+PRINT
+PRINT "Tüm değişken testleri başarıyla tamamlandı!"
