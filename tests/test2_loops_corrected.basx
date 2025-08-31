@@ -1,0 +1,36 @@
+PRINT "=== Test 2: Döngüler ve Kontrol Yapıları ==="
+
+REM FOR döngüsü
+PRINT "FOR döngüsü (1'den 5'e):"
+DIM i AS INTEGER
+FOR i = 1 TO 5
+    PRINT "i =", i
+NEXT
+
+REM FOR döngüsü step ile  
+PRINT "FOR döngüsü STEP 2 ile (0'dan 10'a):"
+DIM j AS INTEGER
+FOR j = 0 TO 10 STEP 2
+    PRINT "j =", j
+NEXT
+
+REM WHILE döngüsü
+PRINT "WHILE döngüsü:"
+DIM counter AS INTEGER
+LET counter = 1
+WHILE counter <= 3
+    PRINT "Counter:", counter
+    LET counter = counter + 1
+WEND
+
+REM Nested loops (iç içe döngüler)
+PRINT "İç içe döngüler - Çarpım tablosu (3x3):"
+DIM row AS INTEGER
+DIM col AS INTEGER
+FOR row = 1 TO 3
+    FOR col = 1 TO 3
+        PRINT row * col
+    NEXT
+NEXT
+
+PRINT "=== Test 2 Tamamlandı ==="
