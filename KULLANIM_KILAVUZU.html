@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pdsXv11g - Modern BASIC Yorumlayıcısı Kullanım Kılavuzu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary-color: #64748b;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #ffffff;
+            --surface-color: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,0 1000,0 1000,100 0,50"/></svg>') no-repeat center bottom;
+            background-size: cover;
+        }
+
+        header .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-subtitle {
+            font-size: 1.25rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .nav-logo {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin: 0;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: var(--surface-color);
+        }
+
+        /* Main Content */
+        main {
+            padding: 4rem 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc-list {
+            list-style: none;
+            margin: 0;
+        }
+
+        .toc-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .toc-link:hover, .toc-link.active {
+            color: var(--primary-color);
+            background: var(--surface-color);
+            transform: translateX(4px);
+        }
+
+        .toc-sub {
+            margin-left: 1rem;
+            font-size: 0.8rem;
+        }
+
+        /* Article Content */
+        .article {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 2rem;
+            border-bottom: 2px solid var(--surface-color);
+            padding-bottom: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Code Blocks */
+        code {
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+            background: var(--surface-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            font-size: 0.9rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--surface-color);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+            background: white;
+            box-shadow: var(--shadow);
+        }
+
+        .alert-info {
+            border-left-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .alert-warning {
+            border-left-color: var(--warning-color);
+            background: #fffbeb;
+        }
+
+        .alert-success {
+            border-left-color: var(--accent-color);
+            background: #ecfdf5;
+        }
+
+        .alert-danger {
+            border-left-color: var(--danger-color);
+            background: #fef2f2;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin: 1rem 0;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--surface-color);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+                border-top: 1px solid var(--border-color);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .sidebar {
+                position: relative;
+                top: auto;
+                max-height: none;
+            }
+
+            .article {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            z-index: 1000;
+            transition: width 0.1s;
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav, .sidebar, footer {
+                display: none;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .article {
+                box-shadow: none;
+                border: none;
+            }
+        }
+
+        /* Highlight.js Theme Override */
+        .hljs {
+            background: var(--code-bg) !important;
+        }
+
+        /* Section Icons */
+        .section-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 1.2em;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1 class="header-title">🚀 pdsXv11g</h1>
+            <p class="header-subtitle">Modern BASIC Yorumlayıcısı Kullanım Kılavuzu</p>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>Versiyon 1.1</span>
+                </div>
+                <div class="meta-item">
+                    <span>👨‍💻</span>
+                    <span>İleri Seviye Programlama</span>
+                </div>
+                <div class="meta-item">
+                    <span>🎯</span>
+                    <span>Kapsamlı Rehber</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="nav-container">
+                <div class="nav-logo">📘 pdsXv11g Kılavuzu</div>
+                <button class="nav-toggle" onclick="toggleNav()">☰</button>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#kurulum" class="nav-link">Kurulum</a></li>
+                    <li><a href="#temel-komutlar" class="nav-link">Temel Komutlar</a></li>
+                    <li><a href="#fonksiyonlar" class="nav-link">Fonksiyonlar</a></li>
+                    <li><a href="#ileri-seviye" class="nav-link">İleri Seviye</a></li>
+                    <li><a href="#modulleri" class="nav-link">Modül Sistemi</a></li>
+                    <li><a href="#veritabani" class="nav-link">Veritabanı</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="content-grid">
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <h3 class="sidebar-title">📋 İçindekiler</h3>
+                    <ul class="toc-list">
+                        <li class="toc-item"><a href="#kurulum-ve-baslatma" class="toc-link">🚀 Kurulum ve Başlatma</a></li>
+                        <li class="toc-item"><a href="#temel-komutlar" class="toc-link">📝 Temel Komutlar</a></li>
+                        <li class="toc-item"><a href="#veri-tipleri" class="toc-link">🗂️ Veri Tipleri</a></li>
+                        <li class="toc-item"><a href="#degiskenler-ve-atama" class="toc-link">🔢 Değişkenler ve Atama</a></li>
+                        <li class="toc-item"><a href="#kontrol-yapilari" class="toc-link">🔀 Kontrol Yapıları</a></li>
+                        <li class="toc-item"><a href="#donguler" class="toc-link">🔄 Döngüler</a></li>
+                        <li class="toc-item"><a href="#fonksiyonlar" class="toc-link">🔧 Fonksiyonlar</a></li>
+                        <li class="toc-item"><a href="#built-in-fonksiyonlar" class="toc-link">📚 Built-in Fonksiyonlar</a>
+                            <ul class="toc-list toc-sub">
+                                <li class="toc-item"><a href="#string-fonksiyonlari" class="toc-link">String Fonksiyonları</a></li>
+                                <li class="toc-item"><a href="#matematik-fonksiyonlari" class="toc-link">Matematik Fonksiyonları</a></li>
+                                <li class="toc-item"><a href="#istatistiksel-fonksiyonlar" class="toc-link">İstatistiksel Fonksiyonlar</a></li>
+                            </ul>
+                        </li>
+                        <li class="toc-item"><a href="#klavye-girisi" class="toc-link">⌨️ Klavye Girişi</a></li>
+                        <li class="toc-item"><a href="#repl-ve-dosya-islemleri" class="toc-link">💾 REPL ve Dosya İşlemleri</a></li>
+                        <li class="toc-item"><a href="#ileri-ozellikler" class="toc-link">🧩 İleri Özellikler</a></li>
+                        <li class="toc-item"><a href="#ornekler" class="toc-link">🎯 Örnekler</a></li>
+                        <li class="toc-item"><a href="#ileri-seviye-programlama" class="toc-link">🎓 İleri Seviye Programlama</a>
+                            <ul class="toc-list toc-sub">
+                                <li class="toc-item"><a href="#programlama-paradigmalari" class="toc-link">Programlama Paradigmaları</a></li>
+                                <li class="toc-item"><a href="#algoritmalar" class="toc-link">Gelişmiş Algoritmalar</a></li>
+                                <li class="toc-item"><a href="#oyun-analizi" class="toc-link">Oyun Analizi</a></li>
+                            </ul>
+                        </li>
+                        <li class="toc-item"><a href="#modul-sistemi" class="toc-link">📦 Modül Sistemi</a></li>
+                        <li class="toc-item"><a href="#veritabani-islemleri" class="toc-link">🗄️ Veritabanı İşlemleri</a></li>
+                        <li class="toc-item"><a href="#network-programming" class="toc-link">🌐 Network Programming</a></li>
+                        <li class="toc-item"><a href="#console-gui" class="toc-link">🎨 Console GUI</a></li>
+                        <li class="toc-item"><a href="#dosya-formatlari" class="toc-link">📁 Dosya Formatları</a></li>
+                        <li class="toc-item"><a href="#security" class="toc-link">🔐 Security</a></li>
+                    </ul>
+                </aside>
+
+                <!-- Article Content -->
+                <article class="article">
+                    <h1 id="baslik">🚀 pdsXv11g - Modern BASIC Yorumlayıcısı</h1>
+                    
+                    <div class="alert alert-info">
+                        <strong>📢 Hoş Geldiniz!</strong> Bu kapsamlı kılavuz, pdsXv11g yorumlayıcısının tüm özelliklerini detaylı olarak açıklar. Temel komutlardan ileri seviye programlama tekniklerine kadar her şeyi bulacaksınız.
+                    </div>
+
+                    <section id="kurulum-ve-baslatma">
+                        <h2><span class="section-icon">🚀</span>Kurulum ve Başlatma</h2>
+                        
+                        <h3>Sanal Ortam Kurulumu</h3>
+                        <pre><code class="language-bash"># Sanal ortamı kur ve bağımlılıkları yükle
+python pdsXv11g.py --setup-venv
+
+# Bağımlılıkları kontrol et
+python pdsXv11g.py --check-deps</code></pre>
+
+                        <h3>Çalıştırma Modları</h3>
+                        <pre><code class="language-bash"># Etkileşimli REPL modu
+python pdsXv11g.py
+
+# Dosya çalıştırma
+python pdsXv11g.py program.basx
+
+# Debug modu
+python pdsXv11g.py --debug program.basx
+
+# Trace modu
+python pdsXv11g.py --trace program.basx</code></pre>
+                    </section>
+
+                    <section id="temel-komutlar">
+                        <h2><span class="section-icon">📝</span>Temel Komutlar</h2>
+                        
+                        <div class="card-grid">
+                            <div class="card">
+                                <div class="card-title">PRINT - Ekrana Yazdırma</div>
+                                <div class="card-description">Değişkenler ve metinleri ekranda görüntüleme</div>
+                                <pre><code class="language-basic">PRINT "Merhaba Dünya"
+PRINT variable_name
+PRINT "Değer:", variable_name
+PRINT value1, value2, value3          ' Virgülle ayırma
+PRINT "Satır sonu yok";               ' Semicolon ile satır sonu engelleme</code></pre>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-title">INPUT - Kullanıcıdan Veri Alma</div>
+                                <div class="card-description">Interaktif veri girişi</div>
+                                <pre><code class="language-basic">INPUT "Adınızı girin: ", user_name
+INPUT "Yaşınız: ", age</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>HELP - Yardım Sistemi</h3>
+                        <pre><code class="language-basic">HELP                    ' Genel yardım
+HELP PRINT             ' Belirli komut yardımı
+HELP EXAMPLES          ' Örnek programlar</code></pre>
+                    </section>
+
+                    <section id="veri-tipleri">
+                        <h2><span class="section-icon">🗂️</span>Veri Tipleri</h2>
+                        
+                        <h3>Temel Tipler</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tip</th>
+                                    <th>Açıklama</th>
+                                    <th>Örnek</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>STRING</code></td>
+                                    <td>Metin verileri</td>
+                                    <td><code>DIM name AS STRING</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>INTEGER</code></td>
+                                    <td>Tam sayılar</td>
+                                    <td><code>DIM age AS INTEGER</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>DOUBLE</code></td>
+                                    <td>Ondalıklı sayılar</td>
+                                    <td><code>DIM price AS DOUBLE</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>BOOLEAN</code></td>
+                                    <td>Mantıksal (True/False)</td>
+                                    <td><code>DIM flag AS BOOLEAN</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Koleksiyon Tipleri</h3>
+                        <pre><code class="language-basic">DIM my_list AS LIST        ' Liste
+DIM my_dict AS DICT        ' Sözlük
+DIM my_set AS SET          ' Küme
+DIM my_tuple AS TUPLE      ' Tuple
+DIM my_array AS ARRAY      ' Dizi</code></pre>
+                    </section>
+
+                    <section id="degiskenler-ve-atama">
+                        <h2><span class="section-icon">🔢</span>Değişkenler ve Atama</h2>
+                        
+                        <h3>Değişken Tanımlama</h3>
+                        <pre><code class="language-basic">' Strict DIM mode - değişkenler kullanımdan önce tanımlanmalı
+DIM name AS STRING
+DIM age AS INTEGER
+DIM scores AS ARRAY</code></pre>
+
+                        <h3>Dizi İşlemleri</h3>
+                        <pre><code class="language-basic">' Dizi tanımlama
+DIM numbers(10) AS INTEGER     ' 10 elemanlı dizi
+DIM matrix(3, 3) AS DOUBLE     ' 3x3 matris
+
+' Dizi atama
+numbers(0) = 100
+numbers(1) = 200
+matrix(0, 0) = 1.5
+matrix(1, 2) = 3.14</code></pre>
+                    </section>
+
+                    <section id="kontrol-yapilari">
+                        <h2><span class="section-icon">🔀</span>Kontrol Yapıları</h2>
+                        
+                        <h3>IF-THEN-ELSE</h3>
+                        <pre><code class="language-basic">' Tek satır IF
+IF age >= 18 THEN PRINT "Reşit"
+
+' Blok IF (Çok satırlı)
+IF score >= 90 THEN
+    PRINT "Mükemmel!"
+    PRINT "Tebrikler"
+ELSEIF score >= 80 THEN
+    PRINT "İyi"
+ELSEIF score >= 70 THEN
+    PRINT "Orta"
+ELSE
+    PRINT "Geliştirmeye ihtiyaç var"
+END IF</code></pre>
+
+                        <h3>SELECT CASE</h3>
+                        <pre><code class="language-basic">DIM choice AS INTEGER
+choice = 2
+
+SELECT CASE choice
+    CASE 1
+        PRINT "Bir seçildi"
+    CASE 2
+        PRINT "İki seçildi"
+    CASE 3 TO 5
+        PRINT "3-5 arası"
+    CASE ELSE
+        PRINT "Diğer"
+END SELECT</code></pre>
+                    </section>
+
+                    <section id="donguler">
+                        <h2><span class="section-icon">🔄</span>Döngüler</h2>
+                        
+                        <h3>FOR-NEXT Döngüsü</h3>
+                        <pre><code class="language-basic">' Basit FOR döngüsü
+FOR i = 1 TO 10
+    PRINT i
+NEXT
+
+' STEP ile döngü
+FOR i = 0 TO 20 STEP 2
+    PRINT i
+NEXT
+
+' İç içe döngüler
+FOR row = 1 TO 3
+    FOR col = 1 TO 3
+        PRINT row * col
+    NEXT col
+NEXT row</code></pre>
+
+                        <h3>WHILE-WEND Döngüsü</h3>
+                        <pre><code class="language-basic">DIM counter AS INTEGER
+counter = 1
+
+WHILE counter <= 5
+    PRINT "Counter:", counter
+    counter = counter + 1
+WEND</code></pre>
+                    </section>
+
+                    <section id="fonksiyonlar">
+                        <h2><span class="section-icon">🔧</span>Fonksiyonlar</h2>
+                        
+                        <h3>DEF FN - Tek Satırlık Fonksiyonlar</h3>
+                        <pre><code class="language-basic">' Basit matematik fonksiyonu
+DEF FN square(x) = x * x
+
+' Kullanım
+PRINT square(5)    ' Sonuç: 25</code></pre>
+
+                        <h3>DEF FUNCTION - Çok Satırlık Fonksiyonlar</h3>
+                        <pre><code class="language-basic">DEF FUNCTION factorial(n)
+    IF n <= 1 THEN
+        RETURN 1
+    ELSE
+        RETURN n * factorial(n - 1)
+    END IF
+END FUNCTION
+
+' Kullanım
+PRINT factorial(5)    ' Sonuç: 120</code></pre>
+                    </section>
+
+                    <section id="built-in-fonksiyonlar">
+                        <h2><span class="section-icon">📚</span>Built-in Fonksiyonlar</h2>
+                        
+                        <div class="card-grid">
+                            <div class="card">
+                                <div class="card-title">String Fonksiyonları</div>
+                                <pre><code class="language-basic">LEN("Hello")                    ' String uzunluğu
+LEFT$("Hello", 3)               ' Soldan 3 karakter
+RIGHT$("Hello", 2)              ' Sağdan 2 karakter
+MID$("Hello", 2, 3)             ' 2. pozisyondan 3 karakter
+UCASE$("hello")                 ' Büyük harf
+LCASE$("HELLO")                 ' Küçük harf</code></pre>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-title">Matematik Fonksiyonları</div>
+                                <pre><code class="language-basic">ABS(-5)                         ' Mutlak değer: 5
+INT(3.7)                        ' Tam kısmı: 3
+SQR(16)                         ' Karekök: 4
+ROUND(3.7, 0)                   ' Yuvarlama: 4
+SIN(PI/2)                       ' Sinüs: 1
+COS(0)                          ' Kosinüs: 1</code></pre>
+                            </div>
+                        </div>
+
+                        <h3 id="istatistiksel-fonksiyonlar">İstatistiksel Fonksiyonlar</h3>
+                        <pre><code class="language-basic">DIM data AS ARRAY
+data = [1, 2, 3, 4, 5]
+
+MEAN(data)                      ' Ortalama
+MEDIAN(data)                    ' Medyan
+MODE(data)                      ' Mod
+STD(data)                       ' Standart sapma
+VAR(data)                       ' Varyans
+CORR(x, y)                      ' Korelasyon</code></pre>
+                    </section>
+
+                    <section id="klavye-girisi">
+                        <h2><span class="section-icon">⌨️</span>Klavye Girişi</h2>
+                        
+                        <h3>KEY() - Non-blocking Tuş Kontrolü</h3>
+                        <pre><code class="language-basic">' Herhangi bir tuşa basılmış mı kontrol et (non-blocking)
+DIM pressed_key AS STRING
+pressed_key = KEY()
+IF pressed_key <> "" THEN
+    PRINT "Basılan tuş: " + pressed_key
+END IF
+
+' Belirli bir tuş kontrolü
+IF KEY("A") THEN
+    PRINT "A tuşuna basıldı!"
+END IF
+
+' Özel tuşlar
+IF KEY("<YUKARIOK>") THEN
+    PRINT "Yukarı ok tuşuna basıldı!"
+END IF</code></pre>
+
+                        <h3>GETKEY() - Tuş Bekle</h3>
+                        <pre><code class="language-basic">' Herhangi bir tuşa basılmasını bekle
+DIM key AS STRING
+key = GETKEY()
+PRINT "Basılan tuş: " + key
+
+' Belirli tuşları bekle
+key = GETKEY("A,B,C")
+PRINT "A, B veya C tuşlarından birine basıldı: " + key</code></pre>
+
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Desteklenen Özel Tuşlar:</strong>
+                            <code>&lt;YUKARIOK&gt;</code>, <code>&lt;ASAGIOK&gt;</code>, <code>&lt;SOLOK&gt;</code>, <code>&lt;SAGOK&gt;</code>, <code>&lt;ENTER&gt;</code>, <code>&lt;ESC&gt;</code>
+                        </div>
+                    </section>
+
+                    <section id="repl-ve-dosya-islemleri">
+                        <h2><span class="section-icon">💾</span>REPL ve Dosya İşlemleri</h2>
+                        
+                        <h3>REPL Modu Komutları</h3>
+                        <ul>
+                            <li><code>LIST</code> - Mevcut programı listele</li>
+                            <li><code>NEW</code> - Programı temizle</li>
+                            <li><code>EDIT &lt;satır_no&gt;</code> - Belirli satırı düzenle</li>
+                            <li><code>DELETE &lt;satır_no&gt;</code> - Belirli satırı sil</li>
+                            <li><code>RUN</code> - Mevcut programı çalıştır</li>
+                            <li><code>SAVE &lt;dosya&gt;</code> - Programı kaydet</li>
+                            <li><code>LOAD &lt;dosya&gt;</code> - Program yükle</li>
+                            <li><code>EXIT</code> - REPL'den çık</li>
+                        </ul>
+
+                        <pre><code class="language-basic">' Program kaydetme
+SAVE "myprogram.pdsx"
+
+' Program yükleme
+LOAD "myprogram.pdsx"
+
+' Program çalıştırma
+RUN "myprogram.pdsx"</code></pre>
+                    </section>
+
+                    <section id="ileri-ozellikler">
+                        <h2><span class="section-icon">🧩</span>İleri Özellikler</h2>
+                        
+                        <h3>HTTP API Çağrıları</h3>
+                        <pre><code class="language-basic">' HTTP GET
+CALL API::GET "https://api.example.com/data" TO response
+
+' HTTP POST
+CALL API::POST "https://api.example.com/create" DATA {"name": "test"} TO result
+
+' HTTP PUT
+CALL API::PUT "https://api.example.com/update/1" DATA {"name": "updated"} TO result
+
+' HTTP DELETE
+CALL API::DELETE "https://api.example.com/delete/1" TO result</code></pre>
+
+                        <h3>Class Tanımlama</h3>
+                        <pre><code class="language-basic">CLASS Calculator
+    STATIC version AS STRING = "1.0"
+    
+    SUB add(a, b)
+        RETURN a + b
+    END SUB
+    
+    PRIVATE SUB internal_calc()
+        ' Private method
+    END SUB
+END CLASS
+
+' Class kullanımı
+DIM calc AS Calculator
+PRINT calc.add(5, 3)</code></pre>
+                    </section>
+
+                    <section id="ornekler">
+                        <h2><span class="section-icon">🎯</span>Örnekler</h2>
+                        
+                        <h3>Örnek 1: Basit Hesap Makinesi</h3>
+                        <pre><code class="language-basic">PRINT "=== Basit Hesap Makinesi ==="
+
+DIM num1 AS DOUBLE
+DIM num2 AS DOUBLE
+DIM operation AS STRING
+
+INPUT "İlk sayı: ", num1
+INPUT "İkinci sayı: ", num2
+INPUT "İşlem (+, -, *, /): ", operation
+
+SELECT CASE operation
+    CASE "+"
+        PRINT "Sonuç:", num1 + num2
+    CASE "-"
+        PRINT "Sonuç:", num1 - num2
+    CASE "*"
+        PRINT "Sonuç:", num1 * num2
+    CASE "/"
+        IF num2 <> 0 THEN
+            PRINT "Sonuç:", num1 / num2
+        ELSE
+            PRINT "Hata: Sıfıra bölme!"
+        END IF
+    CASE ELSE
+        PRINT "Geçersiz işlem!"
+END SELECT</code></pre>
+
+                        <h3>Örnek 2: Fibonacci Serisi</h3>
+                        <pre><code class="language-basic">DEF FUNCTION fibonacci(n)
+    IF n <= 1 THEN
+        RETURN n
+    ELSE
+        RETURN fibonacci(n-1) + fibonacci(n-2)
+    END IF
+END FUNCTION
+
+PRINT "Fibonacci Serisi (İlk 10 terim):"
+FOR i = 0 TO 9
+    PRINT "F(" + STR$(i) + ") =", fibonacci(i)
+NEXT i</code></pre>
+                    </section>
+
+                    <section id="ileri-seviye-programlama">
+                        <h2><span class="section-icon">🎓</span>İleri Seviye Programlama</h2>
+                        
+                        <div class="alert alert-success">
+                            <strong>🎯 Bu bölüm kapsamı:</strong> Modern programlama paradigmaları, algoritma implementasyonları, oyun geliştirme teknikleri, veri analizi ve profesyonel yazılım geliştirme prensipleri pdsXv11g ile nasıl uygulanır öğrenin.
+                        </div>
+
+                        <h3 id="programlama-paradigmalari">Programlama Paradigmaları</h3>
+                        
+                        <h4>Fonksiyonel Programlama</h4>
+                        <pre><code class="language-basic">' Higher-Order Functions
+DIM numbers AS ARRAY
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+' Lambda benzeri fonksiyon tanımlama
+DEF FN square(x) = x * x
+DEF FN is_even(x) = (x MOD 2 = 0)
+
+' Fonksiyonel pipeline
+DIM squared_evens AS ARRAY
+squared_evens = MAP(square, FILTER(is_even, numbers))
+PRINT "Çift sayıların karesi:", squared_evens</code></pre>
+
+                        <h4>Nesne Yönelimli Programlama Simülasyonu</h4>
+                        <pre><code class="language-basic">' "Class" simülasyonu - Dictionary tabanlı nesne
+DEF FUNCTION create_person(name, age, profession)
+    DIM person AS DICT
+    person = {
+        "name": name,
+        "age": age,
+        "profession": profession,
+        "skills": [],
+        "experience": 0
+    }
+    RETURN person
+END FUNCTION
+
+' "Method" simülasyonu
+DEF SUB person_add_skill(person_obj, skill)
+    INSERT(person_obj("skills"), skill)
+    person_obj("experience") = person_obj("experience") + 1
+END SUB</code></pre>
+
+                        <h3 id="algoritmalar">Gelişmiş Algoritmalar</h3>
+                        
+                        <h4>Quick Sort Implementasyonu</h4>
+                        <pre><code class="language-basic">DEF FUNCTION quicksort(arr, low, high)
+    IF low < high THEN
+        DIM pivot_index AS INTEGER
+        pivot_index = partition(arr, low, high)
+        
+        ' Özyinelemeli sıralama
+        arr = quicksort(arr, low, pivot_index - 1)
+        arr = quicksort(arr, pivot_index + 1, high)
+    END IF
+    RETURN arr
+END FUNCTION
+
+DEF FUNCTION partition(arr, low, high)
+    DIM pivot AS DOUBLE
+    pivot = arr(high)
+    DIM i AS INTEGER
+    i = low - 1
+    
+    FOR j = low TO high - 1
+        IF arr(j) <= pivot THEN
+            i = i + 1
+            ' Swap elements
+            DIM temp AS DOUBLE
+            temp = arr(i)
+            arr(i) = arr(j)
+            arr(j) = temp
+        END IF
+    NEXT j
+    
+    ' Place pivot
+    DIM temp AS DOUBLE
+    temp = arr(i + 1)
+    arr(i + 1) = arr(high)
+    arr(high) = temp
+    
+    RETURN i + 1
+END FUNCTION</code></pre>
+
+                        <h4>Dinamik Programlama - Fibonacci with Memoization</h4>
+                        <pre><code class="language-basic">DIM fibonacci_cache AS DICT
+fibonacci_cache = {}
+
+DEF FUNCTION fibonacci_memo(n)
+    IF fibonacci_cache.CONTAINS(STR$(n)) THEN
+        RETURN fibonacci_cache(STR$(n))
+    END IF
+    
+    DIM result AS INTEGER
+    IF n <= 1 THEN
+        result = n
+    ELSE
+        result = fibonacci_memo(n - 1) + fibonacci_memo(n - 2)
+    END IF
+    
+    fibonacci_cache(STR$(n)) = result
+    RETURN result
+END FUNCTION</code></pre>
+
+                        <h3 id="oyun-analizi">Oyun Geliştirme ve Analizi</h3>
+                        
+                        <h4>2048 Oyunu - Hareket Algoritması Analizi</h4>
+                        <div class="alert alert-info">
+                            <strong>📊 Algoritma Karmaşıklığı:</strong>
+                            <ul>
+                                <li>Zaman Karmaşıklığı: O(n²) - 4x4 tahta için sabit</li>
+                                <li>Alan Karmaşıklığı: O(n) - geçici diziler için</li>
+                            </ul>
+                        </div>
+
+                        <pre><code class="language-basic">DEF FUNCTION move_left() AS BOOLEAN
+    DIM moved AS BOOLEAN
+    moved = False
+    
+    FOR i = 0 TO 3  ' Her satır için
+        ' 1. Adım: Sıfır olmayan değerleri topla
+        DIM row AS ARRAY
+        row = []
+        FOR j = 0 TO 3
+            IF board(i)(j) <> 0 THEN
+                INSERT(row, board(i)(j))
+            END IF
+        NEXT j
+        
+        ' 2. Adım: Birleştirme algoritması
+        DIM merged_row AS ARRAY
+        merged_row = []
+        DIM j AS INTEGER
+        j = 0
+        
+        WHILE j < LEN(row)
+            IF j < LEN(row) - 1 AND row(j) = row(j + 1) THEN
+                ' İki aynı değeri birleştir
+                DIM merged_value AS INTEGER
+                merged_value = row(j) * 2
+                INSERT(merged_row, merged_value)
+                score = score + merged_value
+                j = j + 2
+            ELSE
+                INSERT(merged_row, row(j))
+                j = j + 1
+            END IF
+        WEND
+        
+        ' 3. Adım: Satırı 4 elemana tamamla
+        WHILE LEN(merged_row) < 4
+            INSERT(merged_row, 0)
+        WEND
+        
+        ' 4. Adım: Değişiklik tespit et ve uygula
+        FOR j = 0 TO 3
+            IF board(i)(j) <> merged_row(j) THEN
+                moved = True
+            END IF
+            board(i)(j) = merged_row(j)
+        NEXT j
+    NEXT i
+    
+    RETURN moved
+END FUNCTION</code></pre>
+
+                        <h4>TicTacToe AI - Minimax Algoritması</h4>
+                        <pre><code class="language-basic">DEF FUNCTION minimax(board_state, depth, is_maximizing)
+    DIM score AS INTEGER
+    score = evaluate_board(board_state)
+    
+    ' Terminal durumlar
+    IF score = 10 THEN RETURN score - depth
+    IF score = -10 THEN RETURN score + depth
+    IF NOT has_moves_left(board_state) THEN RETURN 0
+    
+    IF is_maximizing THEN
+        DIM best AS INTEGER
+        best = -1000
+        
+        FOR i = 0 TO 2
+            FOR j = 0 TO 2
+                IF board_state(i)(j) = " " THEN
+                    board_state(i)(j) = computer_turn
+                    best = MAX(best, minimax(board_state, depth + 1, False))
+                    board_state(i)(j) = " "  ' Geri al
+                END IF
+            NEXT j
+        NEXT i
+        
+        RETURN best
+    ELSE
+        DIM best AS INTEGER
+        best = 1000
+        
+        FOR i = 0 TO 2
+            FOR j = 0 TO 2
+                IF board_state(i)(j) = " " THEN
+                    board_state(i)(j) = player_turn
+                    best = MIN(best, minimax(board_state, depth + 1, True))
+                    board_state(i)(j) = " "
+                END IF
+            NEXT j
+        NEXT i
+        
+        RETURN best
+    END IF
+END FUNCTION</code></pre>
+                    </section>
+
+                    <section id="modul-sistemi">
+                        <h2><span class="section-icon">📦</span>Modül Sistemi ve Kütüphane Geliştirme</h2>
+                        
+                        <h3>Kendi Kütüphaneni Geliştirme</h3>
+                        <pre><code class="language-basic">' myutils.libx - Utility kütüphanesi
+LIBRARY MyUtils
+
+LIBRARY VERSION "1.0.0"
+LIBRARY AUTHOR "Developer Name"
+LIBRARY DESCRIPTION "Utility functions for common operations"
+
+' Export edilecek fonksiyonlar
+EXPORT string_utils, math_utils, file_utils
+
+NAMESPACE string_utils
+    DEF FUNCTION reverse_string(input_str)
+        DIM result AS STRING
+        result = ""
+        FOR i = LEN(input_str) TO 1 STEP -1
+            result = result + MID$(input_str, i, 1)
+        NEXT i
+        RETURN result
+    END FUNCTION
+END NAMESPACE
+
+END LIBRARY</code></pre>
+
+                        <h3>Kütüphane Kullanımı</h3>
+                        <pre><code class="language-basic">' Ana program dosyası
+IMPORT "myutils.libx" AS utils
+
+' Namespace'li kullanım
+DIM reversed AS STRING
+reversed = utils.string_utils.reverse_string("Hello World")
+PRINT "Reversed:", reversed</code></pre>
+                    </section>
+
+                    <section id="veritabani-islemleri">
+                        <h2><span class="section-icon">🗄️</span>Veritabanı İşlemleri</h2>
+                        
+                        <h3>Database Connection Manager</h3>
+                        <pre><code class="language-basic">DEF FUNCTION db_connect(db_path, connection_name)
+    TRY
+        CONNECT TO db_path AS connection_name
+        db_connections(connection_name) = {
+            "path": db_path,
+            "active": TRUE,
+            "created_at": TIMER,
+            "queries_count": 0
+        }
+        RETURN TRUE
+    CATCH error DO
+        PRINT "Database connection failed:", error
+        RETURN FALSE
+    END TRY
+END FUNCTION</code></pre>
+
+                        <h3>ORM Pattern Implementation</h3>
+                        <pre><code class="language-basic">DEF FUNCTION User_create(name, email, age)
+    DIM user_data AS DICT
+    user_data = {
+        "name": name,
+        "email": email, 
+        "age": age,
+        "created_at": DATE$() + " " + TIME$()
+    }
+    
+    DIM sql AS STRING
+    sql = "INSERT INTO users (name, email, age, created_at) VALUES ('" +
+          name + "', '" + email + "', " + STR$(age) + ", '" + 
+          user_data("created_at") + "')"
+    
+    DIM result AS ARRAY
+    result = db.db_execute("main_db", sql)
+    RETURN user_data
+END FUNCTION</code></pre>
+                    </section>
+
+                    <section id="network-programming">
+                        <h2><span class="section-icon">🌐</span>Network Programming</h2>
+                        
+                        <h3>HTTP Server Simülasyonu</h3>
+                        <pre><code class="language-basic">DIM routes AS DICT
+DIM middleware_stack AS ARRAY
+routes = {}
+middleware_stack = []
+
+DEF SUB register_route(method, path, handler_function)
+    DIM route_key AS STRING
+    route_key = method + ":" + path
+    routes(route_key) = handler_function
+END SUB
+
+DEF FUNCTION handle_request(method, path, request_data)
+    DIM route_key AS STRING
+    route_key = method + ":" + path
+    
+    ' Route handling
+    IF routes.CONTAINS(route_key) THEN
+        RETURN CALL routes(route_key)(request_context)
+    ELSE
+        RETURN {"status": 404, "body": "Not Found"}
+    END IF
+END FUNCTION</code></pre>
+
+                        <h3>REST API Örneği</h3>
+                        <pre><code class="language-basic">DEF FUNCTION get_users_api(request)
+    DIM users AS ARRAY
+    users = UserModel.User_find_all()
+    
+    RETURN {
+        "status": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": JSON_STRINGIFY(users)
+    }
+END FUNCTION</code></pre>
+                    </section>
+
+                    <section id="console-gui">
+                        <h2><span class="section-icon">🎨</span>Console GUI</h2>
+                        
+                        <h3>Box Drawing ve ASCII Art</h3>
+                        <pre><code class="language-basic">DEF SUB draw_box(x, y, width, height, title)
+    ' Top border
+    LOCATE y, x
+    PRINT "┌" + STRING$(width - 2, "─") + "┐"
+    
+    ' Side borders
+    FOR i = 1 TO height - 2
+        LOCATE y + i, x
+        PRINT "│" + STRING$(width - 2, " ") + "│"
+    NEXT i
+    
+    ' Bottom border
+    LOCATE y + height - 1, x
+    PRINT "└" + STRING$(width - 2, "─") + "┘"
+    
+    ' Title
+    IF title <> "" THEN
+        LOCATE y, x + 2
+        PRINT "[ " + title + " ]"
+    END IF
+END SUB</code></pre>
+
+                        <h3>Progress Bar</h3>
+                        <pre><code class="language-basic">DEF SUB draw_progress_bar(x, y, width, percentage, label)
+    DIM filled_width AS INTEGER
+    filled_width = (width * percentage) / 100
+    
+    LOCATE y, x
+    PRINT label + " ["
+    PRINT STRING$(filled_width, "█")
+    PRINT STRING$(width - filled_width, "░")
+    PRINT "] " + STR$(percentage) + "%"
+END SUB</code></pre>
+                    </section>
+
+                    <section id="dosya-formatlari">
+                        <h2><span class="section-icon">📁</span>Dosya Formatları</h2>
+                        
+                        <h3>JSON İşleme</h3>
+                        <pre><code class="language-basic">DEF FUNCTION json_stringify(obj)
+    DIM obj_type AS STRING
+    obj_type = TYPE_OF(obj)
+    
+    SELECT CASE obj_type
+        CASE "STRING"
+            RETURN """" + json_escape_string(obj) + """"
+        CASE "INTEGER", "DOUBLE"
+            RETURN STR$(obj)
+        CASE "BOOLEAN"
+            IF obj THEN
+                RETURN "true"
+            ELSE
+                RETURN "false"
+            END IF
+        CASE "ARRAY"
+            DIM result AS STRING
+            result = "["
+            FOR i = 0 TO LEN(obj) - 1
+                IF i > 0 THEN result = result + ","
+                result = result + json_stringify(obj(i))
+            NEXT i
+            result = result + "]"
+            RETURN result
+    END SELECT
+END FUNCTION</code></pre>
+
+                        <h3>CSV İşleme</h3>
+                        <pre><code class="language-basic">DEF FUNCTION csv_parse(csv_content, delimiter)
+    DIM lines AS ARRAY
+    lines = SPLIT(csv_content, CHR$(10))
+    
+    DIM result AS ARRAY
+    result = []
+    
+    FOR i = 0 TO LEN(lines) - 1
+        DIM line AS STRING
+        line = TRIM(lines(i))
+        
+        IF line <> "" THEN
+            DIM fields AS ARRAY
+            fields = csv_parse_line(line, delimiter)
+            INSERT(result, fields)
+        END IF
+    NEXT i
+    
+    RETURN result
+END FUNCTION</code></pre>
+                    </section>
+
+                    <section id="security">
+                        <h2><span class="section-icon">🔐</span>Security ve Kriptografi</h2>
+                        
+                        <h3>Hash Fonksiyonları</h3>
+                        <pre><code class="language-basic">DEF FUNCTION simple_hash(input_string)
+    DIM hash_value AS LONG
+    hash_value = 0
+    
+    FOR i = 1 TO LEN(input_string)
+        DIM char_code AS INTEGER
+        char_code = ASC(MID$(input_string, i, 1))
+        hash_value = ((hash_value * 31) + char_code) MOD 2147483647
+    NEXT i
+    
+    RETURN ABS(hash_value)
+END FUNCTION</code></pre>
+
+                        <h3>Caesar Cipher</h3>
+                        <pre><code class="language-basic">DEF FUNCTION caesar_encrypt(plaintext, shift)
+    DIM result AS STRING
+    result = ""
+    
+    FOR i = 1 TO LEN(plaintext)
+        DIM char AS STRING
+        char = MID$(plaintext, i, 1)
+        DIM ascii_val AS INTEGER
+        ascii_val = ASC(char)
+        
+        ' Handle uppercase letters
+        IF ascii_val >= 65 AND ascii_val <= 90 THEN
+            ascii_val = ((ascii_val - 65 + shift) MOD 26) + 65
+        ' Handle lowercase letters
+        ELSEIF ascii_val >= 97 AND ascii_val <= 122 THEN
+            ascii_val = ((ascii_val - 97 + shift) MOD 26) + 97
+        END IF
+        
+        result = result + CHR$(ascii_val)
+    NEXT i
+    
+    RETURN result
+END FUNCTION</code></pre>
+
+                        <h3>Input Validation</h3>
+                        <pre><code class="language-basic">DEF FUNCTION validate_email(email)
+    ' Basic email validation
+    IF LEN(email) < 5 THEN RETURN FALSE
+    IF INSTR(1, email, "@") = 0 THEN RETURN FALSE
+    IF INSTR(1, email, ".") = 0 THEN RETURN FALSE
+    
+    DIM at_pos AS INTEGER
+    at_pos = INSTR(1, email, "@")
+    
+    ' Check if @ is not at start or end
+    IF at_pos = 1 OR at_pos = LEN(email) THEN RETURN FALSE
+    
+    ' Check for multiple @
+    IF INSTR(at_pos + 1, email, "@") > 0 THEN RETURN FALSE
+    
+    RETURN TRUE
+END FUNCTION</code></pre>
+                    </section>
+
+                    <section id="best-practices">
+                        <h2><span class="section-icon">🎯</span>Best Practices ve İpuçları</h2>
+                        
+                        <div class="alert alert-success">
+                            <h4>✅ Temel Prensipler:</h4>
+                            <ol>
+                                <li><strong>Modüler Tasarım:</strong> Her fonksiyon tek sorumluluk prensibi</li>
+                                <li><strong>Clean Code:</strong> Anlaşılır ve sürdürülebilir kod yazma</li>
+                                <li><strong>Error Handling:</strong> Robust hata yönetimi teknikleri</li>
+                                <li><strong>Performance:</strong> Algoritma optimizasyonu ve bellek yönetimi</li>
+                                <li><strong>Testing:</strong> Unit test ve debugging stratejileri</li>
+                            </ol>
+                        </div>
+
+                        <h3>Clean Code Principles</h3>
+                        <pre><code class="language-basic">' ❌ Kötü örnek
+DEF FUNCTION calc(d1, d2)
+    RETURN d1 * d2 + 15
+END FUNCTION
+
+' ✅ İyi örnek
+DEF FUNCTION calculate_total_price_with_tax(base_price, tax_rate)
+    DIM tax_amount AS DOUBLE
+    tax_amount = base_price * tax_rate
+    RETURN base_price + tax_amount
+END FUNCTION</code></pre>
+
+                        <h3>Error Handling Patterns</h3>
+                        <pre><code class="language-basic">DEF FUNCTION safe_divide(numerator, denominator)
+    TRY
+        IF denominator = 0 THEN
+            THROW "Division by zero error"
+        END IF
+        RETURN numerator / denominator
+    CATCH error_msg DO
+        PRINT "Error in safe_divide: " + error_msg
+        RETURN NULL
+    END TRY
+END FUNCTION</code></pre>
+
+                        <h3>Performance Optimization</h3>
+                        <pre><code class="language-basic">' Memoization Pattern
+DIM calculation_cache AS DICT
+calculation_cache = {}
+
+DEF FUNCTION expensive_calculation(input_value)
+    DIM key AS STRING
+    key = STR$(input_value)
+    
+    IF calculation_cache.CONTAINS(key) THEN
+        RETURN calculation_cache(key)
+    END IF
+    
+    ' Expensive operation
+    DIM result AS DOUBLE
+    result = 0
+    FOR i = 1 TO input_value
+        result = result + SQR(i) * LOG(i)
+    NEXT i
+    
+    calculation_cache(key) = result
+    RETURN result
+END FUNCTION</code></pre>
+
+                        <h3>🎮 Oyun Geliştirme İçin İpuçları</h3>
+                        <pre><code class="language-basic">' Real-time Klavye Kontrolü
+DIM game_running AS BOOLEAN
+game_running = True
+
+WHILE game_running
+    DIM key AS STRING
+    key = KEY()
+    
+    SELECT CASE key
+        CASE "W", "<YUKARIOK>"
+            ' Yukarı hareket
+        CASE "S", "<ASAGIOK>"
+            ' Aşağı hareket
+        CASE "Q", "<ESC>"
+            game_running = False
+    END SELECT
+    
+    WAIT 50  ' 50ms bekle (frame rate kontrolü)
+WEND</code></pre>
+                    </section>
+
+                    <section id="desteklenen-formatlar">
+                        <h2><span class="section-icon">📄</span>Desteklenen Dosya Formatları</h2>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Uzantı</th>
+                                    <th>Açıklama</th>
+                                    <th>Kullanım</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>.basx</code></td>
+                                    <td>Ana program dosyaları</td>
+                                    <td>Executable BASIC programs</td>
+                                </tr>
+                                <tr>
+                                    <td><code>.libx</code></td>
+                                    <td>Kütüphane dosyaları</td>
+                                    <td>Reusable libraries</td>
+                                </tr>
+                                <tr>
+                                    <td><code>.hx</code></td>
+                                    <td>Header dosyaları</td>
+                                    <td>Declarations and constants</td>
+                                </tr>
+                                <tr>
+                                    <td><code>.pdsx</code></td>
+                                    <td>pdsX program dosyaları</td>
+                                    <td>Legacy support</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <div class="alert alert-info">
+                        <h4>📞 Destek ve Daha Fazla Bilgi</h4>
+                        <ul>
+                            <li>Etkileşimli modda <code>HELP</code> komutu ile anlık yardım</li>
+                            <li><code>HELP [komut_adı]</code> ile belirli komut yardımı</li>
+                            <li><code>HELP EXAMPLES</code> ile örnek programlar</li>
+                            <li>Debug mode ile adım adım kod izleme</li>
+                            <li>REPL modu ile etkileşimli geliştirme</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin: 3rem 0; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                        <h2 style="margin: 0; color: white;">🚀 pdsXv11g</h2>
+                        <p style="margin: 1rem 0; font-size: 1.2rem;">Modern BASIC için gelişmiş yorumlayıcı!</p>
+                        <p style="margin: 0; opacity: 0.9;">Sınırları zorlayın ve modern programlama deneyimi yaşayın!</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 pdsXv11g - Modern BASIC Yorumlayıcısı. Tüm hakları saklıdır.</p>
+                <p>Bu kılavuz ile modern programlama dünyasında yolculuğunuza başlayın! 🚀</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <a href="#baslik" class="back-to-top" id="backToTop">↑</a>
+
+    <script>
+        // Navigation toggle for mobile
+        function toggleNav() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth scrolling for navigation links
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update active navigation item
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tocLinks = document.querySelectorAll('.toc-link');
+            
+            function updateActiveLink() {
+                const scrollPos = window.scrollY + 100;
+                const sections = document.querySelectorAll('section[id], h1[id], h2[id], h3[id]');
+                
+                sections.forEach(section => {
+                    if (section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
+                        const id = section.getAttribute('id');
+                        
+                        // Update nav links
+                        navLinks.forEach(link => {
+                            if (link.getAttribute('href') === '#' + id) {
+                                document.querySelectorAll('.nav-link.active').forEach(l => l.classList.remove('active'));
+                                link.classList.add('active');
+                            }
+                        });
+                        
+                        // Update TOC links
+                        tocLinks.forEach(link => {
+                            if (link.getAttribute('href') === '#' + id) {
+                                document.querySelectorAll('.toc-link.active').forEach(l => l.classList.remove('active'));
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Scroll progress bar
+            function updateScrollProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = (scrollTop / docHeight) * 100;
+                document.querySelector('.scroll-progress').style.width = scrollPercent + '%';
+            }
+
+            // Back to top button
+            function toggleBackToTop() {
+                const backToTop = document.getElementById('backToTop');
+                if (window.scrollY > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            }
+
+            // Event listeners
+            window.addEventListener('scroll', function() {
+                updateActiveLink();
+                updateScrollProgress();
+                toggleBackToTop();
+            });
+
+            // Initialize
+            updateActiveLink();
+            updateScrollProgress();
+            toggleBackToTop();
+
+            // Code syntax highlighting (if highlight.js is loaded)
+            if (typeof hljs !== 'undefined') {
+                hljs.highlightAll();
+            }
+
+            // Print styles
+            window.addEventListener('beforeprint', function() {
+                document.body.classList.add('printing');
+            });
+
+            window.addEventListener('afterprint', function() {
+                document.body.classList.remove('printing');
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+P for print
+            if (e.ctrlKey && e.key === 'p') {
+                window.print();
+                e.preventDefault();
+            }
+            
+            // Escape to close mobile menu
+            if (e.key === 'Escape') {
+                const navMenu = document.getElementById('navMenu');
+                if (navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                }
+            }
+        });
+
+        // Copy code blocks on click
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('pre code')) {
+                const code = e.target.closest('pre code');
+                const text = code.textContent;
+                
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        // Show temporary feedback
+                        const original = code.style.background;
+                        code.style.background = '#10b981';
+                        setTimeout(() => {
+                            code.style.background = original;
+                        }, 200);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
