@@ -1,0 +1,110 @@
+REM Test 5: String fonksiyonları testleri
+REM Bu program built-in string fonksiyonlarını test eder
+
+PRINT "=== String Fonksiyonları Testleri ==="
+PRINT
+
+DIM text AS STRING
+DIM result AS STRING
+text = "Merhaba Dünya"
+
+PRINT "Orijinal metin: '" + text + "'"
+PRINT
+
+REM Uzunluk ve pozisyon fonksiyonları
+PRINT "1. Temel String Fonksiyonları:"
+PRINT "LEN(text) =", LEN(text)
+PRINT "LEFT$(text, 7) = '" + LEFT$(text, 7) + "'"
+PRINT "RIGHT$(text, 5) = '" + RIGHT$(text, 5) + "'"
+PRINT "MID$(text, 9, 5) = '" + MID$(text, 9, 5) + "'"
+
+PRINT
+
+REM Büyük/küçük harf dönüşümleri
+PRINT "2. Büyük/Küçük Harf Dönüşümleri:"
+PRINT "UCASE$(text) = '" + UCASE$(text) + "'"
+PRINT "LCASE$(text) = '" + LCASE$(text) + "'"
+
+PRINT
+
+REM Arama fonksiyonları
+PRINT "3. Arama Fonksiyonları:"
+PRINT "INSTR(1, text, 'Dünya') =", INSTR(1, text, "Dünya")
+PRINT "INSTR(1, text, 'xyz') =", INSTR(1, text, "xyz")
+
+PRINT
+
+REM String oluşturma fonksiyonları
+PRINT "4. String Oluşturma Fonksiyonları:"
+PRINT "STRING$(5, '*') = '" + STRING$(5, "*") + "'"
+PRINT "SPACE$(8) = '" + SPACE$(8) + "'"
+
+PRINT
+
+REM Trim fonksiyonları
+DIM padded_text AS STRING
+padded_text = "   Boşluklu metin   "
+PRINT "5. Trim Fonksiyonları:"
+PRINT "Orijinal: '" + padded_text + "'"
+PRINT "LTRIM$() = '" + LTRIM$(padded_text) + "'"
+PRINT "RTRIM$() = '" + RTRIM$(padded_text) + "'"
+
+PRINT
+
+REM Sayı-string dönüşümleri
+DIM number AS DOUBLE
+DIM number_str AS STRING
+number = 123.45
+number_str = "987.65"
+
+PRINT "6. Sayı-String Dönüşümleri:"
+PRINT "STR$(number) = '" + STR$(number) + "'"
+PRINT "VAL(number_str) =", VAL(number_str)
+
+PRINT
+
+REM Karakter dönüşümleri
+PRINT "7. Karakter Dönüşümleri:"
+PRINT "ASC('A') =", ASC("A")
+PRINT "ASC('a') =", ASC("a")
+PRINT "CHR$(65) = '" + CHR$(65) + "'"
+PRINT "CHR$(97) = '" + CHR$(97) + "'"
+
+PRINT
+
+REM String birleştirme örnekleri
+DIM first_name AS STRING
+DIM last_name AS STRING
+DIM full_name AS STRING
+
+first_name = "Ahmet"
+last_name = "Yılmaz"
+full_name = first_name + " " + last_name
+
+PRINT "8. String Birleştirme:"
+PRINT "İsim: " + first_name
+PRINT "Soyisim: " + last_name
+PRINT "Tam isim: " + full_name
+
+PRINT
+
+REM Karmaşık string işlemleri
+DIM email AS STRING
+DIM at_pos AS INTEGER
+DIM username AS STRING
+DIM domain AS STRING
+
+email = "kullanici@ornek.com"
+at_pos = INSTR(1, email, "@")
+
+IF at_pos > 0 THEN
+    username = LEFT$(email, at_pos - 1)
+    domain = MID$(email, at_pos + 1, LEN(email) - at_pos)
+    PRINT "9. Email Ayrıştırma:"
+    PRINT "Email: " + email
+    PRINT "Kullanıcı adı: " + username
+    PRINT "Domain: " + domain
+END IF
+
+PRINT
+PRINT "String fonksiyonları testleri tamamlandı!"
