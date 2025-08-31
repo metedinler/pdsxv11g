@@ -1,0 +1,282 @@
+REM Örnek 2: Öğrenci Not Sistemi
+REM Bu program öğrenci bilgilerini yönetir ve not hesaplamaları yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║         ÖĞRENCİ NOT SİSTEMİ          ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Öğrenci veri yapısı
+TYPE Student
+    id AS INTEGER
+    name AS STRING
+    grades AS ARRAY
+    average AS DOUBLE
+    letter_grade AS STRING
+END TYPE
+
+REM Öğrenci listesi
+DIM students AS LIST
+students = []
+
+REM ID counter
+DIM next_id AS INTEGER
+next_id = 1
+
+DEF SUB show_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Öğrenci Ekle"
+    PRINT "2. Not Ekle"
+    PRINT "3. Öğrenci Listesi"
+    PRINT "4. Sınıf İstatistikleri"
+    PRINT "5. Not Dağılımı"
+    PRINT "6. Arama"
+    PRINT "7. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF FUNCTION calculate_letter_grade(average)
+    IF average >= 90 THEN
+        RETURN "AA"
+    ELSEIF average >= 85 THEN
+        RETURN "BA"
+    ELSEIF average >= 80 THEN
+        RETURN "BB"
+    ELSEIF average >= 75 THEN
+        RETURN "CB"
+    ELSEIF average >= 70 THEN
+        RETURN "CC"
+    ELSEIF average >= 65 THEN
+        RETURN "DC"
+    ELSEIF average >= 60 THEN
+        RETURN "DD"
+    ELSEIF average >= 50 THEN
+        RETURN "FD"
+    ELSE
+        RETURN "FF"
+    END IF
+END FUNCTION
+
+DEF SUB add_student()
+    DIM new_student AS Student
+    
+    new_student.id = next_id
+    next_id = next_id + 1
+    
+    INPUT "Öğrenci adı: ", new_student.name
+    new_student.grades = []
+    new_student.average = 0.0
+    new_student.letter_grade = "Henüz Hesaplanmadı"
+    
+    INSERT(students, new_student)
+    PRINT "Öğrenci başarıyla eklendi. ID: " + STR$(new_student.id)
+END SUB
+
+DEF SUB add_grade()
+    IF LEN(students) = 0 THEN
+        PRINT "Henüz öğrenci yok. Önce öğrenci ekleyin."
+        RETURN
+    END IF
+    
+    DIM student_id AS INTEGER
+    DIM grade AS DOUBLE
+    DIM found AS BOOLEAN
+    found = False
+    
+    INPUT "Öğrenci ID: ", student_id
+    INPUT "Not (0-100): ", grade
+    
+    IF grade < 0 OR grade > 100 THEN
+        PRINT "Not 0-100 arasında olmalıdır!"
+        RETURN
+    END IF
+    
+    FOR i = 0 TO LEN(students) - 1
+        IF students(i).id = student_id THEN
+            INSERT(students(i).grades, grade)
+            
+            REM Ortalama hesapla
+            DIM total AS DOUBLE
+            total = SUM(students(i).grades)
+            students(i).average = total / LEN(students(i).grades)
+            students(i).letter_grade = calculate_letter_grade(students(i).average)
+            
+            found = True
+            PRINT "Not başarıyla eklendi. Yeni ortalama: " + STR$(ROUND(students(i).average, 2))
+            EXIT FOR
+        END IF
+    NEXT i
+    
+    IF NOT found THEN
+        PRINT "Öğrenci bulunamadı!"
+    END IF
+END SUB
+
+DEF SUB list_students()
+    IF LEN(students) = 0 THEN
+        PRINT "Henüz öğrenci yok."
+        RETURN
+    END IF
+    
+    PRINT "╔════╤════════════════════╤════════╤════════╤══════════╗"
+    PRINT "║ ID │        İsim        │ Not Sa.│Ortalama│Harf Notu ║"
+    PRINT "╠════╪════════════════════╪════════╪════════╪══════════╣"
+    
+    FOR i = 0 TO LEN(students) - 1
+        DIM id_str AS STRING
+        DIM name_str AS STRING
+        DIM count_str AS STRING
+        DIM avg_str AS STRING
+        
+        id_str = STR$(students(i).id)
+        name_str = LEFT$(students(i).name + SPACE$(20), 20)
+        count_str = STR$(LEN(students(i).grades))
+        avg_str = STR$(ROUND(students(i).average, 2))
+        
+        PRINT "║" + id_str + SPACE$(4 - LEN(id_str)) + "│" + name_str + "│" + 
+              SPACE$(8 - LEN(count_str)) + count_str + "│" + 
+              SPACE$(8 - LEN(avg_str)) + avg_str + "│" + 
+              SPACE$(10 - LEN(students(i).letter_grade)) + students(i).letter_grade + "║"
+    NEXT i
+    
+    PRINT "╚════╧════════════════════╧════════╧════════╧══════════╝"
+END SUB
+
+DEF SUB class_statistics()
+    IF LEN(students) = 0 THEN
+        PRINT "Henüz öğrenci yok."
+        RETURN
+    END IF
+    
+    DIM all_averages AS ARRAY
+    all_averages = []
+    
+    FOR i = 0 TO LEN(students) - 1
+        IF LEN(students(i).grades) > 0 THEN
+            INSERT(all_averages, students(i).average)
+        END IF
+    NEXT i
+    
+    IF LEN(all_averages) = 0 THEN
+        PRINT "Henüz not girilmiş."
+        RETURN
+    END IF
+    
+    PRINT "═══ SINIF İSTATİSTİKLERİ ═══"
+    PRINT "Öğrenci sayısı: " + STR$(LEN(students))
+    PRINT "Not girilen öğrenci: " + STR$(LEN(all_averages))
+    PRINT "Sınıf ortalaması: " + STR$(ROUND(MEAN(all_averages), 2))
+    PRINT "En yüksek ortalama: " + STR$(ROUND(MAX(all_averages), 2))
+    PRINT "En düşük ortalama: " + STR$(ROUND(MIN(all_averages), 2))
+    PRINT "Standart sapma: " + STR$(ROUND(STD(all_averages), 4))
+    PRINT "Medyan: " + STR$(ROUND(MEDIAN(all_averages), 2))
+END SUB
+
+DEF SUB grade_distribution()
+    IF LEN(students) = 0 THEN
+        PRINT "Henüz öğrenci yok."
+        RETURN
+    END IF
+    
+    DIM aa_count, ba_count, bb_count, cb_count, cc_count AS INTEGER
+    DIM dc_count, dd_count, fd_count, ff_count AS INTEGER
+    
+    aa_count = 0: ba_count = 0: bb_count = 0: cb_count = 0: cc_count = 0
+    dc_count = 0: dd_count = 0: fd_count = 0: ff_count = 0
+    
+    FOR i = 0 TO LEN(students) - 1
+        SELECT CASE students(i).letter_grade
+            CASE "AA": aa_count = aa_count + 1
+            CASE "BA": ba_count = ba_count + 1
+            CASE "BB": bb_count = bb_count + 1
+            CASE "CB": cb_count = cb_count + 1
+            CASE "CC": cc_count = cc_count + 1
+            CASE "DC": dc_count = dc_count + 1
+            CASE "DD": dd_count = dd_count + 1
+            CASE "FD": fd_count = fd_count + 1
+            CASE "FF": ff_count = ff_count + 1
+        END SELECT
+    NEXT i
+    
+    PRINT "═══ NOT DAĞILIMI ═══"
+    PRINT "AA: " + STR$(aa_count) + " öğrenci"
+    PRINT "BA: " + STR$(ba_count) + " öğrenci"
+    PRINT "BB: " + STR$(bb_count) + " öğrenci"
+    PRINT "CB: " + STR$(cb_count) + " öğrenci"
+    PRINT "CC: " + STR$(cc_count) + " öğrenci"
+    PRINT "DC: " + STR$(dc_count) + " öğrenci"
+    PRINT "DD: " + STR$(dd_count) + " öğrenci"
+    PRINT "FD: " + STR$(fd_count) + " öğrenci"
+    PRINT "FF: " + STR$(ff_count) + " öğrenci"
+END SUB
+
+DEF SUB search_student()
+    IF LEN(students) = 0 THEN
+        PRINT "Henüz öğrenci yok."
+        RETURN
+    END IF
+    
+    DIM search_term AS STRING
+    INPUT "Aranacak isim (kısmi arama): ", search_term
+    search_term = UCASE$(search_term)
+    
+    DIM found_any AS BOOLEAN
+    found_any = False
+    
+    PRINT "═══ ARAMA SONUÇLARI ═══"
+    FOR i = 0 TO LEN(students) - 1
+        IF INSTR(1, UCASE$(students(i).name), search_term) > 0 THEN
+            PRINT "ID: " + STR$(students(i).id) + " - " + students(i).name
+            PRINT "  Not sayısı: " + STR$(LEN(students(i).grades))
+            PRINT "  Ortalama: " + STR$(ROUND(students(i).average, 2))
+            PRINT "  Harf notu: " + students(i).letter_grade
+            PRINT "  Notlar: " + STR$(students(i).grades)
+            PRINT
+            found_any = True
+        END IF
+    NEXT i
+    
+    IF NOT found_any THEN
+        PRINT "Eşleşen öğrenci bulunamadı."
+    END IF
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-7): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            add_student()
+        CASE 2
+            add_grade()
+        CASE 3
+            list_students()
+        CASE 4
+            class_statistics()
+        CASE 5
+            grade_distribution()
+        CASE 6
+            search_student()
+        CASE 7
+            running = False
+            PRINT "Sistem kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Öğrenci not sistemi kapatıldı."
