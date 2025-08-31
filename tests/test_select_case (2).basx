@@ -1,0 +1,55 @@
+PRINT "=== SELECT CASE Testi ==="
+
+REM String deger testi
+DIM grade AS STRING
+LET grade = "B"
+PRINT "Grade:", grade
+
+SELECT CASE grade
+CASE "A"
+PRINT "Excellent!"
+CASE "B"
+PRINT "Good!"
+CASE "C"
+PRINT "Average"
+CASE "D", "F"
+PRINT "Poor"
+CASE ELSE
+PRINT "Invalid grade"
+END SELECT
+
+REM Integer deger testi
+DIM number AS INTEGER
+LET number = 5
+PRINT "Number:", number
+
+SELECT CASE number
+CASE 1, 2, 3
+PRINT "Small number"
+CASE 4, 5, 6
+PRINT "Medium number"
+CASE IS > 6
+PRINT "Large number"
+CASE ELSE
+PRINT "Zero or negative"
+END SELECT
+
+REM Kosul testi
+DIM score AS INTEGER
+LET score = 85
+PRINT "Score:", score
+
+SELECT CASE score
+CASE IS >= 90
+PRINT "A grade"
+CASE IS >= 80
+PRINT "B grade"
+CASE IS >= 70
+PRINT "C grade"
+CASE IS >= 60
+PRINT "D grade"
+CASE ELSE
+PRINT "F grade"
+END SELECT
+
+PRINT "=== Test Tamamlandi ==="
