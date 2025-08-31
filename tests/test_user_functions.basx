@@ -1,0 +1,87 @@
+DIM ADD AS INTEGER
+DIM DEF AS INTEGER
+DIM DEFINED AS INTEGER
+DIM FACTORIAL AS INTEGER
+DIM FN AS INTEGER
+DIM FONKSIYON AS INTEGER
+DIM FONKSIYONLAR AS INTEGER
+DIM FUNC AS INTEGER
+DIM FUNCTION AS INTEGER
+DIM KULLANMA AS INTEGER
+DIM MERHABA AS INTEGER
+DIM MULTIPLY AS INTEGER
+DIM NAME AS STRING
+DIM OLARAK AS INTEGER
+DIM PARAMETRE AS INTEGER
+DIM POWER AS INTEGER
+DIM RECURSION AS INTEGER
+DIM SONUCU AS INTEGER
+DIM SQUARE AS INTEGER
+DIM SUB AS INTEGER
+DIM TAMAMLANDI AS INTEGER
+DIM TEST AS INTEGER
+DIM TESTI AS INTEGER
+DIM USER AS INTEGER
+REM Test: User-defined fonksiyonlar ve recursion
+PRINT "=== User-Defined Fonksiyonlar Testi ==="
+
+REM 1. DEF FN - tek satirlik fonksiyon
+DEF FN square(x) = x * x
+DEF FN add(a, b) = a + b
+
+DIM num AS INTEGER
+num = 5
+
+PRINT "DEF FN Test:"
+PRINT "square(5) =", square(num)
+PRINT "add(10, 20) =", add(10, 20)
+
+REM 2. DEF FUNCTION - cok satirlik fonksiyon
+DEF FUNCTION factorial(n)
+DIM result AS INTEGER
+IF n <= 1 THEN
+result = 1
+ELSE
+result = n * factorial(n - 1)
+END IF
+RETURN result
+END FUNCTION
+
+PRINT "DEF FUNCTION Test (Recursion):"
+PRINT "factorial(5) =", factorial(5)
+PRINT "factorial(3) =", factorial(3)
+
+REM 3. FUNC - lambda tarzi fonksiyon
+FUNC multiply(x, y)
+DIM temp AS INTEGER
+temp = x * y
+RETURN temp
+END FUNC
+
+PRINT "FUNC Test:"
+PRINT "multiply(7, 8) =", multiply(7, 8)
+
+REM 4. DEF SUB - subroutine
+DEF SUB greet(name)
+PRINT "Merhaba", name + "!"
+END SUB
+
+PRINT "DEF SUB Test:"
+CALL greet("Dunya")
+CALL greet("BASIC")
+
+REM 5. Fonksiyonlari parametre olarak kullanma
+DEF FUNCTION power(base, exp)
+DIM result AS INTEGER
+DIM i AS INTEGER
+result = 1
+FOR i = 1 TO exp
+result = result * base
+NEXT
+RETURN result
+END FUNCTION
+
+PRINT "Fonksiyon sonucu parametre olarak kullanma:"
+PRINT "square(power(2, 3)) =", square(power(2, 3))
+
+PRINT "=== Test Tamamlandi ==="
