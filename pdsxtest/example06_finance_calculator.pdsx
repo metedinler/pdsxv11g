@@ -1,0 +1,724 @@
+REM Örnek 6: Kredi ve Yatırım Hesaplama Sistemi
+REM Bu program krediler, yatırımlar ve finansal planlamalar için hesaplamalar yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║  KREDİ VE YATIRIM HESAPLAMA SİSTEMİ  ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+DEF SUB show_finance_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Kredi Hesaplama (Eşit Taksit)"
+    PRINT "2. Kredi Hesaplama (Azalan Taksit)"
+    PRINT "3. Yatırım Getiri Hesaplama"
+    PRINT "4. Bileşik Faiz Hesaplama"
+    PRINT "5. Emeklilik Planlaması"
+    PRINT "6. Mortgage Hesaplama"
+    PRINT "7. Leasing Hesaplama"
+    PRINT "8. Enflasyon Etkisi Analizi"
+    PRINT "9. Yatırım Karşılaştırma"
+    PRINT "10. Risk Analizi"
+    PRINT "11. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB equal_installment_loan()
+    PRINT "═══ EŞİT TAKSİT KREDİ HESAPLAMA ═══"
+    
+    DIM loan_amount AS DOUBLE
+    DIM annual_rate AS DOUBLE
+    DIM months AS INTEGER
+    
+    INPUT "Kredi tutarı (₺): ", loan_amount
+    INPUT "Yıllık faiz oranı (%): ", annual_rate
+    INPUT "Vade (ay): ", months
+    
+    DIM monthly_rate AS DOUBLE
+    monthly_rate = annual_rate / 100 / 12
+    
+    DIM monthly_payment AS DOUBLE
+    IF monthly_rate = 0 THEN
+        monthly_payment = loan_amount / months
+    ELSE
+        monthly_payment = loan_amount * (monthly_rate * (1 + monthly_rate)^months) / ((1 + monthly_rate)^months - 1)
+    END IF
+    
+    DIM total_payment AS DOUBLE
+    DIM total_interest AS DOUBLE
+    total_payment = monthly_payment * months
+    total_interest = total_payment - loan_amount
+    
+    PRINT
+    PRINT "SONUÇLAR:"
+    PRINT "Aylık taksit: " + STR$(ROUND(monthly_payment, 2)) + " ₺"
+    PRINT "Toplam ödeme: " + STR$(ROUND(total_payment, 2)) + " ₺"
+    PRINT "Toplam faiz: " + STR$(ROUND(total_interest, 2)) + " ₺"
+    PRINT "Faiz oranı: %" + STR$(ROUND((total_interest / loan_amount) * 100, 2))
+    
+    PRINT
+    INPUT "Ödeme tablosunu görmek istiyor musunuz? (E/H): ", show_table
+    
+    IF UPPER$(show_table) = "E" THEN
+        PRINT
+        PRINT "TAKSİT TABLOSU:"
+        PRINT STRING$(70, "-")
+        PRINT "Taksit | Anapara    | Faiz       | Taksit     | Kalan Borç"
+        PRINT STRING$(70, "-")
+        
+        DIM remaining_balance AS DOUBLE
+        remaining_balance = loan_amount
+        
+        FOR i = 1 TO months
+            DIM interest_payment AS DOUBLE
+            DIM principal_payment AS DOUBLE
+            
+            interest_payment = remaining_balance * monthly_rate
+            principal_payment = monthly_payment - interest_payment
+            remaining_balance = remaining_balance - principal_payment
+            
+            PRINT RIGHT$("   " + STR$(i), 6) + " | " +
+                  RIGHT$("        " + STR$(ROUND(principal_payment, 2)), 10) + " | " +
+                  RIGHT$("        " + STR$(ROUND(interest_payment, 2)), 10) + " | " +
+                  RIGHT$("        " + STR$(ROUND(monthly_payment, 2)), 10) + " | " +
+                  RIGHT$("          " + STR$(ROUND(remaining_balance, 2)), 11)
+        NEXT i
+    END IF
+END SUB
+
+DEF SUB decreasing_installment_loan()
+    PRINT "═══ AZALAN TAKSİT KREDİ HESAPLAMA ═══"
+    
+    DIM loan_amount AS DOUBLE
+    DIM annual_rate AS DOUBLE
+    DIM months AS INTEGER
+    
+    INPUT "Kredi tutarı (₺): ", loan_amount
+    INPUT "Yıllık faiz oranı (%): ", annual_rate
+    INPUT "Vade (ay): ", months
+    
+    DIM monthly_rate AS DOUBLE
+    monthly_rate = annual_rate / 100 / 12
+    
+    DIM principal_payment AS DOUBLE
+    principal_payment = loan_amount / months
+    
+    DIM first_payment AS DOUBLE
+    first_payment = principal_payment + (loan_amount * monthly_rate)
+    
+    DIM last_payment AS DOUBLE
+    last_payment = principal_payment + (principal_payment * monthly_rate)
+    
+    DIM total_payment AS DOUBLE
+    total_payment = loan_amount + (loan_amount * monthly_rate * (months + 1) / 2)
+    
+    DIM total_interest AS DOUBLE
+    total_interest = total_payment - loan_amount
+    
+    PRINT
+    PRINT "SONUÇLAR:"
+    PRINT "İlk taksit: " + STR$(ROUND(first_payment, 2)) + " ₺"
+    PRINT "Son taksit: " + STR$(ROUND(last_payment, 2)) + " ₺"
+    PRINT "Aylık anapara: " + STR$(ROUND(principal_payment, 2)) + " ₺"
+    PRINT "Toplam ödeme: " + STR$(ROUND(total_payment, 2)) + " ₺"
+    PRINT "Toplam faiz: " + STR$(ROUND(total_interest, 2)) + " ₺"
+    
+    PRINT
+    INPUT "İlk 12 taksiti görmek istiyor musunuz? (E/H): ", show_table
+    
+    IF UPPER$(show_table) = "E" THEN
+        PRINT
+        PRINT "İLK 12 TAKSİT:"
+        PRINT STRING$(60, "-")
+        PRINT "Taksit | Anapara  | Faiz     | Toplam   | Kalan"
+        PRINT STRING$(60, "-")
+        
+        DIM remaining AS DOUBLE
+        remaining = loan_amount
+        
+        FOR i = 1 TO MIN(12, months)
+            DIM interest_part AS DOUBLE
+            DIM total_installment AS DOUBLE
+            
+            interest_part = remaining * monthly_rate
+            total_installment = principal_payment + interest_part
+            remaining = remaining - principal_payment
+            
+            PRINT RIGHT$("   " + STR$(i), 6) + " | " +
+                  RIGHT$("      " + STR$(ROUND(principal_payment, 2)), 8) + " | " +
+                  RIGHT$("      " + STR$(ROUND(interest_part, 2)), 8) + " | " +
+                  RIGHT$("      " + STR$(ROUND(total_installment, 2)), 8) + " | " +
+                  RIGHT$("     " + STR$(ROUND(remaining, 2)), 7)
+        NEXT i
+    END IF
+END SUB
+
+DEF SUB investment_return_calculation()
+    PRINT "═══ YATIRIM GETİRİ HESAPLAMA ═══"
+    
+    DIM initial_amount AS DOUBLE
+    DIM final_amount AS DOUBLE
+    DIM investment_period AS DOUBLE
+    DIM calculation_type AS INTEGER
+    
+    PRINT "1. Getiri oranını hesapla"
+    PRINT "2. Hedef tutarı hesapla"
+    PRINT "3. Süreyi hesapla"
+    INPUT "Seçiminiz: ", calculation_type
+    
+    SELECT CASE calculation_type
+        CASE 1
+            INPUT "Başlangıç tutarı (₺): ", initial_amount
+            INPUT "Son tutar (₺): ", final_amount
+            INPUT "Yatırım süresi (yıl): ", investment_period
+            
+            DIM annual_return AS DOUBLE
+            annual_return = ((final_amount / initial_amount) ^ (1 / investment_period) - 1) * 100
+            
+            DIM total_return AS DOUBLE
+            total_return = ((final_amount - initial_amount) / initial_amount) * 100
+            
+            PRINT
+            PRINT "SONUÇLAR:"
+            PRINT "Yıllık getiri oranı: %" + STR$(ROUND(annual_return, 4))
+            PRINT "Toplam getiri oranı: %" + STR$(ROUND(total_return, 2))
+            PRINT "Kazanç: " + STR$(ROUND(final_amount - initial_amount, 2)) + " ₺"
+            
+        CASE 2
+            INPUT "Başlangıç tutarı (₺): ", initial_amount
+            INPUT "Hedef yıllık getiri oranı (%): ", annual_return
+            INPUT "Yatırım süresi (yıl): ", investment_period
+            
+            final_amount = initial_amount * (1 + annual_return / 100) ^ investment_period
+            
+            PRINT
+            PRINT "SONUÇLAR:"
+            PRINT "Hedef tutar: " + STR$(ROUND(final_amount, 2)) + " ₺"
+            PRINT "Kazanç: " + STR$(ROUND(final_amount - initial_amount, 2)) + " ₺"
+            
+        CASE 3
+            INPUT "Başlangıç tutarı (₺): ", initial_amount
+            INPUT "Hedef tutar (₺): ", final_amount
+            INPUT "Yıllık getiri oranı (%): ", annual_return
+            
+            investment_period = LOG(final_amount / initial_amount) / LOG(1 + annual_return / 100)
+            
+            PRINT
+            PRINT "SONUÇLAR:"
+            PRINT "Gerekli süre: " + STR$(ROUND(investment_period, 2)) + " yıl"
+            PRINT "Gerekli süre: " + STR$(ROUND(investment_period * 12, 0)) + " ay"
+    END SELECT
+END SUB
+
+DEF SUB compound_interest_calculation()
+    PRINT "═══ BİLEŞİK FAİZ HESAPLAMA ═══"
+    
+    DIM principal AS DOUBLE
+    DIM rate AS DOUBLE
+    DIM time AS DOUBLE
+    DIM compound_frequency AS INTEGER
+    
+    INPUT "Ana para (₺): ", principal
+    INPUT "Yıllık faiz oranı (%): ", rate
+    INPUT "Süre (yıl): ", time
+    
+    PRINT "Bileşikleştirme sıklığı:"
+    PRINT "1. Yıllık"
+    PRINT "2. 6 Aylık"
+    PRINT "3. 3 Aylık"
+    PRINT "4. Aylık"
+    PRINT "5. Günlük"
+    INPUT "Seçiminiz: ", compound_frequency
+    
+    DIM n AS INTEGER
+    SELECT CASE compound_frequency
+        CASE 1: n = 1
+        CASE 2: n = 2
+        CASE 3: n = 4
+        CASE 4: n = 12
+        CASE 5: n = 365
+    END SELECT
+    
+    DIM final_amount AS DOUBLE
+    final_amount = principal * (1 + (rate / 100) / n) ^ (n * time)
+    
+    DIM compound_interest AS DOUBLE
+    compound_interest = final_amount - principal
+    
+    DIM effective_rate AS DOUBLE
+    effective_rate = ((final_amount / principal) ^ (1 / time) - 1) * 100
+    
+    PRINT
+    PRINT "SONUÇLAR:"
+    PRINT "Ana para: " + STR$(principal) + " ₺"
+    PRINT "Son tutar: " + STR$(ROUND(final_amount, 2)) + " ₺"
+    PRINT "Bileşik faiz: " + STR$(ROUND(compound_interest, 2)) + " ₺"
+    PRINT "Efektif yıllık oran: %" + STR$(ROUND(effective_rate, 4))
+    
+    REM Basit faiz ile karşılaştırma
+    DIM simple_interest AS DOUBLE
+    simple_interest = principal * (rate / 100) * time
+    DIM simple_final AS DOUBLE
+    simple_final = principal + simple_interest
+    
+    PRINT
+    PRINT "BASİT FAİZ İLE KARŞILAŞTIRMA:"
+    PRINT "Basit faiz tutarı: " + STR$(ROUND(simple_final, 2)) + " ₺"
+    PRINT "Fark: " + STR$(ROUND(final_amount - simple_final, 2)) + " ₺"
+    PRINT "Bileşik faiz avantajı: %" + STR$(ROUND(((final_amount - simple_final) / simple_final) * 100, 2))
+END SUB
+
+DEF SUB retirement_planning()
+    PRINT "═══ EMEKLİLİK PLANLAMASI ═══"
+    
+    DIM current_age AS INTEGER
+    DIM retirement_age AS INTEGER
+    DIM monthly_savings AS DOUBLE
+    DIM expected_return AS DOUBLE
+    DIM target_amount AS DOUBLE
+    
+    INPUT "Mevcut yaşınız: ", current_age
+    INPUT "Emeklilik yaşı: ", retirement_age
+    INPUT "Aylık birikiminiz (₺): ", monthly_savings
+    INPUT "Beklenen yıllık getiri oranı (%): ", expected_return
+    
+    DIM years_to_retirement AS INTEGER
+    years_to_retirement = retirement_age - current_age
+    
+    DIM months_to_retirement AS INTEGER
+    months_to_retirement = years_to_retirement * 12
+    
+    DIM monthly_rate AS DOUBLE
+    monthly_rate = expected_return / 100 / 12
+    
+    DIM future_value AS DOUBLE
+    IF monthly_rate = 0 THEN
+        future_value = monthly_savings * months_to_retirement
+    ELSE
+        future_value = monthly_savings * (((1 + monthly_rate) ^ months_to_retirement - 1) / monthly_rate)
+    END IF
+    
+    PRINT
+    PRINT "EMEKLİLİK HESAPLAMA SONUÇLARI:"
+    PRINT "Emekliliğe kalan süre: " + STR$(years_to_retirement) + " yıl"
+    PRINT "Toplam katkı: " + STR$(monthly_savings * months_to_retirement) + " ₺"
+    PRINT "Emeklilikte birikecek tutar: " + STR$(ROUND(future_value, 2)) + " ₺"
+    PRINT "Faiz geliri: " + STR$(ROUND(future_value - (monthly_savings * months_to_retirement), 2)) + " ₺"
+    
+    REM Aylık emeklilik geliri hesaplama
+    PRINT
+    INPUT "Emeklilik süresini tahmin edin (yıl): ", retirement_years
+    INPUT "Emeklilikte beklenen getiri oranı (%): ", retirement_return
+    
+    DIM retirement_monthly_rate AS DOUBLE
+    retirement_monthly_rate = retirement_return / 100 / 12
+    
+    DIM retirement_months AS INTEGER
+    retirement_months = retirement_years * 12
+    
+    DIM monthly_pension AS DOUBLE
+    IF retirement_monthly_rate = 0 THEN
+        monthly_pension = future_value / retirement_months
+    ELSE
+        monthly_pension = future_value * retirement_monthly_rate / (1 - (1 + retirement_monthly_rate) ^ (-retirement_months))
+    END IF
+    
+    PRINT
+    PRINT "EMEKLİLİK GELİRİ:"
+    PRINT "Aylık emeklilik geliri: " + STR$(ROUND(monthly_pension, 2)) + " ₺"
+    PRINT "Yıllık emeklilik geliri: " + STR$(ROUND(monthly_pension * 12, 2)) + " ₺"
+    
+    REM Enflasyon etkisi
+    INPUT "Ortalama enflasyon oranı (%): ", inflation_rate
+    
+    DIM real_monthly_pension AS DOUBLE
+    real_monthly_pension = monthly_pension / ((1 + inflation_rate / 100) ^ years_to_retirement)
+    
+    PRINT
+    PRINT "ENFLASYON ETKİSİ:"
+    PRINT "Bugünkü satın alma gücü ile:"
+    PRINT "Aylık gelir: " + STR$(ROUND(real_monthly_pension, 2)) + " ₺"
+END SUB
+
+DEF SUB mortgage_calculation()
+    PRINT "═══ MORTGAGE HESAPLAMA ═══"
+    
+    DIM house_price AS DOUBLE
+    DIM down_payment AS DOUBLE
+    DIM loan_amount AS DOUBLE
+    DIM interest_rate AS DOUBLE
+    DIM loan_years AS INTEGER
+    
+    INPUT "Ev fiyatı (₺): ", house_price
+    INPUT "Peşinat oranı (%): ", down_payment_percent
+    
+    down_payment = house_price * (down_payment_percent / 100)
+    loan_amount = house_price - down_payment
+    
+    INPUT "Yıllık faiz oranı (%): ", interest_rate
+    INPUT "Kredi vadesi (yıl): ", loan_years
+    
+    DIM monthly_rate AS DOUBLE
+    monthly_rate = interest_rate / 100 / 12
+    
+    DIM num_payments AS INTEGER
+    num_payments = loan_years * 12
+    
+    DIM monthly_payment AS DOUBLE
+    monthly_payment = loan_amount * (monthly_rate * (1 + monthly_rate) ^ num_payments) / ((1 + monthly_rate) ^ num_payments - 1)
+    
+    DIM total_payments AS DOUBLE
+    total_payments = monthly_payment * num_payments
+    
+    DIM total_interest AS DOUBLE
+    total_interest = total_payments - loan_amount
+    
+    PRINT
+    PRINT "MORTGAGE HESAPLAMA SONUÇLARI:"
+    PRINT "Ev fiyatı: " + STR$(house_price) + " ₺"
+    PRINT "Peşinat: " + STR$(down_payment) + " ₺"
+    PRINT "Kredi tutarı: " + STR$(loan_amount) + " ₺"
+    PRINT "Aylık ödeme: " + STR$(ROUND(monthly_payment, 2)) + " ₺"
+    PRINT "Toplam ödeme: " + STR$(ROUND(total_payments, 2)) + " ₺"
+    PRINT "Toplam faiz: " + STR$(ROUND(total_interest, 2)) + " ₺"
+    
+    DIM debt_to_income AS DOUBLE
+    INPUT "Aylık geliriniz (₺): ", monthly_income
+    debt_to_income = (monthly_payment / monthly_income) * 100
+    
+    PRINT "Borç/Gelir oranı: %" + STR$(ROUND(debt_to_income, 2))
+    
+    IF debt_to_income <= 30 THEN
+        PRINT "Değerlendirme: İdeal seviyede"
+    ELSEIF debt_to_income <= 40 THEN
+        PRINT "Değerlendirme: Kabul edilebilir"
+    ELSE
+        PRINT "Değerlendirme: Yüksek risk seviyesi"
+    END IF
+END SUB
+
+DEF SUB leasing_calculation()
+    PRINT "═══ LİZİNG HESAPLAMA ═══"
+    
+    DIM vehicle_price AS DOUBLE
+    DIM down_payment AS DOUBLE
+    DIM residual_value AS DOUBLE
+    DIM interest_rate AS DOUBLE
+    DIM lease_months AS INTEGER
+    
+    INPUT "Araç fiyatı (₺): ", vehicle_price
+    INPUT "Peşinat (₺): ", down_payment
+    INPUT "Kalıntı değer oranı (%): ", residual_percent
+    INPUT "Yıllık faiz oranı (%): ", interest_rate
+    INPUT "Leasing süresi (ay): ", lease_months
+    
+    residual_value = vehicle_price * (residual_percent / 100)
+    
+    DIM depreciation_cost AS DOUBLE
+    depreciation_cost = (vehicle_price - down_payment - residual_value) / lease_months
+    
+    DIM interest_cost AS DOUBLE
+    interest_cost = (vehicle_price - down_payment + residual_value) * (interest_rate / 100) / 12
+    
+    DIM monthly_payment AS DOUBLE
+    monthly_payment = depreciation_cost + interest_cost
+    
+    DIM total_cost AS DOUBLE
+    total_cost = down_payment + (monthly_payment * lease_months)
+    
+    PRINT
+    PRINT "LİZİNG HESAPLAMA SONUÇLARI:"
+    PRINT "Araç fiyatı: " + STR$(vehicle_price) + " ₺"
+    PRINT "Peşinat: " + STR$(down_payment) + " ₺"
+    PRINT "Kalıntı değer: " + STR$(residual_value) + " ₺"
+    PRINT "Aylık amortisman: " + STR$(ROUND(depreciation_cost, 2)) + " ₺"
+    PRINT "Aylık faiz: " + STR$(ROUND(interest_cost, 2)) + " ₺"
+    PRINT "Aylık ödeme: " + STR$(ROUND(monthly_payment, 2)) + " ₺"
+    PRINT "Toplam maliyet: " + STR$(ROUND(total_cost, 2)) + " ₺"
+    
+    REM Satın alma ile karşılaştırma
+    DIM loan_payment AS DOUBLE
+    DIM monthly_rate AS DOUBLE
+    monthly_rate = interest_rate / 100 / 12
+    
+    IF monthly_rate = 0 THEN
+        loan_payment = (vehicle_price - down_payment) / lease_months
+    ELSE
+        loan_payment = (vehicle_price - down_payment) * (monthly_rate * (1 + monthly_rate) ^ lease_months) / ((1 + monthly_rate) ^ lease_months - 1)
+    END IF
+    
+    PRINT
+    PRINT "SATIN ALMA İLE KARŞILAŞTIRMA:"
+    PRINT "Kredi ile aylık ödeme: " + STR$(ROUND(loan_payment, 2)) + " ₺"
+    PRINT "Fark: " + STR$(ROUND(loan_payment - monthly_payment, 2)) + " ₺"
+    
+    IF monthly_payment < loan_payment THEN
+        PRINT "Leasing daha avantajlı (aylık)"
+    ELSE
+        PRINT "Kredili satın alma daha avantajlı (aylık)"
+    END IF
+END SUB
+
+DEF SUB inflation_analysis()
+    PRINT "═══ ENFLASYON ETKİSİ ANALİZİ ═══"
+    
+    DIM current_amount AS DOUBLE
+    DIM inflation_rate AS DOUBLE
+    DIM years AS INTEGER
+    
+    INPUT "Bugünkü para tutarı (₺): ", current_amount
+    INPUT "Ortalama enflasyon oranı (%): ", inflation_rate
+    INPUT "Kaç yıl sonrası: ", years
+    
+    DIM future_nominal AS DOUBLE
+    future_nominal = current_amount * (1 + inflation_rate / 100) ^ years
+    
+    DIM purchasing_power AS DOUBLE
+    purchasing_power = current_amount / (1 + inflation_rate / 100) ^ years
+    
+    DIM needed_return AS DOUBLE
+    needed_return = inflation_rate + 2  ' Gerçek getiri için
+    
+    DIM protected_amount AS DOUBLE
+    protected_amount = current_amount * (1 + needed_return / 100) ^ years
+    
+    PRINT
+    PRINT "ENFLASYON ANALİZİ SONUÇLARI:"
+    PRINT "Bugünkü tutar: " + STR$(current_amount) + " ₺"
+    PRINT STR$(years) + " yıl sonra nominal değer: " + STR$(ROUND(future_nominal, 2)) + " ₺"
+    PRINT "Bugünkü satın alma gücü: " + STR$(ROUND(purchasing_power, 2)) + " ₺"
+    PRINT "Satın alma gücü kaybı: " + STR$(ROUND(current_amount - purchasing_power, 2)) + " ₺"
+    PRINT "Kayıp oranı: %" + STR$(ROUND(((current_amount - purchasing_power) / current_amount) * 100, 2))
+    
+    PRINT
+    PRINT "KORUMA STRATEJİSİ:"
+    PRINT "Önerilen minimum getiri: %" + STR$(needed_return)
+    PRINT "Bu getiri ile tutar: " + STR$(ROUND(protected_amount, 2)) + " ₺"
+    PRINT "Gerçek kazanç: " + STR$(ROUND(protected_amount - future_nominal, 2)) + " ₺"
+END SUB
+
+DEF SUB investment_comparison()
+    PRINT "═══ YATIRIM KARŞILAŞTIRMA ═══"
+    
+    DIM num_investments AS INTEGER
+    INPUT "Kaç yatırım seçeneği karşılaştıracaksınız? (2-5): ", num_investments
+    
+    IF num_investments < 2 OR num_investments > 5 THEN
+        PRINT "Geçersiz sayı!"
+        EXIT SUB
+    END IF
+    
+    DIM investment_names AS ARRAY
+    DIM returns AS ARRAY
+    DIM risks AS ARRAY
+    DIM amounts AS ARRAY
+    
+    investment_names = []
+    returns = []
+    risks = []
+    amounts = []
+    
+    FOR i = 1 TO num_investments
+        PRINT
+        PRINT "--- Yatırım " + STR$(i) + " ---"
+        INPUT "Yatırım adı: ", inv_name
+        INPUT "Beklenen yıllık getiri (%): ", ret_rate
+        INPUT "Risk seviyesi (1-10): ", risk_level
+        INPUT "Yatırım tutarı (₺): ", inv_amount
+        
+        INSERT(investment_names, inv_name)
+        INSERT(returns, ret_rate)
+        INSERT(risks, risk_level)
+        INSERT(amounts, inv_amount)
+    NEXT i
+    
+    INPUT "Yatırım süresi (yıl): ", investment_years
+    
+    PRINT
+    PRINT "YATIRIM KARŞILAŞTIRMA SONUÇLARI:"
+    PRINT STRING$(80, "=")
+    
+    FOR i = 0 TO num_investments - 1
+        DIM future_value AS DOUBLE
+        future_value = amounts(i) * (1 + returns(i) / 100) ^ investment_years
+        
+        DIM total_return AS DOUBLE
+        total_return = future_value - amounts(i)
+        
+        DIM risk_adjusted_return AS DOUBLE
+        risk_adjusted_return = returns(i) / risks(i)  ' Sharpe benzeri basit oran
+        
+        PRINT
+        PRINT "Yatırım: " + investment_names(i)
+        PRINT "Başlangıç: " + STR$(amounts(i)) + " ₺"
+        PRINT "Son değer: " + STR$(ROUND(future_value, 2)) + " ₺"
+        PRINT "Toplam getiri: " + STR$(ROUND(total_return, 2)) + " ₺"
+        PRINT "Getiri oranı: %" + STR$(ROUND(((future_value / amounts(i)) - 1) * 100, 2))
+        PRINT "Risk seviyesi: " + STR$(risks(i)) + "/10"
+        PRINT "Risk ayarlı getiri: " + STR$(ROUND(risk_adjusted_return, 2))
+        PRINT STRING$(40, "-")
+    NEXT i
+    
+    REM En iyi seçenek önerisi
+    DIM best_return_idx AS INTEGER
+    DIM best_risk_adj_idx AS INTEGER
+    DIM max_return AS DOUBLE
+    DIM max_risk_adj AS DOUBLE
+    
+    max_return = -999999
+    max_risk_adj = -999999
+    
+    FOR i = 0 TO num_investments - 1
+        IF returns(i) > max_return THEN
+            max_return = returns(i)
+            best_return_idx = i
+        END IF
+        
+        DIM current_risk_adj AS DOUBLE
+        current_risk_adj = returns(i) / risks(i)
+        IF current_risk_adj > max_risk_adj THEN
+            max_risk_adj = current_risk_adj
+            best_risk_adj_idx = i
+        END IF
+    NEXT i
+    
+    PRINT
+    PRINT "ÖNERİLER:"
+    PRINT "En yüksek getiri: " + investment_names(best_return_idx)
+    PRINT "En iyi risk/getiri oranı: " + investment_names(best_risk_adj_idx)
+END SUB
+
+DEF SUB risk_analysis()
+    PRINT "═══ RİSK ANALİZİ ═══"
+    
+    DIM portfolio_value AS DOUBLE
+    INPUT "Portföy değeri (₺): ", portfolio_value
+    
+    PRINT
+    PRINT "Risk toleransınızı belirleyin:"
+    PRINT "1. Muhafazakar (Düşük risk)"
+    PRINT "2. Dengeli (Orta risk)"  
+    PRINT "3. Agresif (Yüksek risk)"
+    INPUT "Seçiminiz: ", risk_tolerance
+    
+    DIM stock_percent AS DOUBLE
+    DIM bond_percent AS DOUBLE
+    DIM cash_percent AS DOUBLE
+    
+    SELECT CASE risk_tolerance
+        CASE 1  ' Muhafazakar
+            stock_percent = 30
+            bond_percent = 50
+            cash_percent = 20
+        CASE 2  ' Dengeli
+            stock_percent = 60
+            bond_percent = 30
+            cash_percent = 10
+        CASE 3  ' Agresif
+            stock_percent = 80
+            bond_percent = 15
+            cash_percent = 5
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+            EXIT SUB
+    END SELECT
+    
+    DIM stock_amount AS DOUBLE
+    DIM bond_amount AS DOUBLE
+    DIM cash_amount AS DOUBLE
+    
+    stock_amount = portfolio_value * (stock_percent / 100)
+    bond_amount = portfolio_value * (bond_percent / 100)
+    cash_amount = portfolio_value * (cash_percent / 100)
+    
+    PRINT
+    PRINT "ÖNERİLEN PORTFÖY DAĞILIMI:"
+    PRINT "Hisse senedi: %" + STR$(stock_percent) + " - " + STR$(stock_amount) + " ₺"
+    PRINT "Tahvil: %" + STR$(bond_percent) + " - " + STR$(bond_amount) + " ₺"
+    PRINT "Nakit: %" + STR$(cash_percent) + " - " + STR$(cash_amount) + " ₺"
+    
+    REM Risk senaryoları
+    PRINT
+    PRINT "RİSK SENARYOLARI (1 yıllık):"
+    
+    DIM scenario_names AS ARRAY
+    DIM stock_changes AS ARRAY
+    DIM bond_changes AS ARRAY
+    
+    scenario_names = ["İyimser", "Normal", "Kötümser", "Çok Kötü"]
+    stock_changes = [25, 8, -15, -35]
+    bond_changes = [8, 4, 2, -5]
+    
+    FOR i = 0 TO 3
+        DIM new_stock_value AS DOUBLE
+        DIM new_bond_value AS DOUBLE
+        DIM new_total AS DOUBLE
+        DIM portfolio_change AS DOUBLE
+        
+        new_stock_value = stock_amount * (1 + stock_changes(i) / 100)
+        new_bond_value = bond_amount * (1 + bond_changes(i) / 100)
+        new_total = new_stock_value + new_bond_value + cash_amount
+        
+        portfolio_change = ((new_total - portfolio_value) / portfolio_value) * 100
+        
+        PRINT scenario_names(i) + " senaryo:"
+        PRINT "  Portföy değeri: " + STR$(ROUND(new_total, 2)) + " ₺"
+        PRINT "  Değişim: %" + STR$(ROUND(portfolio_change, 2))
+        PRINT
+    NEXT i
+    
+    REM Risk ölçütleri
+    PRINT "RİSK ÖLÇÜTÜ:"
+    DIM var_95 AS DOUBLE  ' %95 VaR yaklaşımı
+    var_95 = portfolio_value * 0.15  ' Basit yaklaşım
+    
+    PRINT "Yıllık VaR (%95): " + STR$(ROUND(var_95, 2)) + " ₺"
+    PRINT "Bu, %95 olasılıkla kaybınızın bu tutarı geçmeyeceği anlamına gelir."
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_finance_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-11): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            equal_installment_loan()
+        CASE 2
+            decreasing_installment_loan()
+        CASE 3
+            investment_return_calculation()
+        CASE 4
+            compound_interest_calculation()
+        CASE 5
+            retirement_planning()
+        CASE 6
+            mortgage_calculation()
+        CASE 7
+            leasing_calculation()
+        CASE 8
+            inflation_analysis()
+        CASE 9
+            investment_comparison()
+        CASE 10
+            risk_analysis()
+        CASE 11
+            running = False
+            PRINT "Program kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Finans hesaplama programı kapatıldı."
