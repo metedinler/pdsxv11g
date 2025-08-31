@@ -1,0 +1,24 @@
+DIM AYRILIR AS INTEGER
+DIM BITISIK AS INTEGER
+DIM ILE AS INTEGER
+DIM KARISIK AS INTEGER
+DIM SEMICOLON AS INTEGER
+DIM SON AS INTEGER
+DIM TAB AS INTEGER
+DIM VIRGUL AS INTEGER
+DIM YAZDIRILIR AS INTEGER
+REM Test: Semicolon ve virgul fark testi
+DIM a AS INTEGER
+DIM b AS INTEGER
+
+a = 10
+b = 20
+
+PRINT "Virgul ile (tab ile ayrilir):"
+PRINT a, b, "son"
+
+PRINT "Semicolon ile (bitisik yazdirilir):"
+PRINT a; b; "son"
+
+PRINT "Karisik:"
+PRINT "a="; a, "b="; b
