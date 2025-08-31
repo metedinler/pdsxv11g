@@ -1,0 +1,124 @@
+REM Test 6: Matematik fonksiyonları testleri
+REM Bu program built-in matematik fonksiyonlarını test eder
+
+PRINT "=== Matematik Fonksiyonları Testleri ==="
+PRINT
+
+REM Temel matematik fonksiyonları
+PRINT "1. Temel Matematik Fonksiyonları:"
+PRINT "ABS(-15) =", ABS(-15)
+PRINT "INT(3.7) =", INT(3.7)
+PRINT "SQR(16) =", SQR(16)
+PRINT "ROUND(3.7, 0) =", ROUND(3.7, 0)
+PRINT "ROUND(3.14159, 2) =", ROUND(3.14159, 2)
+PRINT "SGN(-5) =", SGN(-5)
+PRINT "SGN(0) =", SGN(0)
+PRINT "SGN(8) =", SGN(8)
+
+PRINT
+
+REM Modulo ve min/max
+PRINT "2. Modulo ve Min/Max:"
+PRINT "15 MOD 4 =", 15 MOD 4
+PRINT "MIN(5, 3, 8, 1) =", MIN(5, 3, 8, 1)
+PRINT "MAX(5, 3, 8, 1) =", MAX(5, 3, 8, 1)
+
+PRINT
+
+REM Trigonometrik fonksiyonlar (radyan)
+PRINT "3. Trigonometrik Fonksiyonlar (Radyan):"
+PRINT "SIN(PI/2) =", ROUND(SIN(PI/2), 4)
+PRINT "COS(0) =", ROUND(COS(0), 4)
+PRINT "TAN(PI/4) =", ROUND(TAN(PI/4), 4)
+PRINT "ATN(1) =", ROUND(ATN(1), 4)
+
+PRINT
+
+REM Trigonometrik fonksiyonlar (derece)
+PRINT "4. Trigonometrik Fonksiyonlar (Derece):"
+PRINT "SIND(90) =", ROUND(SIND(90), 4)
+PRINT "COSD(0) =", ROUND(COSD(0), 4)
+PRINT "TAND(45) =", ROUND(TAND(45), 4)
+
+PRINT
+
+REM Hiperbolik fonksiyonlar
+PRINT "5. Hiperbolik Fonksiyonlar:"
+PRINT "SINH(0) =", ROUND(SINH(0), 4)
+PRINT "COSH(0) =", ROUND(COSH(0), 4)
+PRINT "TANH(0) =", ROUND(TANH(0), 4)
+
+PRINT
+
+REM Logaritma ve üstel
+PRINT "6. Logaritma ve Üstel Fonksiyonlar:"
+PRINT "LOG(E) =", ROUND(LOG(E), 4)
+PRINT "EXP(1) =", ROUND(EXP(1), 4)
+
+PRINT
+
+REM Sabitler
+PRINT "7. Matematik Sabitleri:"
+PRINT "PI =", ROUND(PI, 6)
+PRINT "E =", ROUND(E, 6)
+
+PRINT
+
+REM Sayı sistemi dönüşümleri
+PRINT "8. Sayı Sistemi Dönüşümleri:"
+DIM num AS INTEGER
+num = 15
+PRINT "Onluk: " + STR$(num)
+PRINT "İkilik: " + BIN(num)
+PRINT "Onaltılık: " + HEX(num)
+PRINT "Sekizlik: " + OCT(num)
+
+PRINT
+
+REM Rastgele sayılar
+PRINT "9. Rastgele Sayılar:"
+PRINT "RND() =", ROUND(RND(), 4)
+PRINT "RND() =", ROUND(RND(), 4)
+PRINT "RND() =", ROUND(RND(), 4)
+
+PRINT
+
+REM Pratik hesaplamalar
+PRINT "10. Pratik Hesaplamalar:"
+
+REM Üçgenin alanı (Heron formülü)
+DEF FUNCTION triangle_area(a, b, c)
+    DIM s AS DOUBLE
+    s = (a + b + c) / 2
+    RETURN SQR(s * (s - a) * (s - b) * (s - c))
+END FUNCTION
+
+REM Dairenin alanı
+DEF FUNCTION circle_area(radius)
+    RETURN PI * radius * radius
+END FUNCTION
+
+REM Faktöriyel hesaplama
+DEF FUNCTION math_factorial(n)
+    IF n <= 1 THEN
+        RETURN 1
+    ELSE
+        RETURN n * math_factorial(n - 1)
+    END IF
+END FUNCTION
+
+PRINT "Kenarları 3, 4, 5 olan üçgenin alanı:", ROUND(triangle_area(3, 4, 5), 2)
+PRINT "Yarıçapı 5 olan dairenin alanı:", ROUND(circle_area(5), 2)
+PRINT "6! =", math_factorial(6)
+
+PRINT
+
+REM Hipotenüs hesaplama
+DEF FUNCTION hypotenuse(a, b)
+    RETURN SQR(a*a + b*b)
+END FUNCTION
+
+PRINT "Kenarları 3 ve 4 olan dik üçgenin hipotenüsü:", ROUND(hypotenuse(3, 4), 2)
+
+PRINT
+PRINT "Matematik fonksiyonları testleri tamamlandı!"
