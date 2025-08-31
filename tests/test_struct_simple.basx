@@ -1,0 +1,18 @@
+' Test basic STRUCT field access
+STRUCT Person
+    name AS STRING
+    age AS INTEGER
+END STRUCT
+
+' DIM ile tipi tanımla
+DIM person AS Person
+
+' Field assignment
+person.name = "John Doe"
+person.age = 30
+
+' Print values
+PRINT "Name: "; person.name
+PRINT "Age: "; person.age
+
+END
