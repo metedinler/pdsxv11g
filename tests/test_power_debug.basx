@@ -1,0 +1,20 @@
+DIM BASE AS INTEGER
+DIM DONGU AS INTEGER
+DIM FINAL AS INTEGER
+DIM YENI AS INTEGER
+REM Cok basit power debug
+DEF FUNCTION power(base, exp)
+DIM result AS INTEGER
+result = 1
+DIM i AS INTEGER
+FOR i = 1 TO exp
+PRINT "dongu i =", i, "result =", result, "base =", base
+result = result * base
+PRINT "yeni result =", result
+NEXT i
+RETURN result
+END FUNCTION
+
+DIM p AS INTEGER
+p = power(2, 3)
+PRINT "Final result:", p
