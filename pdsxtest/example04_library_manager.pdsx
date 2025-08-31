@@ -1,0 +1,498 @@
+REM Örnek 4: Kişisel Kütüphane Yönetimi
+REM Bu program kitap koleksiyonunu yönetir ve okuma takibi yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║      KİŞİSEL KÜTÜPHANE YÖNETİMİ      ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Kitap durumu sabitleri
+LET STATUS_UNREAD = 1
+LET STATUS_READING = 2
+LET STATUS_COMPLETED = 3
+LET STATUS_PAUSED = 4
+
+REM Kitap veri yapısı
+TYPE Book
+    id AS INTEGER
+    title AS STRING
+    author AS STRING
+    genre AS STRING
+    pages AS INTEGER
+    status AS INTEGER
+    rating AS INTEGER
+    notes AS STRING
+    start_date AS STRING
+    finish_date AS STRING
+END TYPE
+
+REM Ana veri yapıları
+DIM books AS LIST
+DIM genres AS LIST
+books = []
+genres = ["Roman", "Bilim Kurgu", "Fantastik", "Polisiye", "Tarih", "Biyografi", 
+         "Felsefe", "Bilim", "Sanat", "Kişisel Gelişim", "Şiir", "Diğer"]
+
+REM ID sayacı
+DIM next_book_id AS INTEGER
+next_book_id = 1
+
+DEF FUNCTION get_status_text(status_code)
+    SELECT CASE status_code
+        CASE STATUS_UNREAD
+            RETURN "Okunmadı"
+        CASE STATUS_READING
+            RETURN "Okunuyor"
+        CASE STATUS_COMPLETED
+            RETURN "Tamamlandı"
+        CASE STATUS_PAUSED
+            RETURN "Duraklatıldı"
+        CASE ELSE
+            RETURN "Bilinmiyor"
+    END SELECT
+END FUNCTION
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Kitap Ekle"
+    PRINT "2. Kitap Listesi"
+    PRINT "3. Kitap Ara"
+    PRINT "4. Okuma Durumu Güncelle"
+    PRINT "5. Kitap Değerlendir"
+    PRINT "6. İstatistikler"
+    PRINT "7. Kategori Analizi"
+    PRINT "8. Okuma Hedefleri"
+    PRINT "9. Kitap Sil"
+    PRINT "10. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB show_genres()
+    PRINT "Mevcut Kategoriler:"
+    FOR i = 0 TO LEN(genres) - 1
+        PRINT STR$(i + 1) + ". " + genres(i)
+    NEXT i
+END SUB
+
+DEF SUB add_book()
+    DIM new_book AS Book
+    DIM title AS STRING
+    DIM author AS STRING
+    DIM pages AS INTEGER
+    DIM genre_choice AS INTEGER
+    
+    new_book.id = next_book_id
+    next_book_id = next_book_id + 1
+    
+    INPUT "Kitap başlığı: ", title
+    new_book.title = title
+    
+    INPUT "Yazar: ", author
+    new_book.author = author
+    
+    show_genres()
+    INPUT "Kategori seçin (1-" + STR$(LEN(genres)) + "): ", genre_choice
+    
+    IF genre_choice >= 1 AND genre_choice <= LEN(genres) THEN
+        new_book.genre = genres(genre_choice - 1)
+    ELSE
+        PRINT "Geçersiz kategori! 'Diğer' olarak ayarlandı."
+        new_book.genre = "Diğer"
+    END IF
+    
+    INPUT "Sayfa sayısı: ", pages
+    IF pages <= 0 THEN
+        pages = 1
+    END IF
+    new_book.pages = pages
+    
+    new_book.status = STATUS_UNREAD
+    new_book.rating = 0
+    new_book.notes = ""
+    new_book.start_date = ""
+    new_book.finish_date = ""
+    
+    INSERT(books, new_book)
+    PRINT "Kitap başarıyla eklendi. ID: " + STR$(new_book.id)
+END SUB
+
+DEF SUB list_books()
+    IF LEN(books) = 0 THEN
+        PRINT "Kütüphanede henüz kitap yok."
+        RETURN
+    END IF
+    
+    PRINT "╔════╤══════════════════════════════╤══════════════════╤═══════════╤══════════╗"
+    PRINT "║ ID │           Başlık             │      Yazar       │ Kategori  │  Durum   ║"
+    PRINT "╠════╪══════════════════════════════╪══════════════════╪═══════════╪══════════╣"
+    
+    FOR i = 0 TO LEN(books) - 1
+        DIM title_short AS STRING
+        DIM author_short AS STRING
+        DIM genre_short AS STRING
+        DIM status_text AS STRING
+        
+        title_short = LEFT$(books(i).title + SPACE$(30), 30)
+        author_short = LEFT$(books(i).author + SPACE$(18), 18)
+        genre_short = LEFT$(books(i).genre + SPACE$(11), 11)
+        status_text = get_status_text(books(i).status)
+        
+        PRINT "║" + STR$(books(i).id) + "   │" + title_short + "│" + 
+              author_short + "│" + genre_short + "│" + status_text + "  ║"
+    NEXT i
+    
+    PRINT "╚════╧══════════════════════════════╧══════════════════╧═══════════╧══════════╝"
+    
+    PRINT
+    PRINT "Toplam " + STR$(LEN(books)) + " kitap kayıtlı."
+END SUB
+
+DEF SUB search_books()
+    IF LEN(books) = 0 THEN
+        PRINT "Kütüphanede henüz kitap yok."
+        RETURN
+    END IF
+    
+    PRINT "Arama türü:"
+    PRINT "1. Başlığa göre  2. Yazara göre  3. Kategoriye göre"
+    
+    DIM search_type AS INTEGER
+    DIM search_term AS STRING
+    
+    INPUT "Seçiminiz: ", search_type
+    INPUT "Arama terimi: ", search_term
+    search_term = UCASE$(search_term)
+    
+    DIM found_count AS INTEGER
+    found_count = 0
+    
+    PRINT "═══ ARAMA SONUÇLARI ═══"
+    
+    FOR i = 0 TO LEN(books) - 1
+        DIM match AS BOOLEAN
+        match = False
+        
+        SELECT CASE search_type
+            CASE 1
+                match = INSTR(1, UCASE$(books(i).title), search_term) > 0
+            CASE 2
+                match = INSTR(1, UCASE$(books(i).author), search_term) > 0
+            CASE 3
+                match = INSTR(1, UCASE$(books(i).genre), search_term) > 0
+            CASE ELSE
+                PRINT "Geçersiz arama türü!"
+                RETURN
+        END SELECT
+        
+        IF match THEN
+            PRINT "ID: " + STR$(books(i).id)
+            PRINT "Başlık: " + books(i).title
+            PRINT "Yazar: " + books(i).author
+            PRINT "Kategori: " + books(i).genre
+            PRINT "Sayfa: " + STR$(books(i).pages)
+            PRINT "Durum: " + get_status_text(books(i).status)
+            IF books(i).rating > 0 THEN
+                PRINT "Puan: " + STR$(books(i).rating) + "/5"
+            END IF
+            PRINT "─────────────────────────"
+            found_count = found_count + 1
+        END IF
+    NEXT i
+    
+    IF found_count = 0 THEN
+        PRINT "Eşleşen kitap bulunamadı."
+    ELSE
+        PRINT "Toplam " + STR$(found_count) + " kitap bulundu."
+    END IF
+END SUB
+
+DEF SUB update_reading_status()
+    IF LEN(books) = 0 THEN
+        PRINT "Kütüphanede henüz kitap yok."
+        RETURN
+    END IF
+    
+    DIM book_id AS INTEGER
+    DIM new_status AS INTEGER
+    DIM found AS BOOLEAN
+    found = False
+    
+    INPUT "Kitap ID: ", book_id
+    
+    PRINT "Yeni durum:"
+    PRINT "1. Okunmadı  2. Okunuyor  3. Tamamlandı  4. Duraklatıldı"
+    INPUT "Seçiminiz: ", new_status
+    
+    FOR i = 0 TO LEN(books) - 1
+        IF books(i).id = book_id THEN
+            books(i).status = new_status
+            
+            IF new_status = STATUS_READING THEN
+                books(i).start_date = "2025-01-21"  ' Örnek tarih
+            ELSEIF new_status = STATUS_COMPLETED THEN
+                books(i).finish_date = "2025-01-21"  ' Örnek tarih
+            END IF
+            
+            PRINT "Kitap durumu güncellendi: " + get_status_text(new_status)
+            found = True
+            EXIT FOR
+        END IF
+    NEXT i
+    
+    IF NOT found THEN
+        PRINT "Kitap bulunamadı!"
+    END IF
+END SUB
+
+DEF SUB rate_book()
+    IF LEN(books) = 0 THEN
+        PRINT "Kütüphanede henüz kitap yok."
+        RETURN
+    END IF
+    
+    DIM book_id AS INTEGER
+    DIM rating AS INTEGER
+    DIM notes AS STRING
+    DIM found AS BOOLEAN
+    found = False
+    
+    INPUT "Kitap ID: ", book_id
+    
+    FOR i = 0 TO LEN(books) - 1
+        IF books(i).id = book_id THEN
+            PRINT "Kitap: " + books(i).title + " - " + books(i).author
+            
+            INPUT "Puan (1-5): ", rating
+            IF rating < 1 OR rating > 5 THEN
+                PRINT "Puan 1-5 arasında olmalıdır!"
+                RETURN
+            END IF
+            books(i).rating = rating
+            
+            INPUT "Notlarınız: ", notes
+            books(i).notes = notes
+            
+            PRINT "Değerlendirme kaydedildi!"
+            found = True
+            EXIT FOR
+        END IF
+    NEXT i
+    
+    IF NOT found THEN
+        PRINT "Kitap bulunamadı!"
+    END IF
+END SUB
+
+DEF SUB show_statistics()
+    IF LEN(books) = 0 THEN
+        PRINT "İstatistik için kitap gerekli."
+        RETURN
+    END IF
+    
+    DIM total_books AS INTEGER
+    DIM unread_count AS INTEGER
+    DIM reading_count AS INTEGER
+    DIM completed_count AS INTEGER
+    DIM paused_count AS INTEGER
+    DIM total_pages AS INTEGER
+    DIM completed_pages AS INTEGER
+    
+    total_books = LEN(books)
+    unread_count = 0: reading_count = 0: completed_count = 0: paused_count = 0
+    total_pages = 0: completed_pages = 0
+    
+    FOR i = 0 TO total_books - 1
+        total_pages = total_pages + books(i).pages
+        
+        SELECT CASE books(i).status
+            CASE STATUS_UNREAD
+                unread_count = unread_count + 1
+            CASE STATUS_READING
+                reading_count = reading_count + 1
+            CASE STATUS_COMPLETED
+                completed_count = completed_count + 1
+                completed_pages = completed_pages + books(i).pages
+            CASE STATUS_PAUSED
+                paused_count = paused_count + 1
+        END SELECT
+    NEXT i
+    
+    PRINT "╔═══ KÜTÜPHANE İSTATİSTİKLERİ ═══════════════╗"
+    PRINT "║                                           ║"
+    PRINT "║ Toplam Kitap:        " + STR$(total_books) + "              ║"
+    PRINT "║ Okunmadı:            " + STR$(unread_count) + "              ║"
+    PRINT "║ Okunuyor:            " + STR$(reading_count) + "              ║"
+    PRINT "║ Tamamlandı:          " + STR$(completed_count) + "              ║"
+    PRINT "║ Duraklatıldı:        " + STR$(paused_count) + "              ║"
+    PRINT "║                                           ║"
+    PRINT "║ Toplam Sayfa:        " + STR$(total_pages) + "            ║"
+    PRINT "║ Okunan Sayfa:        " + STR$(completed_pages) + "            ║"
+    PRINT "║                                           ║"
+    
+    IF total_books > 0 THEN
+        DIM completion_rate AS DOUBLE
+        completion_rate = (completed_count / total_books) * 100
+        PRINT "║ Tamamlama Oranı:     %" + STR$(ROUND(completion_rate, 1)) + "          ║"
+    END IF
+    
+    IF completed_count > 0 THEN
+        DIM avg_pages AS DOUBLE
+        avg_pages = completed_pages / completed_count
+        PRINT "║ Ort. Kitap Boyu:     " + STR$(ROUND(avg_pages, 0)) + " sayfa     ║"
+    END IF
+    
+    PRINT "╚═══════════════════════════════════════════╝"
+    
+    REM En yüksek puanlı kitaplar
+    PRINT
+    PRINT "En Yüksek Puanlı Kitaplar:"
+    FOR rating_check = 5 TO 1 STEP -1
+        FOR i = 0 TO LEN(books) - 1
+            IF books(i).rating = rating_check THEN
+                PRINT "⭐ " + STR$(rating_check) + "/5 - " + books(i).title + " (" + books(i).author + ")"
+                EXIT FOR
+            END IF
+        NEXT i
+    NEXT rating_check
+END SUB
+
+DEF SUB genre_analysis()
+    IF LEN(books) = 0 THEN
+        PRINT "Analiz için kitap gerekli."
+        RETURN
+    END IF
+    
+    PRINT "═══ KATEGORİ ANALİZİ ═══"
+    
+    FOR j = 0 TO LEN(genres) - 1
+        DIM genre_count AS INTEGER
+        DIM genre_completed AS INTEGER
+        
+        genre_count = 0
+        genre_completed = 0
+        
+        FOR i = 0 TO LEN(books) - 1
+            IF books(i).genre = genres(j) THEN
+                genre_count = genre_count + 1
+                IF books(i).status = STATUS_COMPLETED THEN
+                    genre_completed = genre_completed + 1
+                END IF
+            END IF
+        NEXT i
+        
+        IF genre_count > 0 THEN
+            DIM completion_rate AS DOUBLE
+            completion_rate = (genre_completed / genre_count) * 100
+            PRINT genres(j) + ": " + STR$(genre_count) + " kitap (%" + 
+                  STR$(ROUND(completion_rate, 1)) + " tamamlandı)"
+        END IF
+    NEXT j
+END SUB
+
+DEF SUB reading_goals()
+    PRINT "═══ OKUMA HEDEFLERİ ═══"
+    
+    DIM yearly_goal AS INTEGER
+    DIM completed_this_year AS INTEGER
+    
+    yearly_goal = 24  ' Yılda 24 kitap hedefi
+    completed_this_year = 0
+    
+    FOR i = 0 TO LEN(books) - 1
+        IF books(i).status = STATUS_COMPLETED THEN
+            completed_this_year = completed_this_year + 1
+        END IF
+    NEXT i
+    
+    DIM progress_rate AS DOUBLE
+    progress_rate = (completed_this_year / yearly_goal) * 100
+    
+    PRINT "2025 Yılı Okuma Hedefi: " + STR$(yearly_goal) + " kitap"
+    PRINT "Şimdiye kadar okunan: " + STR$(completed_this_year) + " kitap"
+    PRINT "Hedef tamamlama: %" + STR$(ROUND(progress_rate, 1))
+    PRINT "Kalan kitap: " + STR$(yearly_goal - completed_this_year)
+    
+    IF progress_rate >= 100 THEN
+        PRINT "🎉 Tebrikler! Hedefinizi aştınız!"
+    ELSEIF progress_rate >= 80 THEN
+        PRINT "🌟 Harika gidiyorsunuz!"
+    ELSEIF progress_rate >= 50 THEN
+        PRINT "📚 İyi bir tempoda devam ediyorsunuz."
+    ELSE
+        PRINT "📖 Hedefinize ulaşmak için daha çok okuma yapmanız gerekiyor."
+    END IF
+END SUB
+
+DEF SUB delete_book()
+    IF LEN(books) = 0 THEN
+        PRINT "Silinecek kitap yok."
+        RETURN
+    END IF
+    
+    DIM book_id AS INTEGER
+    INPUT "Silinecek kitap ID: ", book_id
+    
+    FOR i = 0 TO LEN(books) - 1
+        IF books(i).id = book_id THEN
+            PRINT "Silinecek kitap: " + books(i).title
+            DIM confirm AS STRING
+            INPUT "Silmek istediğinizden emin misiniz? (e/h): ", confirm
+            
+            IF UCASE$(confirm) = "E" THEN
+                REMOVE(books, i)
+                PRINT "Kitap başarıyla silindi."
+            ELSE
+                PRINT "Silme işlemi iptal edildi."
+            END IF
+            RETURN
+        END IF
+    NEXT i
+    
+    PRINT "Kitap bulunamadı!"
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-10): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            add_book()
+        CASE 2
+            list_books()
+        CASE 3
+            search_books()
+        CASE 4
+            update_reading_status()
+        CASE 5
+            rate_book()
+        CASE 6
+            show_statistics()
+        CASE 7
+            genre_analysis()
+        CASE 8
+            reading_goals()
+        CASE 9
+            delete_book()
+        CASE 10
+            running = False
+            PRINT "Program kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Kişisel kütüphane yönetimi kapatıldı."
