@@ -1,0 +1,19 @@
+DIM FACTORIAL AS INTEGER
+REM Basit factorial testi
+DEF FUNCTION factorial(n)
+DIM result AS INTEGER
+IF n <= 1 THEN
+result = 1
+ELSE
+result = n * factorial(n - 1)
+END IF
+RETURN result
+END FUNCTION
+
+DIM f5 AS INTEGER
+f5 = factorial(5)
+PRINT "Factorial 5 =", f5
+
+DIM f3 AS INTEGER
+f3 = factorial(3)
+PRINT "Factorial 3 =", f3
