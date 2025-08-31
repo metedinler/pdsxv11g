@@ -1,0 +1,19 @@
+' Test Matrix Operations
+
+DIM matrix AS ARRAY
+matrix = [[1, 2], [3, 4]]
+
+PRINT "Matrix operations test:"
+PRINT "Original matrix:", matrix
+
+' Test TRANSPOSE
+DIM transposed AS ARRAY
+transposed = TRANSPOSE(matrix)
+PRINT "Transposed:", transposed
+
+' Test DIAG (diagonal)
+DIM diagonal AS ARRAY  
+diagonal = DIAG(matrix)
+PRINT "Diagonal:", diagonal
+
+END
