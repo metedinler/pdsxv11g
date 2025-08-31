@@ -1,0 +1,70 @@
+PRINT "=== Test 3: Diziler ve Basit Koleksiyonlar ==="
+
+REM Basit dizi simülasyonu (değişkenlerle)
+PRINT "Sayı dizisi simülasyonu:"
+DIM num0 AS INTEGER
+DIM num1 AS INTEGER
+DIM num2 AS INTEGER
+DIM num3 AS INTEGER
+DIM num4 AS INTEGER
+
+num0 = 10
+num1 = 20
+num2 = 30
+num3 = 40
+num4 = 50
+
+PRINT "num[0] =", num0
+PRINT "num[1] =", num1
+PRINT "num[2] =", num2
+PRINT "num[3] =", num3
+PRINT "num[4] =", num4
+
+REM String dizisi simülasyonu
+PRINT "İsim dizisi simülasyonu:"
+DIM name0 AS STRING
+DIM name1 AS STRING
+DIM name2 AS STRING
+
+name0 = "Ali"
+name1 = "Veli"
+name2 = "Mehmet"
+
+PRINT "name[0] =", name0
+PRINT "name[1] =", name1  
+PRINT "name[2] =", name2
+
+REM Basit hesaplamalar
+PRINT "Toplam:", num0 + num1 + num2 + num3 + num4
+PRINT "Ortalama:", (num0 + num1 + num2 + num3 + num4) / 5
+
+REM Minimum ve Maximum bulma
+DIM min_val AS INTEGER
+DIM max_val AS INTEGER
+min_val = num0
+max_val = num0
+
+IF num1 < min_val THEN min_val = num1
+IF num2 < min_val THEN min_val = num2
+IF num3 < min_val THEN min_val = num3
+IF num4 < min_val THEN min_val = num4
+
+IF num1 > max_val THEN max_val = num1
+IF num2 > max_val THEN max_val = num2
+IF num3 > max_val THEN max_val = num3
+IF num4 > max_val THEN max_val = num4
+
+PRINT "Minimum:", min_val
+PRINT "Maksimum:", max_val
+
+REM Çarpım tablosu (3x3)
+PRINT "3x3 Çarpım Tablosu:"
+DIM row AS INTEGER
+DIM col AS INTEGER
+FOR row = 1 TO 3
+    FOR col = 1 TO 3
+        PRINT row * col
+    NEXT
+NEXT
+
+PRINT "=== Test 3 Tamamlandı ==="
