@@ -1,0 +1,529 @@
+REM Örnek 5: Veri Analizi ve Görselleştirme
+REM Bu program veri setlerini analiz eder ve basit görselleştirme yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║     VERİ ANALİZİ VE GÖRSELLEŞTİRME    ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Örnek veri setleri
+DIM sales_data AS ARRAY
+DIM temperatures AS ARRAY
+DIM student_scores AS ARRAY
+DIM stock_prices AS ARRAY
+
+REM Veri setlerini başlat
+sales_data = [1200, 1350, 1100, 1600, 1450, 1300, 1750, 1250, 1400, 1550, 1650, 1800]
+temperatures = [15.2, 18.5, 22.1, 25.8, 28.3, 31.2, 33.5, 32.1, 28.9, 24.6, 19.8, 16.4]
+student_scores = [85, 92, 78, 96, 73, 89, 95, 82, 76, 91, 87, 94, 80, 88, 93]
+stock_prices = [150.5, 152.3, 148.9, 155.7, 159.2, 161.8, 158.4, 162.3, 164.1, 167.8]
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Satış Verisi Analizi"
+    PRINT "2. Sıcaklık Verisi Analizi"
+    PRINT "3. Öğrenci Notları Analizi"
+    PRINT "4. Hisse Senedi Analizi"
+    PRINT "5. Karşılaştırmalı Analiz"
+    PRINT "6. Korelasyon Analizi"
+    PRINT "7. Trend Analizi"
+    PRINT "8. Veri Görselleştirme"
+    PRINT "9. İstatistiksel Testler"
+    PRINT "10. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB basic_statistics(data_array, data_name)
+    PRINT "═══ " + data_name + " TEMEL İSTATİSTİKLER ═══"
+    PRINT "Veri sayısı: " + STR$(LEN(data_array))
+    PRINT "Ortalama: " + STR$(ROUND(MEAN(data_array), 4))
+    PRINT "Medyan: " + STR$(ROUND(MEDIAN(data_array), 4))
+    PRINT "Standart sapma: " + STR$(ROUND(STD(data_array), 4))
+    PRINT "Varyans: " + STR$(ROUND(VAR(data_array), 4))
+    PRINT "Minimum: " + STR$(MIN(data_array))
+    PRINT "Maksimum: " + STR$(MAX(data_array))
+    PRINT "Toplam: " + STR$(SUM(data_array))
+    
+    REM Çeyreklikler
+    PRINT "1. Çeyreklik (Q1): " + STR$(PERCENTILE(data_array, 25))
+    PRINT "3. Çeyreklik (Q3): " + STR$(PERCENTILE(data_array, 75))
+    
+    REM Çeyreklikler arası açıklık
+    DIM iqr AS DOUBLE
+    iqr = PERCENTILE(data_array, 75) - PERCENTILE(data_array, 25)
+    PRINT "IQR (Çeyreklikler arası): " + STR$(ROUND(iqr, 4))
+    
+    REM Çarpıklık yaklaşımı
+    DIM mean_val AS DOUBLE
+    DIM median_val AS DOUBLE
+    mean_val = MEAN(data_array)
+    median_val = MEDIAN(data_array)
+    
+    IF mean_val > median_val THEN
+        PRINT "Dağılım: Sağa çarpık (Pozitif çarpıklık)"
+    ELSEIF mean_val < median_val THEN
+        PRINT "Dağılım: Sola çarpık (Negatif çarpıklık)"
+    ELSE
+        PRINT "Dağılım: Simetrik"
+    END IF
+END SUB
+
+DEF SUB analyze_sales_data()
+    basic_statistics(sales_data, "SATIŞ VERİSİ")
+    PRINT
+    
+    REM Aylık analiz
+    DIM months AS ARRAY
+    months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+              "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    
+    PRINT "AYLIK SATIŞ DETAYI:"
+    FOR i = 0 TO LEN(sales_data) - 1
+        PRINT months(i) + ": " + STR$(sales_data(i)) + " ₺"
+    NEXT i
+    
+    PRINT
+    
+    REM En iyi ve en kötü aylar
+    DIM max_sales AS DOUBLE
+    DIM min_sales AS DOUBLE
+    DIM max_month AS INTEGER
+    DIM min_month AS INTEGER
+    
+    max_sales = MAX(sales_data)
+    min_sales = MIN(sales_data)
+    
+    FOR i = 0 TO LEN(sales_data) - 1
+        IF sales_data(i) = max_sales THEN max_month = i
+        IF sales_data(i) = min_sales THEN min_month = i
+    NEXT i
+    
+    PRINT "En iyi ay: " + months(max_month) + " (" + STR$(max_sales) + " ₺)"
+    PRINT "En kötü ay: " + months(min_month) + " (" + STR$(min_sales) + " ₺)"
+    
+    REM Büyüme analizi
+    PRINT
+    PRINT "BÜYÜME ANALİZİ:"
+    FOR i = 1 TO LEN(sales_data) - 1
+        DIM growth_rate AS DOUBLE
+        growth_rate = ((sales_data(i) - sales_data(i-1)) / sales_data(i-1)) * 100
+        PRINT months(i) + ": %" + STR$(ROUND(growth_rate, 2)) + " büyüme"
+    NEXT i
+END SUB
+
+DEF SUB analyze_temperature_data()
+    basic_statistics(temperatures, "SICAKLIK VERİSİ")
+    PRINT
+    
+    DIM months AS ARRAY
+    months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+              "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    
+    PRINT "AYLIK SICAKLIK DETAYI:"
+    FOR i = 0 TO LEN(temperatures) - 1
+        PRINT months(i) + ": " + STR$(temperatures(i)) + "°C"
+    NEXT i
+    
+    PRINT
+    
+    REM Mevsimsel analiz
+    DIM spring_avg, summer_avg, autumn_avg, winter_avg AS DOUBLE
+    spring_avg = MEAN([temperatures(2), temperatures(3), temperatures(4)])  ' Mart, Nisan, Mayıs
+    summer_avg = MEAN([temperatures(5), temperatures(6), temperatures(7)])  ' Haziran, Temmuz, Ağustos
+    autumn_avg = MEAN([temperatures(8), temperatures(9), temperatures(10)]) ' Eylül, Ekim, Kasım
+    winter_avg = MEAN([temperatures(11), temperatures(0), temperatures(1)]) ' Aralık, Ocak, Şubat
+    
+    PRINT "MEVSİMSEL ORTALAMALAR:"
+    PRINT "İlkbahar: " + STR$(ROUND(spring_avg, 2)) + "°C"
+    PRINT "Yaz: " + STR$(ROUND(summer_avg, 2)) + "°C"
+    PRINT "Sonbahar: " + STR$(ROUND(autumn_avg, 2)) + "°C"
+    PRINT "Kış: " + STR$(ROUND(winter_avg, 2)) + "°C"
+END SUB
+
+DEF SUB analyze_student_scores()
+    basic_statistics(student_scores, "ÖĞRENCİ NOTLARI")
+    PRINT
+    
+    REM Not dağılımı
+    DIM aa_count, ba_count, bb_count, cb_count, cc_count AS INTEGER
+    DIM dc_count, dd_count, ff_count AS INTEGER
+    
+    aa_count = 0: ba_count = 0: bb_count = 0: cb_count = 0: cc_count = 0
+    dc_count = 0: dd_count = 0: ff_count = 0
+    
+    FOR i = 0 TO LEN(student_scores) - 1
+        IF student_scores(i) >= 90 THEN
+            aa_count = aa_count + 1
+        ELSEIF student_scores(i) >= 85 THEN
+            ba_count = ba_count + 1
+        ELSEIF student_scores(i) >= 80 THEN
+            bb_count = bb_count + 1
+        ELSEIF student_scores(i) >= 75 THEN
+            cb_count = cb_count + 1
+        ELSEIF student_scores(i) >= 70 THEN
+            cc_count = cc_count + 1
+        ELSEIF student_scores(i) >= 65 THEN
+            dc_count = dc_count + 1
+        ELSEIF student_scores(i) >= 60 THEN
+            dd_count = dd_count + 1
+        ELSE
+            ff_count = ff_count + 1
+        END IF
+    NEXT i
+    
+    PRINT "NOT DAĞILIMI:"
+    PRINT "AA (90-100): " + STR$(aa_count) + " öğrenci"
+    PRINT "BA (85-89):  " + STR$(ba_count) + " öğrenci"
+    PRINT "BB (80-84):  " + STR$(bb_count) + " öğrenci"
+    PRINT "CB (75-79):  " + STR$(cb_count) + " öğrenci"
+    PRINT "CC (70-74):  " + STR$(cc_count) + " öğrenci"
+    PRINT "DC (65-69):  " + STR$(dc_count) + " öğrenci"
+    PRINT "DD (60-64):  " + STR$(dd_count) + " öğrenci"
+    PRINT "FF (0-59):   " + STR$(ff_count) + " öğrenci"
+    
+    REM Başarı oranı
+    DIM passing_count AS INTEGER
+    passing_count = aa_count + ba_count + bb_count + cb_count + cc_count + dc_count + dd_count
+    DIM success_rate AS DOUBLE
+    success_rate = (passing_count / LEN(student_scores)) * 100
+    
+    PRINT
+    PRINT "Geçme oranı: %" + STR$(ROUND(success_rate, 2))
+    PRINT "Kalma oranı: %" + STR$(ROUND(100 - success_rate, 2))
+END SUB
+
+DEF SUB analyze_stock_data()
+    basic_statistics(stock_prices, "HİSSE SENEDİ FİYATLARI")
+    PRINT
+    
+    PRINT "FİYAT HAREKETLERİ:"
+    FOR i = 1 TO LEN(stock_prices) - 1
+        DIM price_change AS DOUBLE
+        DIM change_percent AS DOUBLE
+        
+        price_change = stock_prices(i) - stock_prices(i-1)
+        change_percent = (price_change / stock_prices(i-1)) * 100
+        
+        DIM direction AS STRING
+        IF price_change > 0 THEN
+            direction = "▲"
+        ELSEIF price_change < 0 THEN
+            direction = "▼"
+        ELSE
+            direction = "="
+        END IF
+        
+        PRINT "Gün " + STR$(i+1) + ": " + STR$(stock_prices(i)) + " ₺ " + direction + 
+              " (" + STR$(ROUND(change_percent, 2)) + "%)"
+    NEXT i
+    
+    REM Toplam getiri
+    DIM total_return AS DOUBLE
+    total_return = ((stock_prices(LEN(stock_prices)-1) - stock_prices(0)) / stock_prices(0)) * 100
+    
+    PRINT
+    PRINT "Toplam getiri: %" + STR$(ROUND(total_return, 2))
+    
+    REM Volatilite (basit hesaplama)
+    DIM daily_returns AS ARRAY
+    daily_returns = []
+    
+    FOR i = 1 TO LEN(stock_prices) - 1
+        DIM return_rate AS DOUBLE
+        return_rate = ((stock_prices(i) - stock_prices(i-1)) / stock_prices(i-1)) * 100
+        INSERT(daily_returns, return_rate)
+    NEXT i
+    
+    PRINT "Volatilite (günlük getiri std.sapma): %" + STR$(ROUND(STD(daily_returns), 4))
+END SUB
+
+DEF SUB comparative_analysis()
+    PRINT "═══ KARŞILAŞTIRMALI ANALİZ ═══"
+    
+    PRINT "VERİ SETLERİ KARŞILAŞTIRMASI:"
+    PRINT "Satış verisi ortalama: " + STR$(ROUND(MEAN(sales_data), 2))
+    PRINT "Sıcaklık ortalama: " + STR$(ROUND(MEAN(temperatures), 2))
+    PRINT "Öğrenci notları ortalama: " + STR$(ROUND(MEAN(student_scores), 2))
+    PRINT "Hisse fiyatları ortalama: " + STR$(ROUND(MEAN(stock_prices), 2))
+    
+    PRINT
+    PRINT "STD. SAPMA KARŞILAŞTIRMASI:"
+    PRINT "Satış verisi: " + STR$(ROUND(STD(sales_data), 4))
+    PRINT "Sıcaklık: " + STR$(ROUND(STD(temperatures), 4))
+    PRINT "Öğrenci notları: " + STR$(ROUND(STD(student_scores), 4))
+    PRINT "Hisse fiyatları: " + STR$(ROUND(STD(stock_prices), 4))
+    
+    PRINT
+    PRINT "VARİASYON KATSAYISI (CV):"
+    PRINT "Satış verisi: " + STR$(ROUND((STD(sales_data) / MEAN(sales_data)) * 100, 2)) + "%"
+    PRINT "Sıcaklık: " + STR$(ROUND((STD(temperatures) / MEAN(temperatures)) * 100, 2)) + "%"
+    PRINT "Öğrenci notları: " + STR$(ROUND((STD(student_scores) / MEAN(student_scores)) * 100, 2)) + "%"
+    PRINT "Hisse fiyatları: " + STR$(ROUND((STD(stock_prices) / MEAN(stock_prices)) * 100, 2)) + "%"
+END SUB
+
+DEF SUB correlation_analysis()
+    PRINT "═══ KORELASYON ANALİZİ ═══"
+    
+    REM Veri setlerini aynı uzunlukta yapmak için kısalt
+    DIM sales_short AS ARRAY
+    DIM temp_short AS ARRAY
+    
+    sales_short = [sales_data(0), sales_data(1), sales_data(2), sales_data(3), 
+                   sales_data(4), sales_data(5), sales_data(6), sales_data(7), 
+                   sales_data(8), sales_data(9)]
+    temp_short = [temperatures(0), temperatures(1), temperatures(2), temperatures(3),
+                  temperatures(4), temperatures(5), temperatures(6), temperatures(7),
+                  temperatures(8), temperatures(9)]
+    
+    DIM corr_sales_temp AS DOUBLE
+    corr_sales_temp = CORR(sales_short, temp_short)
+    
+    PRINT "Satış - Sıcaklık korelasyonu: " + STR$(ROUND(corr_sales_temp, 4))
+    
+    IF ABS(corr_sales_temp) > 0.7 THEN
+        PRINT "Güçlü korelasyon"
+    ELSEIF ABS(corr_sales_temp) > 0.3 THEN
+        PRINT "Orta düzeyde korelasyon"
+    ELSE
+        PRINT "Zayıf korelasyon"
+    END IF
+    
+    IF corr_sales_temp > 0 THEN
+        PRINT "Pozitif yönlü ilişki"
+    ELSE
+        PRINT "Negatif yönlü ilişki"
+    END IF
+END SUB
+
+DEF SUB trend_analysis()
+    PRINT "═══ TREND ANALİZİ ═══"
+    
+    REM Basit doğrusal trend hesaplama (satış verisi için)
+    PRINT "SATIŞ VERİSİ TREND ANALİZİ:"
+    
+    DIM sum_x AS DOUBLE
+    DIM sum_y AS DOUBLE
+    DIM sum_xy AS DOUBLE
+    DIM sum_x2 AS DOUBLE
+    DIM n AS INTEGER
+    
+    n = LEN(sales_data)
+    sum_x = 0: sum_y = 0: sum_xy = 0: sum_x2 = 0
+    
+    FOR i = 0 TO n - 1
+        sum_x = sum_x + (i + 1)
+        sum_y = sum_y + sales_data(i)
+        sum_xy = sum_xy + ((i + 1) * sales_data(i))
+        sum_x2 = sum_x2 + ((i + 1) * (i + 1))
+    NEXT i
+    
+    DIM slope AS DOUBLE
+    DIM intercept AS DOUBLE
+    
+    slope = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x * sum_x)
+    intercept = (sum_y - slope * sum_x) / n
+    
+    PRINT "Trend denklemi: y = " + STR$(ROUND(slope, 2)) + "x + " + STR$(ROUND(intercept, 2))
+    
+    IF slope > 0 THEN
+        PRINT "Pozitif trend (Artış eğilimi)"
+    ELSEIF slope < 0 THEN
+        PRINT "Negatif trend (Azalış eğilimi)"
+    ELSE
+        PRINT "Yatay trend (Değişim yok)"
+    END IF
+    
+    PRINT "Aylık ortalama değişim: " + STR$(ROUND(slope, 2)) + " ₺"
+END SUB
+
+DEF SUB data_visualization()
+    PRINT "═══ VERİ GÖRSELLEŞTİRME ═══"
+    
+    PRINT "SATIŞ VERİSİ ÇUBUK GRAFİĞİ:"
+    DIM max_val AS DOUBLE
+    max_val = MAX(sales_data)
+    
+    FOR i = 0 TO LEN(sales_data) - 1
+        DIM bar_length AS INTEGER
+        bar_length = INT((sales_data(i) / max_val) * 40)  ' 40 karakter maksimum
+        
+        DIM month_short AS STRING
+        SELECT CASE i
+            CASE 0: month_short = "Oca"
+            CASE 1: month_short = "Şub"
+            CASE 2: month_short = "Mar"
+            CASE 3: month_short = "Nis"
+            CASE 4: month_short = "May"
+            CASE 5: month_short = "Haz"
+            CASE 6: month_short = "Tem"
+            CASE 7: month_short = "Ağu"
+            CASE 8: month_short = "Eyl"
+            CASE 9: month_short = "Eki"
+            CASE 10: month_short = "Kas"
+            CASE 11: month_short = "Ara"
+        END SELECT
+        
+        PRINT month_short + " │" + STRING$(bar_length, "█") + " " + STR$(sales_data(i))
+    NEXT i
+    
+    PRINT
+    PRINT "ÖĞRENCİ NOTLARI DAĞILIM GRAFİĞİ:"
+    DIM score_ranges AS ARRAY
+    DIM range_counts AS ARRAY
+    
+    score_ranges = ["0-49", "50-59", "60-69", "70-79", "80-89", "90-100"]
+    range_counts = [0, 0, 0, 0, 0, 0]
+    
+    FOR i = 0 TO LEN(student_scores) - 1
+        DIM score AS INTEGER
+        score = student_scores(i)
+        
+        IF score < 50 THEN
+            range_counts(0) = range_counts(0) + 1
+        ELSEIF score < 60 THEN
+            range_counts(1) = range_counts(1) + 1
+        ELSEIF score < 70 THEN
+            range_counts(2) = range_counts(2) + 1
+        ELSEIF score < 80 THEN
+            range_counts(3) = range_counts(3) + 1
+        ELSEIF score < 90 THEN
+            range_counts(4) = range_counts(4) + 1
+        ELSE
+            range_counts(5) = range_counts(5) + 1
+        END IF
+    NEXT i
+    
+    DIM max_count AS INTEGER
+    max_count = MAX(range_counts)
+    
+    FOR i = 0 TO LEN(score_ranges) - 1
+        DIM bar_len AS INTEGER
+        bar_len = INT((range_counts(i) / max_count) * 20)
+        PRINT score_ranges(i) + " │" + STRING$(bar_len, "▓") + " " + STR$(range_counts(i))
+    NEXT i
+END SUB
+
+DEF SUB statistical_tests()
+    PRINT "═══ İSTATİSTİKSEL TESTLER ═══"
+    
+    REM Normallik testi (basit yaklaşım)
+    PRINT "NORMALLİK DEĞERLENDİRMESİ (Basit):"
+    
+    FOR dataset = 1 TO 3
+        DIM test_data AS ARRAY
+        DIM data_name AS STRING
+        
+        SELECT CASE dataset
+            CASE 1
+                test_data = sales_data
+                data_name = "Satış Verisi"
+            CASE 2
+                test_data = temperatures
+                data_name = "Sıcaklık Verisi"
+            CASE 3
+                test_data = student_scores
+                data_name = "Öğrenci Notları"
+        END SELECT
+        
+        DIM mean_val AS DOUBLE
+        DIM median_val AS DOUBLE
+        DIM skewness_approx AS DOUBLE
+        
+        mean_val = MEAN(test_data)
+        median_val = MEDIAN(test_data)
+        skewness_approx = (mean_val - median_val) / STD(test_data)
+        
+        PRINT data_name + ":"
+        PRINT "  Çarpıklık yaklaşımı: " + STR$(ROUND(skewness_approx, 4))
+        
+        IF ABS(skewness_approx) < 0.5 THEN
+            PRINT "  Değerlendirme: Normal dağılıma yakın"
+        ELSEIF ABS(skewness_approx) < 1 THEN
+            PRINT "  Değerlendirme: Orta düzeyde çarpık"
+        ELSE
+            PRINT "  Değerlendirme: Yüksek düzeyde çarpık"
+        END IF
+        PRINT
+    NEXT dataset
+    
+    REM Outlier detection (basit yöntem)
+    PRINT "AYKIRI DEĞER TESPİTİ (IQR Yöntemi):"
+    
+    DIM q1 AS DOUBLE
+    DIM q3 AS DOUBLE
+    DIM iqr AS DOUBLE
+    DIM lower_bound AS DOUBLE
+    DIM upper_bound AS DOUBLE
+    
+    q1 = PERCENTILE(student_scores, 25)
+    q3 = PERCENTILE(student_scores, 75)
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    
+    PRINT "Öğrenci notları için:"
+    PRINT "Alt sınır: " + STR$(ROUND(lower_bound, 2))
+    PRINT "Üst sınır: " + STR$(ROUND(upper_bound, 2))
+    
+    DIM outlier_count AS INTEGER
+    outlier_count = 0
+    
+    FOR i = 0 TO LEN(student_scores) - 1
+        IF student_scores(i) < lower_bound OR student_scores(i) > upper_bound THEN
+            PRINT "Aykırı değer: " + STR$(student_scores(i))
+            outlier_count = outlier_count + 1
+        END IF
+    NEXT i
+    
+    IF outlier_count = 0 THEN
+        PRINT "Aykırı değer bulunamadı."
+    ELSE
+        PRINT "Toplam " + STR$(outlier_count) + " aykırı değer bulundu."
+    END IF
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-10): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            analyze_sales_data()
+        CASE 2
+            analyze_temperature_data()
+        CASE 3
+            analyze_student_scores()
+        CASE 4
+            analyze_stock_data()
+        CASE 5
+            comparative_analysis()
+        CASE 6
+            correlation_analysis()
+        CASE 7
+            trend_analysis()
+        CASE 8
+            data_visualization()
+        CASE 9
+            statistical_tests()
+        CASE 10
+            running = False
+            PRINT "Program kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Veri analizi programı kapatıldı."
