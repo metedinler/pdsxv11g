@@ -1,0 +1,12 @@
+REM Math test
+DIM a AS INTEGER
+DIM b AS INTEGER
+DIM result AS INTEGER
+
+a = 5
+b = 3
+result = a * b
+PRINT "5 * 3 =", result
+
+result = a + b
+PRINT "5 + 3 =", result
