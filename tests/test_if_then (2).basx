@@ -1,0 +1,5 @@
+REM Test IF-THEN yapisi
+A = 10
+IF A > 5 THEN PRINT "A buyuk"
+IF A < 20 THEN PRINT "A kucuk"
+IF A = 10 THEN PRINT "A esit"
