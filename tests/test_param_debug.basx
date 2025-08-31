@@ -1,0 +1,15 @@
+DIM DOUBLE_X AS INTEGER
+DIM PARAMETRESI AS INTEGER
+DIM SONUC AS INTEGER
+DIM X AS INTEGER
+REM Debug info icin basit test
+DEF FUNCTION test_params(x)
+PRINT "x parametresi:", x
+double_x = x * 2
+PRINT "double_x:", double_x
+RETURN double_x
+END FUNCTION
+
+DIM result AS INTEGER
+result = test_params(5)
+PRINT "Sonuc:", result
