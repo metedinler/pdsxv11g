@@ -1,0 +1,4 @@
+REM Test PRINT komutlari
+PRINT "Hello World"
+PRINT "Sayi: ", 42
+PRINT "Toplam: ", 10 + 5
