@@ -1,0 +1,10 @@
+REM En basit fonksiyon testi
+DEF FUNCTION add_numbers(a, b)
+DIM sum AS INTEGER
+sum = a + b
+RETURN sum
+END FUNCTION
+
+DIM result AS INTEGER
+result = add_numbers(5, 3)
+PRINT "5 + 3 =", result
