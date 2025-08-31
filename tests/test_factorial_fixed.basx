@@ -1,0 +1,33 @@
+DIM FACTORIAL AS INTEGER
+DIM POWER AS INTEGER
+REM Basit factorial - tek satir IF kullanarak
+DEF FUNCTION factorial(n)
+DIM result AS INTEGER
+result = 1
+IF n > 1 THEN result = n * factorial(n - 1)
+RETURN result
+END FUNCTION
+
+REM Test
+DIM f5 AS INTEGER
+f5 = factorial(5)
+PRINT "factorial(5) =", f5
+
+DIM f3 AS INTEGER
+f3 = factorial(3)
+PRINT "factorial(3) =", f3
+
+REM Power testi de
+DEF FUNCTION power(base, exp)
+DIM result AS INTEGER
+DIM i AS INTEGER
+result = 1
+FOR i = 1 TO exp
+result = result * base
+NEXT i
+RETURN result
+END FUNCTION
+
+DIM p23 AS INTEGER
+p23 = power(2, 3)
+PRINT "power(2, 3) =", p23
