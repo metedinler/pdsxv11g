@@ -1,0 +1,91 @@
+REM Test 3: Döngü yapıları testleri
+REM Bu program FOR, WHILE, DO-LOOP döngülerini test eder
+
+PRINT "=== Döngü Yapıları Testleri ==="
+PRINT
+
+REM FOR-NEXT döngüsü
+PRINT "1. FOR-NEXT Döngüsü (1'den 5'e):"
+FOR i = 1 TO 5
+    PRINT "i =", i
+NEXT i
+
+PRINT
+
+REM STEP ile FOR döngüsü
+PRINT "2. STEP ile FOR Döngüsü (0'dan 20'ye 3'er):"
+FOR j = 0 TO 20 STEP 3
+    PRINT "j =", j
+NEXT j
+
+PRINT
+
+REM Geriye doğru FOR döngüsü
+PRINT "3. Geriye Doğru FOR Döngüsü (10'dan 1'e):"
+FOR k = 10 TO 1 STEP -1
+    PRINT "k =", k
+NEXT k
+
+PRINT
+
+REM WHILE-WEND döngüsü
+PRINT "4. WHILE-WEND Döngüsü:"
+DIM counter AS INTEGER
+counter = 1
+WHILE counter <= 5
+    PRINT "Counter:", counter
+    counter = counter + 1
+WEND
+
+PRINT
+
+REM DO-LOOP döngüsü
+PRINT "5. DO-LOOP UNTIL Döngüsü:"
+DIM n AS INTEGER
+n = 1
+DO
+    PRINT "n =", n
+    n = n + 1
+LOOP UNTIL n > 3
+
+PRINT
+
+REM DO WHILE döngüsü
+PRINT "6. DO WHILE Döngüsü:"
+DIM m AS INTEGER
+m = 5
+DO WHILE m > 0
+    PRINT "m =", m
+    m = m - 1
+LOOP
+
+PRINT
+
+REM İç içe döngüler
+PRINT "7. İç İçe Döngüler (Çarpım Tablosu 3x3):"
+FOR row = 1 TO 3
+    FOR col = 1 TO 3
+        PRINT STR$(row) + "x" + STR$(col) + "=" + STR$(row * col);
+    NEXT col
+    PRINT
+NEXT row
+
+PRINT
+
+REM EXIT ve CONTINUE testleri
+PRINT "8. EXIT FOR Testi:"
+FOR x = 1 TO 10
+    IF x = 6 THEN EXIT FOR
+    PRINT "x =", x
+NEXT x
+
+PRINT
+
+PRINT "9. CONTINUE FOR Testi (sadece tek sayılar):"
+FOR y = 1 TO 10
+    IF y MOD 2 = 0 THEN CONTINUE FOR
+    PRINT "y =", y
+NEXT y
+
+PRINT
+PRINT "Döngü testleri tamamlandı!"
