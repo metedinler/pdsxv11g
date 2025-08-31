@@ -1,0 +1,74 @@
+REM Test 2: Kontrol yapıları testleri
+REM Bu program IF-THEN-ELSE ve SELECT CASE yapılarını test eder
+
+PRINT "=== Kontrol Yapıları Testleri ==="
+PRINT
+
+REM Tek satır IF testi
+DIM x AS INTEGER
+x = 15
+IF x > 10 THEN PRINT "x 10'dan büyük"
+
+REM Blok IF testi
+DIM score AS INTEGER
+score = 85
+
+IF score >= 90 THEN
+    PRINT "Notunuz: A (Mükemmel!)"
+ELSEIF score >= 80 THEN
+    PRINT "Notunuz: B (İyi)"
+ELSEIF score >= 70 THEN
+    PRINT "Notunuz: C (Orta)"
+ELSEIF score >= 60 THEN
+    PRINT "Notunuz: D (Geçer)"
+ELSE
+    PRINT "Notunuz: F (Kaldı)"
+END IF
+
+REM SELECT CASE testi
+DIM day AS INTEGER
+day = 3
+
+PRINT "Bugün günlerden:";
+SELECT CASE day
+    CASE 1
+        PRINT "Pazartesi"
+    CASE 2
+        PRINT "Salı"
+    CASE 3
+        PRINT "Çarşamba"
+    CASE 4
+        PRINT "Perşembe"
+    CASE 5
+        PRINT "Cuma"
+    CASE 6
+        PRINT "Cumartesi"
+    CASE 7
+        PRINT "Pazar"
+    CASE ELSE
+        PRINT "Geçersiz gün!"
+END SELECT
+
+REM İç içe IF testi
+DIM temperature AS INTEGER
+DIM humidity AS INTEGER
+temperature = 25
+humidity = 60
+
+PRINT "Hava durumu analizi:"
+IF temperature > 20 THEN
+    IF humidity < 70 THEN
+        PRINT "Güzel bir gün!"
+    ELSE
+        PRINT "Sıcak ama nemli"
+    END IF
+ELSE
+    IF temperature < 0 THEN
+        PRINT "Çok soğuk!"
+    ELSE
+        PRINT "Serin bir gün"
+    END IF
+END IF
+
+PRINT
+PRINT "Kontrol yapıları testleri tamamlandı!"
