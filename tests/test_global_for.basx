@@ -1,0 +1,13 @@
+DIM FINAL AS INTEGER
+DIM GLOBAL AS INTEGER
+DIM YENI AS INTEGER
+REM Global FOR dongu testi
+DIM result AS INTEGER
+result = 1
+DIM i AS INTEGER
+FOR i = 1 TO 3
+PRINT "global i =", i, "result =", result
+result = result * 2
+PRINT "global yeni result =", result
+NEXT i
+PRINT "Global final result:", result
