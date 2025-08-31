@@ -1,0 +1,19 @@
+DIM BASLADI AS INTEGER
+DIM BITTI AS INTEGER
+DIM BULUNDU AS INTEGER
+DIM LABEL AS INTEGER
+DIM PROGRAM AS INTEGER
+DIM TESTLABEL1 AS INTEGER
+DIM TESTLABEL2 AS INTEGER
+REM Label test dosyasi
+PRINT "Program basladi"
+
+REM LABEL formatini test et
+LABEL TestLabel1
+PRINT "LABEL TestLabel1 bulundu"
+
+REM : formatini test et  
+TestLabel2:
+PRINT "TestLabel2: bulundu"
+
+PRINT "Program bitti"
