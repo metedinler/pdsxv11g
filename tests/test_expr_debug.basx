@@ -1,0 +1,14 @@
+DIM N_MINUS_1 AS INTEGER
+DIM RESULT AS INTEGER
+DIM N AS INTEGER
+DIM SONUC AS INTEGER
+REM Expression evaluation debug
+DEF FUNCTION test_expr(n)
+PRINT "n:", n
+n_minus_1 = n - 1
+PRINT "n - 1:", n_minus_1
+RETURN n_minus_1
+END FUNCTION
+
+result = test_expr(5)
+PRINT "Sonuc:", result
