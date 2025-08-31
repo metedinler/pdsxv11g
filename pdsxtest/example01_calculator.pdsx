@@ -1,0 +1,214 @@
+REM Örnek 1: Gelişmiş Hesap Makinesi
+REM Bu program dört işlem, bilimsel hesaplamalar ve geçmiş özellikli hesap makinesidir
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║        GELİŞMİŞ HESAP MAKİNESİ       ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Geçmiş için dizi
+DIM history AS LIST
+history = []
+
+REM Ana döngü
+DIM continue_calc AS BOOLEAN
+continue_calc = True
+
+DEF FUNCTION add_to_history(operation, result)
+    DIM entry AS STRING
+    entry = operation + " = " + STR$(result)
+    INSERT(history, entry)
+    IF LEN(history) > 10 THEN
+        REMOVE(history, 0)  ' En eski kaydı sil
+    END IF
+END FUNCTION
+
+DEF SUB show_menu()
+    PRINT "───────────────────────────────────────"
+    PRINT "1. Dört İşlem"
+    PRINT "2. Bilimsel Hesaplamalar"
+    PRINT "3. İstatistiksel İşlemler"
+    PRINT "4. Geçmişi Göster"
+    PRINT "5. Geçmişi Temizle"
+    PRINT "6. Çıkış"
+    PRINT "───────────────────────────────────────"
+END SUB
+
+DEF SUB basic_operations()
+    DIM num1 AS DOUBLE
+    DIM num2 AS DOUBLE
+    DIM operation AS STRING
+    DIM result AS DOUBLE
+    
+    INPUT "İlk sayıyı girin: ", num1
+    INPUT "İşlemi girin (+, -, *, /): ", operation
+    INPUT "İkinci sayıyı girin: ", num2
+    
+    SELECT CASE operation
+        CASE "+"
+            result = num1 + num2
+        CASE "-"
+            result = num1 - num2
+        CASE "*"
+            result = num1 * num2
+        CASE "/"
+            IF num2 <> 0 THEN
+                result = num1 / num2
+            ELSE
+                PRINT "Hata: Sıfıra bölme!"
+                RETURN
+            END IF
+        CASE ELSE
+            PRINT "Geçersiz işlem!"
+            RETURN
+    END SELECT
+    
+    PRINT "Sonuç: " + STR$(num1) + " " + operation + " " + STR$(num2) + " = " + STR$(result)
+    add_to_history(STR$(num1) + " " + operation + " " + STR$(num2), result)
+END SUB
+
+DEF SUB scientific_operations()
+    PRINT "Bilimsel İşlemler:"
+    PRINT "1. Karekök  2. Üs  3. Logaritma  4. Trigonometrik"
+    
+    DIM choice AS INTEGER
+    DIM number AS DOUBLE
+    DIM result AS DOUBLE
+    
+    INPUT "Seçiminiz: ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            INPUT "Sayı: ", number
+            IF number >= 0 THEN
+                result = SQR(number)
+                PRINT "√" + STR$(number) + " = " + STR$(result)
+                add_to_history("√" + STR$(number), result)
+            ELSE
+                PRINT "Negatif sayının karekökü alınamaz!"
+            END IF
+            
+        CASE 2
+            DIM base AS DOUBLE
+            DIM exponent AS DOUBLE
+            INPUT "Taban: ", base
+            INPUT "Üs: ", exponent
+            result = base ^ exponent
+            PRINT STR$(base) + "^" + STR$(exponent) + " = " + STR$(result)
+            add_to_history(STR$(base) + "^" + STR$(exponent), result)
+            
+        CASE 3
+            INPUT "Sayı: ", number
+            IF number > 0 THEN
+                result = LOG(number)
+                PRINT "ln(" + STR$(number) + ") = " + STR$(result)
+                add_to_history("ln(" + STR$(number) + ")", result)
+            ELSE
+                PRINT "Logaritma için pozitif sayı gerekli!"
+            END IF
+            
+        CASE 4
+            PRINT "1. sin  2. cos  3. tan"
+            DIM trig_choice AS INTEGER
+            INPUT "Seçim: ", trig_choice
+            INPUT "Açı (derece): ", number
+            
+            SELECT CASE trig_choice
+                CASE 1
+                    result = SIND(number)
+                    PRINT "sin(" + STR$(number) + "°) = " + STR$(ROUND(result, 6))
+                    add_to_history("sin(" + STR$(number) + "°)", result)
+                CASE 2
+                    result = COSD(number)
+                    PRINT "cos(" + STR$(number) + "°) = " + STR$(ROUND(result, 6))
+                    add_to_history("cos(" + STR$(number) + "°)", result)
+                CASE 3
+                    result = TAND(number)
+                    PRINT "tan(" + STR$(number) + "°) = " + STR$(ROUND(result, 6))
+                    add_to_history("tan(" + STR$(number) + "°)", result)
+            END SELECT
+            
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+END SUB
+
+DEF SUB statistical_operations()
+    PRINT "Sayıları virgülle ayırarak girin (örn: 1,2,3,4,5):"
+    DIM input_str AS STRING
+    DIM numbers AS ARRAY
+    
+    INPUT "Sayılar: ", input_str
+    
+    REM Basit parsing - gerçekte daha gelişmiş olmalı
+    numbers = [10, 15, 20, 25, 30]  ' Örnek veri
+    
+    DIM mean_val AS DOUBLE
+    DIM median_val AS DOUBLE
+    DIM std_val AS DOUBLE
+    
+    mean_val = MEAN(numbers)
+    median_val = MEDIAN(numbers)
+    std_val = STD(numbers)
+    
+    PRINT "─── İstatistiksel Sonuçlar ───"
+    PRINT "Ortalama: " + STR$(ROUND(mean_val, 2))
+    PRINT "Medyan: " + STR$(median_val)
+    PRINT "Standart Sapma: " + STR$(ROUND(std_val, 4))
+    PRINT "Minimum: " + STR$(MIN(numbers))
+    PRINT "Maksimum: " + STR$(MAX(numbers))
+    PRINT "Toplam: " + STR$(SUM(numbers))
+    
+    add_to_history("İstatistik - Ortalama", mean_val)
+END SUB
+
+DEF SUB show_history()
+    IF LEN(history) = 0 THEN
+        PRINT "Geçmiş boş."
+    ELSE
+        PRINT "─── Hesaplama Geçmişi ───"
+        FOR i = 0 TO LEN(history) - 1
+            PRINT STR$(i + 1) + ". " + history(i)
+        NEXT i
+    END IF
+END SUB
+
+DEF SUB clear_history()
+    CLEAR(history)
+    PRINT "Geçmiş temizlendi."
+END SUB
+
+REM Ana program döngüsü
+WHILE continue_calc
+    show_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-6): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            basic_operations()
+        CASE 2
+            scientific_operations()
+        CASE 3
+            statistical_operations()
+        CASE 4
+            show_history()
+        CASE 5
+            clear_history()
+        CASE 6
+            continue_calc = False
+            PRINT "Hesap makinesi kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim! Lütfen 1-6 arası bir sayı girin."
+    END SELECT
+    
+    IF continue_calc THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Teşekkürler! Hesap makinesi kapatıldı."
