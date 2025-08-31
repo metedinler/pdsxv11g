@@ -1,0 +1,4 @@
+DIM HELLO AS INTEGER
+DIM name AS STRING
+LET name = "Claude"
+PRINT "Hello " + name + "!"
