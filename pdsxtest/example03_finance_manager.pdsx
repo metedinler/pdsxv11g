@@ -1,0 +1,363 @@
+REM Örnek 3: Kişisel Finans Yöneticisi
+REM Bu program gelir-gider takibi yapar ve finansal analiz sağlar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║      KİŞİSEL FİNANS YÖNETİCİSİ       ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM İşlem türü sabitleri
+LET INCOME = 1
+LET EXPENSE = 2
+
+REM İşlem veri yapısı
+TYPE Transaction
+    id AS INTEGER
+    date AS STRING
+    type AS INTEGER
+    category AS STRING
+    amount AS DOUBLE
+    description AS STRING
+END TYPE
+
+REM Ana veri yapıları
+DIM transactions AS LIST
+DIM categories_income AS LIST
+DIM categories_expense AS LIST
+transactions = []
+
+REM Kategoriler
+categories_income = ["Maaş", "Bonus", "Freelance", "Yatırım", "Diğer Gelir"]
+categories_expense = ["Market", "Kira", "Faturalar", "Ulaşım", "Eğlence", "Giyim", "Sağlık", "Diğer Gider"]
+
+REM ID sayacı
+DIM next_transaction_id AS INTEGER
+next_transaction_id = 1
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Gelir Ekle"
+    PRINT "2. Gider Ekle"
+    PRINT "3. İşlemları Listele"
+    PRINT "4. Aylık Özet"
+    PRINT "5. Kategori Analizi"
+    PRINT "6. Trend Analizi"
+    PRINT "7. Bütçe Takibi"
+    PRINT "8. İşlem Sil"
+    PRINT "9. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB show_categories(type_id)
+    IF type_id = INCOME THEN
+        PRINT "Gelir Kategorileri:"
+        FOR i = 0 TO LEN(categories_income) - 1
+            PRINT STR$(i + 1) + ". " + categories_income(i)
+        NEXT i
+    ELSE
+        PRINT "Gider Kategorileri:"
+        FOR i = 0 TO LEN(categories_expense) - 1
+            PRINT STR$(i + 1) + ". " + categories_expense(i)
+        NEXT i
+    END IF
+END SUB
+
+DEF FUNCTION get_current_date()
+    REM Basit tarih formatı (gerçekte DATE$ kullanılabilir)
+    RETURN "2025-01-21"  ' Sabit tarih örnek için
+END FUNCTION
+
+DEF SUB add_transaction(type_id)
+    DIM new_transaction AS Transaction
+    DIM category_choice AS INTEGER
+    DIM amount AS DOUBLE
+    DIM description AS STRING
+    
+    new_transaction.id = next_transaction_id
+    next_transaction_id = next_transaction_id + 1
+    new_transaction.date = get_current_date()
+    new_transaction.type = type_id
+    
+    show_categories(type_id)
+    INPUT "Kategori seçin: ", category_choice
+    
+    IF type_id = INCOME THEN
+        IF category_choice >= 1 AND category_choice <= LEN(categories_income) THEN
+            new_transaction.category = categories_income(category_choice - 1)
+        ELSE
+            PRINT "Geçersiz kategori!"
+            RETURN
+        END IF
+    ELSE
+        IF category_choice >= 1 AND category_choice <= LEN(categories_expense) THEN
+            new_transaction.category = categories_expense(category_choice - 1)
+        ELSE
+            PRINT "Geçersiz kategori!"
+            RETURN
+        END IF
+    END IF
+    
+    INPUT "Tutar: ", amount
+    IF amount <= 0 THEN
+        PRINT "Tutar pozitif olmalıdır!"
+        RETURN
+    END IF
+    new_transaction.amount = amount
+    
+    INPUT "Açıklama: ", description
+    new_transaction.description = description
+    
+    INSERT(transactions, new_transaction)
+    
+    DIM type_str AS STRING
+    type_str = IFTHEN(type_id = INCOME, "Gelir", "Gider")
+    PRINT type_str + " başarıyla eklendi. ID: " + STR$(new_transaction.id)
+END SUB
+
+DEF SUB list_transactions()
+    IF LEN(transactions) = 0 THEN
+        PRINT "Henüz işlem yok."
+        RETURN
+    END IF
+    
+    PRINT "╔════╤════════════╤═════════╤═══════════════╤═════════╤══════════════════╗"
+    PRINT "║ ID │   Tarih    │   Tür   │   Kategori    │  Tutar  │    Açıklama      ║"
+    PRINT "╠════╪════════════╪═════════╪═══════════════╪═════════╪══════════════════╣"
+    
+    FOR i = 0 TO LEN(transactions) - 1
+        DIM type_str AS STRING
+        DIM amount_str AS STRING
+        
+        type_str = IFTHEN(transactions(i).type = INCOME, "Gelir", "Gider")
+        amount_str = STR$(transactions(i).amount) + " ₺"
+        
+        PRINT "║" + STR$(transactions(i).id) + "   │" + 
+              transactions(i).date + "  │" + 
+              type_str + "  │" + 
+              LEFT$(transactions(i).category + SPACE$(15), 15) + "│" + 
+              amount_str + "     │" + 
+              LEFT$(transactions(i).description + SPACE$(18), 18) + "║"
+    NEXT i
+    
+    PRINT "╚════╧════════════╧═════════╧═══════════════╧═════════╧══════════════════╝"
+END SUB
+
+DEF SUB monthly_summary()
+    IF LEN(transactions) = 0 THEN
+        PRINT "Henüz işlem yok."
+        RETURN
+    END IF
+    
+    DIM total_income AS DOUBLE
+    DIM total_expense AS DOUBLE
+    DIM income_count AS INTEGER
+    DIM expense_count AS INTEGER
+    
+    total_income = 0: total_expense = 0
+    income_count = 0: expense_count = 0
+    
+    FOR i = 0 TO LEN(transactions) - 1
+        IF transactions(i).type = INCOME THEN
+            total_income = total_income + transactions(i).amount
+            income_count = income_count + 1
+        ELSE
+            total_expense = total_expense + transactions(i).amount
+            expense_count = expense_count + 1
+        END IF
+    NEXT i
+    
+    DIM net_income AS DOUBLE
+    net_income = total_income - total_expense
+    
+    PRINT "╔═══ AYLIK ÖZET ═══════════════════════╗"
+    PRINT "║                                     ║"
+    PRINT "║ Toplam Gelir:    " + STR$(total_income) + " ₺      ║"
+    PRINT "║ Toplam Gider:    " + STR$(total_expense) + " ₺      ║"
+    PRINT "║ ─────────────────────────────────── ║"
+    PRINT "║ Net Gelir:       " + STR$(net_income) + " ₺      ║"
+    PRINT "║                                     ║"
+    PRINT "║ Gelir İşlem Say.: " + STR$(income_count) + "           ║"
+    PRINT "║ Gider İşlem Say.: " + STR$(expense_count) + "           ║"
+    PRINT "║                                     ║"
+    
+    IF total_income > 0 THEN
+        DIM expense_ratio AS DOUBLE
+        expense_ratio = (total_expense / total_income) * 100
+        PRINT "║ Gider/Gelir %:   " + STR$(ROUND(expense_ratio, 1)) + "%       ║"
+    END IF
+    
+    PRINT "╚═════════════════════════════════════╝"
+    
+    REM Finansal durum değerlendirmesi
+    IF net_income > 0 THEN
+        PRINT "✅ Finansal durum: Pozitif (Tasarruf var)"
+    ELSEIF net_income = 0 THEN
+        PRINT "⚠️  Finansal durum: Denk (Tasarruf yok)"
+    ELSE
+        PRINT "❌ Finansal durum: Negatif (Açık var)"
+    END IF
+END SUB
+
+DEF SUB category_analysis()
+    IF LEN(transactions) = 0 THEN
+        PRINT "Henüz işlem yok."
+        RETURN
+    END IF
+    
+    PRINT "═══ KATEGORİ ANALİZİ ═══"
+    PRINT
+    PRINT "GELİR KATEGORİLERİ:"
+    
+    FOR j = 0 TO LEN(categories_income) - 1
+        DIM category_total AS DOUBLE
+        category_total = 0
+        
+        FOR i = 0 TO LEN(transactions) - 1
+            IF transactions(i).type = INCOME AND transactions(i).category = categories_income(j) THEN
+                category_total = category_total + transactions(i).amount
+            END IF
+        NEXT i
+        
+        IF category_total > 0 THEN
+            PRINT categories_income(j) + ": " + STR$(category_total) + " ₺"
+        END IF
+    NEXT j
+    
+    PRINT
+    PRINT "GİDER KATEGORİLERİ:"
+    
+    FOR j = 0 TO LEN(categories_expense) - 1
+        DIM category_total2 AS DOUBLE
+        category_total2 = 0
+        
+        FOR i = 0 TO LEN(transactions) - 1
+            IF transactions(i).type = EXPENSE AND transactions(i).category = categories_expense(j) THEN
+                category_total2 = category_total2 + transactions(i).amount
+            END IF
+        NEXT i
+        
+        IF category_total2 > 0 THEN
+            PRINT categories_expense(j) + ": " + STR$(category_total2) + " ₺"
+        END IF
+    NEXT j
+END SUB
+
+DEF SUB budget_tracking()
+    PRINT "═══ BÜTÇE TAKİBİ ═══"
+    
+    REM Örnek bütçe limitleri
+    DIM budget_limits AS DICT
+    budget_limits = {
+        "Market": 1500,
+        "Kira": 3000,
+        "Faturalar": 800,
+        "Ulaşım": 500,
+        "Eğlence": 1000
+    }
+    
+    PRINT "Kategori bazında bütçe durumu:"
+    PRINT
+    
+    FOR j = 0 TO LEN(categories_expense) - 1
+        DIM spent AS DOUBLE
+        spent = 0
+        
+        FOR i = 0 TO LEN(transactions) - 1
+            IF transactions(i).type = EXPENSE AND transactions(i).category = categories_expense(j) THEN
+                spent = spent + transactions(i).amount
+            END IF
+        NEXT i
+        
+        IF spent > 0 THEN
+            DIM category AS STRING
+            category = categories_expense(j)
+            
+            REM Basit bütçe limiti (gerçekte dictionary'den alınabilir)
+            DIM budget_limit AS DOUBLE
+            budget_limit = 1000  ' Varsayılan limit
+            
+            DIM usage_percent AS DOUBLE
+            usage_percent = (spent / budget_limit) * 100
+            
+            PRINT category + ":"
+            PRINT "  Harcanan: " + STR$(spent) + " ₺"
+            PRINT "  Bütçe: " + STR$(budget_limit) + " ₺"
+            PRINT "  Kullanım: %" + STR$(ROUND(usage_percent, 1))
+            
+            IF usage_percent > 100 THEN
+                PRINT "  ❌ Bütçe aşıldı!"
+            ELSEIF usage_percent > 80 THEN
+                PRINT "  ⚠️  Bütçe sınırına yakın"
+            ELSE
+                PRINT "  ✅ Bütçe dahilinde"
+            END IF
+            PRINT
+        END IF
+    NEXT j
+END SUB
+
+DEF SUB delete_transaction()
+    IF LEN(transactions) = 0 THEN
+        PRINT "Silinecek işlem yok."
+        RETURN
+    END IF
+    
+    list_transactions()
+    
+    DIM delete_id AS INTEGER
+    INPUT "Silinecek işlem ID: ", delete_id
+    
+    FOR i = 0 TO LEN(transactions) - 1
+        IF transactions(i).id = delete_id THEN
+            REMOVE(transactions, i)
+            PRINT "İşlem başarıyla silindi."
+            RETURN
+        END IF
+    NEXT i
+    
+    PRINT "İşlem bulunamadı!"
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-9): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            add_transaction(INCOME)
+        CASE 2
+            add_transaction(EXPENSE)
+        CASE 3
+            list_transactions()
+        CASE 4
+            monthly_summary()
+        CASE 5
+            category_analysis()
+        CASE 6
+            PRINT "Trend analizi geliştirilme aşamasında..."
+        CASE 7
+            budget_tracking()
+        CASE 8
+            delete_transaction()
+        CASE 9
+            running = False
+            PRINT "Program kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Kişisel finans yöneticisi kapatıldı."
