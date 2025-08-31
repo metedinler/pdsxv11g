@@ -1,0 +1,524 @@
+REM Oyun 2: Sudoku
+REM 9x9 gridde sayı yerleştirme bulmacası
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║              SUDOKU                  ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global değişkenler
+DIM grid AS ARRAY
+DIM original_grid AS ARRAY
+DIM difficulty AS STRING
+DIM moves_count AS INTEGER
+DIM hints_used AS INTEGER
+DIM game_completed AS BOOLEAN
+
+REM Oyunu başlat
+call initialize_sudoku()
+
+DEF SUB initialize_sudoku()
+    REM 9x9 grid oluştur
+    grid = []
+    original_grid = []
+    
+    FOR i = 0 TO 8
+        DIM row AS ARRAY
+        DIM orig_row AS ARRAY
+        row = []
+        orig_row = []
+        FOR j = 0 TO 8
+            INSERT(row, 0)
+            INSERT(orig_row, 0)
+        NEXT j
+        INSERT(grid, row)
+        INSERT(original_grid, orig_row)
+    NEXT i
+    
+    moves_count = 0
+    hints_used = 0
+    game_completed = False
+    difficulty = "kolay"
+    
+    PRINT "Sudoku oyunu başlatıldı!"
+END SUB
+
+DEF SUB generate_puzzle()
+    PRINT "Sudoku bulmacası oluşturuluyor..."
+    
+    REM Basit bir örnek bulmaca (elle hazırlanmış)
+    DIM sample_puzzle AS ARRAY
+    sample_puzzle = [
+        [5, 3, 0, 0, 7, 0, 0, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
+        [0, 0, 0, 0, 8, 0, 0, 7, 9]
+    ]
+    
+    REM Grid'e kopyala
+    FOR i = 0 TO 8
+        FOR j = 0 TO 8
+            grid(i)(j) = sample_puzzle(i)(j)
+            original_grid(i)(j) = sample_puzzle(i)(j)
+        NEXT j
+    NEXT i
+    
+    SELECT CASE difficulty
+        CASE "zor"
+            call remove_numbers(40)
+        CASE "orta"
+            call remove_numbers(30)
+        CASE ELSE  ' kolay
+            call remove_numbers(20)
+    END SELECT
+    
+    PRINT "✅ " + difficulty + " seviye bulmaca hazırlandı!"
+END SUB
+
+DEF SUB remove_numbers(count AS INTEGER)
+    REM Belirli sayıda sayıyı sıfırla (zorlaştırmak için)
+    DIM removed AS INTEGER
+    removed = 0
+    
+    WHILE removed < count
+        DIM rand_row AS INTEGER
+        DIM rand_col AS INTEGER
+        rand_row = RND(0, 8)
+        rand_col = RND(0, 8)
+        
+        IF grid(rand_row)(rand_col) <> 0 THEN
+            grid(rand_row)(rand_col) = 0
+            original_grid(rand_row)(rand_col) = 0
+            removed = removed + 1
+        END IF
+    WEND
+END SUB
+
+DEF SUB show_grid()
+    PRINT
+    PRINT "    1 2 3   4 5 6   7 8 9"
+    PRINT "  ┌─────────────────────────┐"
+    
+    FOR i = 0 TO 8
+        IF i = 3 OR i = 6 THEN
+            PRINT "  ├─────────────────────────┤"
+        END IF
+        
+        PRINT CHR$(65 + i) + " │ "
+        
+        FOR j = 0 TO 8
+            IF j = 3 OR j = 6 THEN
+                PRINT "│ "
+            END IF
+            
+            IF grid(i)(j) = 0 THEN
+                PRINT ". "
+            ELSE
+                PRINT STR$(grid(i)(j)) + " "
+            END IF
+        NEXT j
+        PRINT "│"
+    NEXT i
+    
+    PRINT "  └─────────────────────────┘"
+    PRINT
+END SUB
+
+DEF SUB show_game_info()
+    PRINT "═══ OYUN BİLGİLERİ ═══"
+    PRINT "Seviye: " + difficulty
+    PRINT "Hamle sayısı: " + STR$(moves_count)
+    PRINT "Kullanılan ipucu: " + STR$(hints_used)
+    
+    DIM filled_cells AS INTEGER
+    DIM total_cells AS INTEGER
+    filled_cells = 0
+    total_cells = 81
+    
+    FOR i = 0 TO 8
+        FOR j = 0 TO 8
+            IF grid(i)(j) <> 0 THEN
+                filled_cells = filled_cells + 1
+            END IF
+        NEXT j
+    NEXT i
+    
+    DIM progress AS DOUBLE
+    progress = (filled_cells / total_cells) * 100
+    PRINT "İlerleme: %" + STR$(ROUND(progress, 1)) + " (" + STR$(filled_cells) + "/81)"
+    PRINT
+END SUB
+
+DEF SUB play_sudoku()
+    WHILE NOT game_completed
+        show_grid()
+        show_game_info()
+        
+        PRINT "Komutlar: A1-9 (konum-sayı), ipucu, kontrol, çık"
+        INPUT "Girişiniz: ", user_input
+        
+        DIM command AS STRING
+        command = UPPER$(user_input)
+        
+        SELECT CASE command
+            CASE "ÇIK", "EXIT"
+                PRINT "Oyun kapatılıyor..."
+                EXIT SUB
+                
+            CASE "IPUCU", "HINT"
+                call give_hint()
+                
+            CASE "KONTROL", "CHECK"
+                call check_solution()
+                
+            CASE "YENI", "NEW"
+                call new_game_menu()
+                
+            CASE "KURAL", "RULES"
+                call show_rules()
+                
+            CASE ELSE
+                REM Hamle girişi: A1-5 formatı
+                IF LEN(user_input) = 4 AND MID$(user_input, 3, 1) = "-" THEN
+                    DIM position AS STRING
+                    DIM number AS INTEGER
+                    position = LEFT$(user_input, 2)
+                    number = VAL(RIGHT$(user_input, 1))
+                    
+                    IF is_valid_position(position) AND number >= 1 AND number <= 9 THEN
+                        call make_move(position, number)
+                    ELSE
+                        PRINT "❌ Geçersiz giriş! Format: A1-5 (konum-sayı)"
+                    END IF
+                ELSE
+                    PRINT "❌ Geçersiz format! Örnek: B3-7 veya 'ipucu'"
+                END IF
+        END SELECT
+        
+        IF is_puzzle_complete() THEN
+            show_grid()
+            PRINT "🎉 TEBRİKLER! Sudoku'yu çözdünüz!"
+            PRINT "Toplam hamle: " + STR$(moves_count)
+            PRINT "Kullanılan ipucu: " + STR$(hints_used)
+            game_completed = True
+        END IF
+        
+        PRINT
+    WEND
+END SUB
+
+DEF FUNCTION is_valid_position(pos AS STRING) AS BOOLEAN
+    IF LEN(pos) <> 2 THEN
+        RETURN False
+    END IF
+    
+    DIM row_char AS STRING
+    DIM col_char AS STRING
+    row_char = UPPER$(LEFT$(pos, 1))
+    col_char = RIGHT$(pos, 1)
+    
+    REM Satır A-I arası olmalı
+    IF ASC(row_char) < ASC("A") OR ASC(row_char) > ASC("I") THEN
+        RETURN False
+    END IF
+    
+    REM Sütun 1-9 arası olmalı
+    DIM col AS INTEGER
+    col = VAL(col_char)
+    IF col < 1 OR col > 9 THEN
+        RETURN False
+    END IF
+    
+    RETURN True
+END FUNCTION
+
+DEF SUB make_move(position AS STRING, number AS INTEGER)
+    DIM row AS INTEGER
+    DIM col AS INTEGER
+    
+    row = ASC(UPPER$(LEFT$(position, 1))) - ASC("A")
+    col = VAL(RIGHT$(position, 1)) - 1
+    
+    REM Orijinal sayıları değiştiremesin
+    IF original_grid(row)(col) <> 0 THEN
+        PRINT "❌ Bu hücre sabit! Değiştirilemez."
+        EXIT SUB
+    END IF
+    
+    REM Geçerli hamle kontrolü
+    IF is_valid_number(row, col, number) THEN
+        grid(row)(col) = number
+        moves_count = moves_count + 1
+        PRINT "✅ " + position + " hücresine " + STR$(number) + " yerleştirildi."
+    ELSE
+        PRINT "❌ Bu sayı bu konuma yerleştirilemez! Sudoku kurallarını kontrol edin."
+    END IF
+END SUB
+
+DEF FUNCTION is_valid_number(row AS INTEGER, col AS INTEGER, num AS INTEGER) AS BOOLEAN
+    REM Satır kontrolü
+    FOR j = 0 TO 8
+        IF j <> col AND grid(row)(j) = num THEN
+            RETURN False
+        END IF
+    NEXT j
+    
+    REM Sütun kontrolü
+    FOR i = 0 TO 8
+        IF i <> row AND grid(i)(col) = num THEN
+            RETURN False
+        END IF
+    NEXT i
+    
+    REM 3x3 kutu kontrolü
+    DIM box_row AS INTEGER
+    DIM box_col AS INTEGER
+    box_row = (row / 3) * 3
+    box_col = (col / 3) * 3
+    
+    FOR i = box_row TO box_row + 2
+        FOR j = box_col TO box_col + 2
+            IF (i <> row OR j <> col) AND grid(i)(j) = num THEN
+                RETURN False
+            END IF
+        NEXT j
+    NEXT i
+    
+    RETURN True
+END FUNCTION
+
+DEF SUB give_hint()
+    IF hints_used >= 3 THEN
+        PRINT "❌ Maksimum ipucu sayısına ulaştınız! (3/3)"
+        EXIT SUB
+    END IF
+    
+    REM Boş bir hücre bul ve doğru sayıyı ver
+    FOR i = 0 TO 8
+        FOR j = 0 TO 8
+            IF grid(i)(j) = 0 THEN
+                REM Bu hücre için geçerli sayıları bul
+                FOR num = 1 TO 9
+                    IF is_valid_number(i, j, num) THEN
+                        DIM pos_str AS STRING
+                        pos_str = CHR$(65 + i) + STR$(j + 1)
+                        PRINT "💡 İpucu: " + pos_str + " konumuna " + STR$(num) + " yerleştirin."
+                        hints_used = hints_used + 1
+                        EXIT SUB
+                    END IF
+                NEXT num
+            END IF
+        NEXT j
+    NEXT i
+    
+    PRINT "❌ İpucu bulunamadı!"
+END SUB
+
+DEF SUB check_solution()
+    DIM errors AS INTEGER
+    errors = 0
+    
+    PRINT "Çözüm kontrol ediliyor..."
+    
+    FOR i = 0 TO 8
+        FOR j = 0 TO 8
+            IF grid(i)(j) <> 0 THEN
+                REM Geçici olarak hücreyi boşalt ve kontrol et
+                DIM temp_val AS INTEGER
+                temp_val = grid(i)(j)
+                grid(i)(j) = 0
+                
+                IF NOT is_valid_number(i, j, temp_val) THEN
+                    errors = errors + 1
+                    DIM pos_str AS STRING
+                    pos_str = CHR$(65 + i) + STR$(j + 1)
+                    PRINT "❌ Hata: " + pos_str + " konumundaki " + STR$(temp_val)
+                END IF
+                
+                grid(i)(j) = temp_val
+            END IF
+        NEXT j
+    NEXT i
+    
+    IF errors = 0 THEN
+        PRINT "✅ Şu ana kadar hata yok!"
+    ELSE
+        PRINT "❌ Toplam " + STR$(errors) + " hata bulundu."
+    END IF
+END SUB
+
+DEF FUNCTION is_puzzle_complete() AS BOOLEAN
+    REM Tüm hücreler dolu mu?
+    FOR i = 0 TO 8
+        FOR j = 0 TO 8
+            IF grid(i)(j) = 0 THEN
+                RETURN False
+            END IF
+        NEXT j
+    NEXT i
+    
+    REM Çözüm geçerli mi?
+    FOR i = 0 TO 8
+        FOR j = 0 TO 8
+            DIM temp_val AS INTEGER
+            temp_val = grid(i)(j)
+            grid(i)(j) = 0
+            
+            IF NOT is_valid_number(i, j, temp_val) THEN
+                grid(i)(j) = temp_val
+                RETURN False
+            END IF
+            
+            grid(i)(j) = temp_val
+        NEXT j
+    NEXT i
+    
+    RETURN True
+END FUNCTION
+
+DEF SUB show_rules()
+    PRINT
+    PRINT "═══════════════ SUDOKU KURALLARI ═══════════════"
+    PRINT "📋 HEDEF:"
+    PRINT "   9x9 tabloyu 1-9 arası sayılarla doldurun"
+    PRINT
+    PRINT "📏 KURALLAR:"
+    PRINT "   • Her satırda 1-9 arası her sayı bir kez bulunmalı"
+    PRINT "   • Her sütunda 1-9 arası her sayı bir kez bulunmalı"
+    PRINT "   • Her 3x3 kutuda 1-9 arası her sayı bir kez bulunmalı"
+    PRINT "   • Verilen sayılar değiştirilemez"
+    PRINT
+    PRINT "🎮 KOMUTLAR:"
+    PRINT "   • A1-5: A satırı 1. sütuna 5 sayısını yerleştir"
+    PRINT "   • ipucu: Bir sonraki doğru hamleni göster"
+    PRINT "   • kontrol: Şu anki çözümü kontrol et"
+    PRINT "   • çık: Oyunu bitir"
+    PRINT
+    PRINT "💡 İPUÇLARI:"
+    PRINT "   • Boş hücreler . ile gösterilir"
+    PRINT "   • Mantık yürüterek çözüm bulun"
+    PRINT "   • İmkansız durumlarda geri alın"
+    PRINT "═════════════════════════════════════════════════"
+    PRINT
+END SUB
+
+DEF SUB new_game_menu()
+    PRINT
+    PRINT "═══ YENİ OYUN ═══"
+    PRINT "1. Kolay"
+    PRINT "2. Orta"
+    PRINT "3. Zor"
+    PRINT "4. İptal"
+    
+    INPUT "Zorluk seviyesi: ", level_choice
+    
+    SELECT CASE level_choice
+        CASE 1
+            difficulty = "kolay"
+            call initialize_sudoku()
+            call generate_puzzle()
+            PRINT "Yeni kolay oyun başlatıldı!"
+            
+        CASE 2
+            difficulty = "orta"
+            call initialize_sudoku()
+            call generate_puzzle()
+            PRINT "Yeni orta seviye oyun başlatıldı!"
+            
+        CASE 3
+            difficulty = "zor"
+            call initialize_sudoku()
+            call generate_puzzle()
+            PRINT "Yeni zor oyun başlatıldı!"
+            
+        CASE 4
+            PRINT "Yeni oyun iptal edildi."
+            
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "═══════════════ SUDOKU OYUNU ═══════════════"
+    PRINT "1. Yeni Oyun"
+    PRINT "2. Devam Et (mevcut oyun varsa)"
+    PRINT "3. Kuralları Göster"
+    PRINT "4. İstatistikler"
+    PRINT "5. Çıkış"
+    PRINT "═════════════════════════════════════════════"
+END SUB
+
+DEF SUB show_statistics()
+    PRINT
+    PRINT "═══ İSTATİSTİKLER ═══"
+    PRINT "Bu oturum:"
+    PRINT "Hamle sayısı: " + STR$(moves_count)
+    PRINT "Kullanılan ipucu: " + STR$(hints_used)
+    PRINT "Zorluk seviyesi: " + difficulty
+    
+    IF game_completed THEN
+        PRINT "Durum: ✅ Tamamlandı"
+    ELSE
+        DIM filled AS INTEGER
+        filled = 0
+        FOR i = 0 TO 8
+            FOR j = 0 TO 8
+                IF grid(i)(j) <> 0 THEN filled = filled + 1
+            NEXT j
+        NEXT i
+        PRINT "Durum: 📝 Devam ediyor (" + STR$(filled) + "/81)"
+    END IF
+    PRINT
+END SUB
+
+REM Ana oyun döngüsü
+DIM main_running AS BOOLEAN
+main_running = True
+
+WHILE main_running
+    show_main_menu()
+    
+    DIM menu_choice AS INTEGER
+    INPUT "Seçiminiz: ", menu_choice
+    
+    SELECT CASE menu_choice
+        CASE 1
+            call new_game_menu()
+            IF difficulty <> "" THEN
+                call play_sudoku()
+            END IF
+            
+        CASE 2
+            IF moves_count = 0 AND NOT game_completed THEN
+                PRINT "Mevcut oyun bulunamadı. Önce yeni oyun başlatın."
+            ELSE
+                call play_sudoku()
+            END IF
+            
+        CASE 3
+            call show_rules()
+            
+        CASE 4
+            call show_statistics()
+            
+        CASE 5
+            main_running = False
+            PRINT "Sudoku oyunu kapatılıyor... Güle güle!"
+            
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF main_running THEN
+        PRINT
+        INPUT "Ana menüye dönmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
