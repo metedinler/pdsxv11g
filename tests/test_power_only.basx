@@ -1,0 +1,15 @@
+DIM POWER AS INTEGER
+REM Basit power fonksiyon - no recursion
+DEF FUNCTION power(base, exp)
+DIM result AS INTEGER
+DIM i AS INTEGER
+result = 1
+FOR i = 1 TO exp
+result = result * base
+NEXT i
+RETURN result
+END FUNCTION
+
+DIM p AS INTEGER
+p = power(2, 3)
+PRINT "power(2, 3) =", p
