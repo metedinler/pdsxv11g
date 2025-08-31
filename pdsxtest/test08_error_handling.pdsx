@@ -1,0 +1,131 @@
+REM Test 8: Hata işleme ve debug testleri
+REM Bu program TRY-CATCH ve debug özelliklerini test eder
+
+PRINT "=== Hata İşleme ve Debug Testleri ==="
+PRINT
+
+REM TRY-CATCH testi
+PRINT "1. TRY-CATCH Testi:"
+
+TRY PRINT 10 / 2 CATCH error DO PRINT "Hata yakalandı:", error
+PRINT "Başarılı işlem tamamlandı"
+
+PRINT
+
+TRY PRINT 10 / 0 CATCH error DO PRINT "Hata yakalandı:", error
+PRINT "Hata sonrası program devam ediyor"
+
+PRINT
+
+REM Tanımlanmamış değişken hatası
+PRINT "2. Tanımlanmamış Değişken Hatası:"
+TRY PRINT undefined_variable CATCH error DO PRINT "Değişken hatası:", error
+
+PRINT
+
+REM Tanımlanmamış fonksiyon hatası
+PRINT "3. Tanımlanmamış Fonksiyon Hatası:"
+TRY PRINT unknown_function(5) CATCH error DO PRINT "Fonksiyon hatası:", error
+
+PRINT
+
+REM Dizi indis hatası
+PRINT "4. Dizi İndis Hatası:"
+DIM test_array(3) AS INTEGER
+test_array(0) = 10
+test_array(1) = 20
+test_array(2) = 30
+
+TRY PRINT test_array(5) CATCH error DO PRINT "İndis hatası:", error
+
+PRINT
+
+REM String fonksiyon hataları
+PRINT "5. String Fonksiyon Hataları:"
+DIM test_string AS STRING
+test_string = "Test"
+
+TRY PRINT MID$(test_string, 10, 5) CATCH error DO PRINT "String hatası:", error
+
+PRINT
+
+REM Matematiksel hatalar
+PRINT "6. Matematiksel Hatalar:"
+TRY PRINT SQR(-5) CATCH error DO PRINT "Matematik hatası:", error
+TRY PRINT LOG(-1) CATCH error DO PRINT "Logaritma hatası:", error
+
+PRINT
+
+REM Debug modları
+PRINT "7. Debug Modları Testi:"
+
+DEBUG ON
+PRINT "Debug modu açık - bu satır debug bilgisi gösterecek"
+DEBUG OFF
+
+TRACE ON
+PRINT "Trace modu açık - bu satır trace edilecek"
+TRACE OFF
+
+PRINT
+
+REM Performance ölçümü
+PRINT "8. Performance Ölçümü:"
+PERFORMANCE
+
+PRINT
+
+REM Karmaşık hata senaryosu
+PRINT "9. Karmaşık Hata Senaryosu:"
+
+DEF FUNCTION risky_operation(x, y)
+    TRY RETURN x / y CATCH error DO RETURN -1
+END FUNCTION
+
+DEF FUNCTION safe_division(a, b)
+    IF b = 0 THEN
+        PRINT "Uyarı: Sıfıra bölme hatası önlendi"
+        RETURN 0
+    ELSE
+        RETURN a / b
+    END IF
+END FUNCTION
+
+PRINT "Güvenli bölme 10/2 =", safe_division(10, 2)
+PRINT "Güvenli bölme 10/0 =", safe_division(10, 0)
+PRINT "Riskli işlem 8/2 =", risky_operation(8, 2)
+PRINT "Riskli işlem 8/0 =", risky_operation(8, 0)
+
+PRINT
+
+REM ON ERROR GOTO testi
+PRINT "10. ON ERROR GOTO Testi:"
+
+ON ERROR GOTO ErrorHandler
+
+PRINT "Hata öncesi - normal çalışma"
+PRINT 5 / 0  ' Bu hata fırlatacak
+PRINT "Bu satır çalışmayacak"
+
+ErrorHandler:
+PRINT "Hata işleyicisine geçildi!"
+PRINT "Program güvenli şekilde sonlandırıldı"
+
+PRINT
+
+REM Kullanıcı tanımlı hata
+DEF FUNCTION validate_age(age)
+    IF age < 0 OR age > 150 THEN
+        RETURN "Geçersiz yaş değeri: " + STR$(age)
+    ELSE
+        RETURN "Geçerli yaş: " + STR$(age)
+    END IF
+END FUNCTION
+
+PRINT "11. Veri Doğrulama Testi:"
+PRINT validate_age(25)
+PRINT validate_age(-5)
+PRINT validate_age(200)
+
+PRINT
+PRINT "Hata işleme ve debug testleri tamamlandı!"
