@@ -1,0 +1,21 @@
+PRINT "=== Test 1: Temel Komutlar ==="
+
+LET name = "Merhaba Dünya"
+LET age = 25
+LET pi = 3.14159
+
+PRINT "İsim:", name
+PRINT "Yaş:", age
+PRINT "Pi:", pi
+
+LET test_string = "pdsXv11 Yorumlayıcısı"
+PRINT "String:", test_string
+
+LET number = 16.7
+PRINT "Sayı:", number
+
+LET x = 10
+LET y = 5
+IF x > y THEN PRINT "x büyük y'den"
+
+PRINT "=== Test 1 Tamamlandı ==="
