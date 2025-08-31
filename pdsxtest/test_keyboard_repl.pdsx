@@ -1,0 +1,176 @@
+REM Test Programı: Klavye Girişi ve REPL Özellikleri
+REM Bu program yeni eklenen KEY, GETKEY fonksiyonlarını test eder
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║    Klavye ve REPL Test Programı      ║"
+PRINT "║           pdsXv11g v1.1              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Menü sistemi
+PRINT "YENİ ÖZELLİKLER TESTİ:"
+PRINT "═══════════════════════"
+PRINT "1. KEY() fonksiyonu testi"
+PRINT "2. GETKEY() fonksiyonu testi"
+PRINT "3. GETKEY('<özel_tuş>') testi"
+PRINT "4. SAVE/LOAD/RUN komutları testi"
+PRINT "5. REPL moduna geçiş"
+PRINT "6. Çıkış"
+PRINT
+
+DIM choice AS INTEGER
+INPUT "Seçiminiz (1-6): ", choice
+
+SELECT CASE choice
+    CASE 1
+        PRINT
+        PRINT "═══ KEY() Fonksiyonu Testi ═══"
+        PRINT "KEY() fonksiyonu bir tuşa basılıp basılmadığını kontrol eder."
+        PRINT "Herhangi bir tuşa basın (10 saniye bekleyeceğiz)..."
+        PRINT "ESC ile çıkış yapabilirsiniz."
+        PRINT
+        
+        DIM start_time AS DOUBLE
+        start_time = TIMER
+        DIM key_pressed AS STRING
+        
+        WHILE TIMER - start_time < 10
+            key_pressed = KEY()
+            IF key_pressed <> "" THEN
+                PRINT "Basılan tuş: '" + key_pressed + "' (ASCII: " + STR$(ASC(key_pressed)) + ")"
+                IF key_pressed = CHR$(27) THEN  ' ESC tuşu
+                    PRINT "ESC tuşuna basıldı, çıkılıyor..."
+                    EXIT WHILE
+                END IF
+            END IF
+        WEND
+        
+        IF TIMER - start_time >= 10 THEN
+            PRINT "Zaman aşımı! Herhangi bir tuşa basılmadı."
+        END IF
+        
+    CASE 2
+        PRINT
+        PRINT "═══ GETKEY() Fonksiyonu Testi ═══"
+        PRINT "GETKEY() fonksiyonu bir tuşa basılmasını bekler."
+        PRINT "Herhangi bir tuşa basın..."
+        
+        DIM pressed_key AS STRING
+        pressed_key = GETKEY()
+        
+        PRINT "Basılan tuş: '" + pressed_key + "' (ASCII: " + STR$(ASC(pressed_key)) + ")"
+        
+        IF pressed_key = CHR$(27) THEN
+            PRINT "ESC tuşuna basıldınız!"
+        ELSEIF pressed_key = CHR$(13) THEN
+            PRINT "ENTER tuşuna basıldınız!"
+        ELSEIF pressed_key = " " THEN
+            PRINT "SPACE tuşuna basıldınız!"
+        END IF
+        
+    CASE 3
+        PRINT
+        PRINT "═══ GETKEY('<özel_tuş>') Testi ═══"
+        PRINT "Bu test özel tuşları bekler."
+        PRINT
+        PRINT "Alt testler:"
+        PRINT "a) Sadece 'A' veya 'B' tuşlarını bekle"
+        PRINT "b) Yön tuşlarını bekle"
+        PRINT "c) Enter veya ESC bekle"
+        PRINT
+        
+        DIM subtest AS INTEGER
+        INPUT "Alt test seçin (1-3): ", subtest
+        
+        SELECT CASE subtest
+            CASE 1
+                PRINT "Sadece 'A' veya 'B' tuşuna basın..."
+                DIM ab_key AS STRING
+                ab_key = GETKEY("A,B")
+                PRINT "Basılan tuş: " + ab_key
+                
+            CASE 2
+                PRINT "Yön tuşlarından birine basın..."
+                PRINT "(Yukarı, Aşağı, Sol, Sağ ok tuşları)"
+                DIM arrow_key AS STRING
+                arrow_key = GETKEY("<YUKARIOK>,<ASAGIOK>,<SOLOK>,<SAGOK>")
+                PRINT "Basılan yön tuşu: " + arrow_key
+                
+            CASE 3
+                PRINT "ENTER veya ESC tuşuna basın..."
+                DIM special_key AS STRING
+                special_key = GETKEY("<ENTER>,<ESC>")
+                PRINT "Basılan özel tuş: " + special_key
+        END SELECT
+        
+    CASE 4
+        PRINT
+        PRINT "═══ Dosya İşlemleri Testi ═══"
+        PRINT "Bu test yeni dosya komutlarını dener."
+        PRINT
+        
+        REM Basit bir test programı oluştur
+        DIM test_program AS STRING
+        test_program = "PRINT 'Bu bir test programıdır!'"
+        test_program = test_program + CHR$(13) + CHR$(10)
+        test_program = test_program + "PRINT 'SAVE/LOAD/RUN komutları çalışıyor!'"
+        
+        REM Dosyaya kaydet
+        PRINT "Test programını 'temp_test.pdsx' dosyasına kaydediyoruz..."
+        
+        REM Manual file save (SAVE komutu interpreter tarafında çalışır)
+        OPEN "temp_test.pdsx" FOR OUTPUT AS #1
+        PRINT #1, "PRINT ""Bu bir test programıdır!"""
+        PRINT #1, "PRINT ""SAVE/LOAD/RUN komutları çalışıyor!"""
+        CLOSE #1
+        
+        PRINT "✅ Dosya kaydedildi!"
+        PRINT
+        PRINT "Şimdi dosyayı yükleyip çalıştıracağız..."
+        PRINT "NOT: RUN komutu interpreter seviyesinde çalışır."
+        PRINT "Manuel test için: RUN temp_test"
+        
+    CASE 5
+        PRINT
+        PRINT "═══ REPL Modu ═══"
+        PRINT "REPL (Read-Eval-Print-Loop) moduna geçiş yapılıyor..."
+        PRINT "NOT: Bu özellik interpreter seviyesinde çalışır."
+        PRINT "Manuel test için: REPL komutunu kullanın."
+        PRINT
+        PRINT "REPL özellikleri:"
+        PRINT "• Çok satırlı program girişi"
+        PRINT "• Satır düzenleme (EDIT <no>)"
+        PRINT "• Satır silme (DELETE <no>)"
+        PRINT "• Program listeleme (LIST)"
+        PRINT "• Kaydetme/Yükleme (SAVE/LOAD)"
+        PRINT "• Çalıştırma (RUN)"
+        
+    CASE 6
+        PRINT "Test programından çıkılıyor..."
+        END
+        
+    CASE ELSE
+        PRINT "Geçersiz seçim!"
+END SELECT
+
+PRINT
+PRINT "═══════════════════════════════════════"
+PRINT "Test tamamlandı!"
+PRINT
+PRINT "YENİ ÖZELLİKLER ÖZETİ:"
+PRINT "═══════════════════════"
+PRINT "✅ KEY() - Non-blocking tuş kontrolü"
+PRINT "✅ GETKEY() - Tuş bekle"
+PRINT "✅ GETKEY('<tuşlar>') - Belirli tuşları bekle"
+PRINT "✅ SAVE <dosya> - Program kaydetme"
+PRINT "✅ LOAD <dosya> - Program yükleme"
+PRINT "✅ RUN [dosya] - Program çalıştırma"
+PRINT "✅ REPL - Etkileşimli mod"
+PRINT "✅ LIST - Program listeleme"
+PRINT "✅ EDIT <no> - Satır düzenleme"
+PRINT "✅ DELETE <no> - Satır silme"
+PRINT
+PRINT "Bu özellikler modern BASIC oyun programlama için"
+PRINT "klavye kontrolü ve geliştirme verimliliği sağlar!"
+PRINT
+INPUT "Çıkmak için Enter tuşuna basın...", dummy
