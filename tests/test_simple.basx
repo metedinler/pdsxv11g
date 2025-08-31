@@ -1,0 +1,7 @@
+DIM TEST AS INTEGER
+REM Simple test  
+DIM n AS INTEGER
+DIM result AS INTEGER
+n = 5
+result = n * 2
+PRINT "Test result:", result
