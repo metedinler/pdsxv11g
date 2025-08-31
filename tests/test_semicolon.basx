@@ -1,0 +1,24 @@
+DIM AFTER AS INTEGER
+DIM FINAL AS INTEGER
+DIM LINE AS INTEGER
+DIM NEW AS INTEGER
+DIM SAME AS INTEGER
+DIM THIS AS INTEGER
+DIM VALUES AS INTEGER
+' Semicolon test
+DIM a
+DIM b
+DIM c
+
+DIM A AS INTEGER
+a = 5
+DIM B AS INTEGER
+b = 2
+DIM C AS INTEGER
+c = 8
+
+PRINT "Values:"; a; " "; b; " "; c
+PRINT "Same line:"; a;
+PRINT b;
+PRINT " final"
+PRINT "New line after this"
