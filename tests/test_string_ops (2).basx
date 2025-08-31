@@ -1,0 +1,5 @@
+REM Test string islemleri - pdsXv11 syntax
+LET A = "Hello"
+LET B = "World" 
+PRINT A; " "; B
+PRINT "Uzunluk: "; LEN(A)
