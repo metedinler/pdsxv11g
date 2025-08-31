@@ -1,0 +1,10 @@
+REM Sadece GOSUB/RETURN testi
+PRINT "Baslangic"
+
+GOSUB TestSubroutine
+PRINT "GOSUB'dan dondu"
+END
+
+LABEL TestSubroutine
+PRINT "GOSUB cagrisi basarili!"
+RETURN
