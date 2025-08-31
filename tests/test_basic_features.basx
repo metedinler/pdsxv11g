@@ -1,0 +1,40 @@
+' Test sadece temel özellikleri
+
+' Test 1: DIM AS ARRAY - Çok boyutlu diziler
+DIM multi_array(2, 3) AS ARRAY
+multi_array(0, 0) = "test"
+multi_array(1, 2) = 42
+PRINT "Multi-dimensional array test:"
+PRINT multi_array(0, 0), multi_array(1, 2)
+
+' Test 2: String dizileri - DIM arr(10) AS STRING
+DIM str_arr(5) AS STRING
+str_arr(0) = "Hello"
+str_arr(1) = "World" 
+str_arr(2) = "Test"
+PRINT "String array test:"
+PRINT str_arr(0), str_arr(1), str_arr(2)
+
+' Test 3: FUNC ... END FUNC lambda syntax
+FUNC add(a, b)
+RETURN a + b
+END FUNC
+
+FUNC multiply(x, y)
+RETURN x * y
+END FUNC
+
+PRINT "Lambda function test:"
+PRINT "add(5, 3) =", add(5, 3)
+PRINT "multiply(4, 6) =", multiply(4, 6)
+
+' Test 4: FOR EACH IN
+DIM test_list AS LIST
+test_list = ["apple", "banana", "cherry"]
+
+PRINT "FOR EACH test:"
+FOR EACH fruit IN test_list
+    PRINT "Fruit:", fruit
+NEXT
+
+END
