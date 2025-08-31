@@ -1,0 +1,1001 @@
+REM Örnek 10: Akıllı Ev Otomasyon Kontrol Sistemi
+REM Bu program akıllı ev cihazlarını kontrol eder ve enerji optimizasyonu yapar
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║  AKILLI EV OTOMASYON SİSTEMİ        ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global veri yapıları
+DIM devices AS ARRAY
+DIM rooms AS ARRAY
+DIM schedules AS ARRAY
+DIM energy_logs AS ARRAY
+DIM sensors AS ARRAY
+DIM scenarios AS ARRAY
+DIM security AS OBJECT
+
+REM Sistem başlatma
+call initialize_smart_home()
+
+DEF SUB initialize_smart_home()
+    REM Odalar tanımlama
+    rooms = [
+        {"name": "Salon", "temperature": 22.5, "humidity": 45, "lighting": 80, "occupancy": True},
+        {"name": "Yatak Odası", "temperature": 20.0, "humidity": 40, "lighting": 0, "occupancy": False},
+        {"name": "Mutfak", "temperature": 24.0, "humidity": 55, "lighting": 100, "occupancy": False},
+        {"name": "Banyo", "temperature": 21.5, "humidity": 60, "lighting": 50, "occupancy": False},
+        {"name": "Çalışma Odası", "temperature": 21.0, "humidity": 42, "lighting": 90, "occupancy": True}
+    ]
+    
+    REM Cihazlar tanımlama
+    devices = [
+        {"id": 1, "name": "Salon Klima", "type": "hvac", "room": "Salon", "status": "açık", 
+         "power": 1200, "temperature": 22, "mode": "soğutma"},
+        {"id": 2, "name": "Salon TV", "type": "entertainment", "room": "Salon", "status": "açık", 
+         "power": 150, "channel": 5, "volume": 25},
+        {"id": 3, "name": "Mutfak Işık", "type": "lighting", "room": "Mutfak", "status": "açık", 
+         "power": 45, "brightness": 100, "color": "beyaz"},
+        {"id": 4, "name": "Yatak Odası Lambader", "type": "lighting", "room": "Yatak Odası", "status": "kapalı", 
+         "power": 15, "brightness": 0, "color": "sıcak beyaz"},
+        {"id": 5, "name": "Kombi", "type": "hvac", "room": "Banyo", "status": "açık", 
+         "power": 2000, "temperature": 60, "mode": "su ısıtma"},
+        {"id": 6, "name": "Bulaşık Makinesi", "type": "appliance", "room": "Mutfak", "status": "kapalı", 
+         "power": 2100, "program": "eco", "remaining_time": 0},
+        {"id": 7, "name": "Çamaşır Makinesi", "type": "appliance", "room": "Banyo", "status": "kapalı", 
+         "power": 2200, "program": "pamuk", "remaining_time": 0}
+    ]
+    
+    REM Sensörler
+    sensors = [
+        {"id": 101, "type": "temperature", "room": "Salon", "value": 22.5, "unit": "°C"},
+        {"id": 102, "type": "humidity", "room": "Salon", "value": 45, "unit": "%"},
+        {"id": 103, "type": "motion", "room": "Salon", "value": 1, "unit": "bool"},
+        {"id": 104, "type": "light", "room": "Salon", "value": 300, "unit": "lux"},
+        {"id": 105, "type": "energy", "room": "genel", "value": 3.5, "unit": "kWh"}
+    ]
+    
+    REM Zamanlamaları başlat
+    schedules = []
+    
+    REM Enerji günlükleri
+    energy_logs = []
+    
+    REM Senaryolar
+    scenarios = [
+        {"name": "Günaydın", "description": "Sabah rutini", "active": False},
+        {"name": "İyi Geceler", "description": "Uyku rutini", "active": False},
+        {"name": "Ev Boş", "description": "Dışarı çıkarken", "active": False},
+        {"name": "Film Gecesi", "description": "Eğlence modu", "active": False}
+    ]
+    
+    REM Güvenlik ayarları
+    security.alarm_status = "kapalı"
+    security.door_locked = True
+    security.window_sensors = True
+    security.motion_detection = True
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT "──────────────────────────────────────"
+    PRINT "1. Cihaz Kontrol Paneli"
+    PRINT "2. Oda Durumu"
+    PRINT "3. Enerji Yönetimi"
+    PRINT "4. Zamanlama ve Otomasyon"
+    PRINT "5. Sensör Verileri"
+    PRINT "6. Akıllı Senaryolar"
+    PRINT "7. Güvenlik Sistemi"
+    PRINT "8. Raporlar ve İstatistikler"
+    PRINT "9. Sistem Ayarları"
+    PRINT "10. Çıkış"
+    PRINT "──────────────────────────────────────"
+END SUB
+
+DEF SUB device_control_panel()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ CİHAZ KONTROL PANELİ ═══"
+        PRINT "1. Tüm Cihazları Listele"
+        PRINT "2. Cihaz Kontrol"
+        PRINT "3. Oda Bazlı Kontrol"
+        PRINT "4. Toplu Açma/Kapama"
+        PRINT "5. Cihaz Ekle/Çıkar"
+        PRINT "6. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call list_all_devices()
+            CASE 2: call control_device()
+            CASE 3: call room_based_control()
+            CASE 4: call bulk_operations()
+            CASE 5: call manage_devices()
+            CASE 6: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB list_all_devices()
+    PRINT
+    PRINT "TÜM CİHAZLAR:"
+    PRINT STRING$(80, "=")
+    PRINT "ID | Cihaz Adı              | Oda         | Durum  | Güç (W) | Tür"
+    PRINT STRING$(80, "-")
+    
+    FOR i = 0 TO LEN(devices) - 1
+        DIM d AS OBJECT
+        d = devices(i)
+        
+        DIM status_icon AS STRING
+        IF d.status = "açık" THEN
+            status_icon = "🟢"
+        ELSE
+            status_icon = "🔴"
+        END IF
+        
+        PRINT RIGHT$("  " + STR$(d.id), 2) + " | " +
+              LEFT$(d.name + STRING$(22, " "), 22) + " | " +
+              LEFT$(d.room + STRING$(11, " "), 11) + " | " +
+              status_icon + LEFT$(d.status + "      ", 6) + " | " +
+              RIGHT$("      " + STR$(d.power), 7) + " | " +
+              d.type
+    NEXT i
+    
+    PRINT STRING$(80, "=")
+    
+    REM Özet bilgi
+    DIM active_count AS INTEGER
+    DIM total_power AS INTEGER
+    active_count = 0
+    total_power = 0
+    
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).status = "açık" THEN
+            active_count = active_count + 1
+            total_power = total_power + devices(i).power
+        END IF
+    NEXT i
+    
+    PRINT "Aktif cihaz sayısı: " + STR$(active_count) + "/" + STR$(LEN(devices))
+    PRINT "Toplam güç tüketimi: " + STR$(total_power) + " W"
+    PRINT "Saatlik enerji maliyeti: " + STR$(ROUND((total_power / 1000) * 0.85, 2)) + " ₺"
+END SUB
+
+DEF SUB control_device()
+    INPUT "Kontrol etmek istediğiniz cihaz ID: ", device_id
+    
+    DIM device_index AS INTEGER
+    device_index = find_device_by_id(device_id)
+    
+    IF device_index = -1 THEN
+        PRINT "Cihaz bulunamadı!"
+        EXIT SUB
+    END IF
+    
+    DIM d AS OBJECT
+    d = devices(device_index)
+    
+    PRINT
+    PRINT "═══ " + UPPER$(d.name) + " KONTROL ═══"
+    PRINT "Mevcut durum: " + d.status
+    PRINT "Güç tüketimi: " + STR$(d.power) + " W"
+    PRINT "Oda: " + d.room
+    PRINT
+    
+    SELECT CASE d.type
+        CASE "lighting"
+            call control_lighting(device_index)
+        CASE "hvac"
+            call control_hvac(device_index)
+        CASE "entertainment"
+            call control_entertainment(device_index)
+        CASE "appliance"
+            call control_appliance(device_index)
+        CASE ELSE
+            call basic_device_control(device_index)
+    END SELECT
+END SUB
+
+DEF SUB control_lighting(device_index AS INTEGER)
+    DIM d AS OBJECT
+    d = devices(device_index)
+    
+    PRINT "IŞIK KONTROL:"
+    PRINT "1. Açık/Kapalı"
+    PRINT "2. Parlaklık Ayarı"
+    PRINT "3. Renk Değiştir"
+    
+    INPUT "Seçiminiz: ", control_choice
+    
+    SELECT CASE control_choice
+        CASE 1
+            IF d.status = "açık" THEN
+                d.status = "kapalı"
+                d.brightness = 0
+                PRINT d.name + " kapatıldı."
+            ELSE
+                d.status = "açık"
+                d.brightness = 80
+                PRINT d.name + " açıldı."
+            END IF
+            
+        CASE 2
+            INPUT "Parlaklık seviyesi (0-100): ", brightness
+            IF brightness >= 0 AND brightness <= 100 THEN
+                d.brightness = brightness
+                IF brightness > 0 THEN
+                    d.status = "açık"
+                ELSE
+                    d.status = "kapalı"
+                END IF
+                PRINT "Parlaklık " + STR$(brightness) + "% olarak ayarlandı."
+            ELSE
+                PRINT "Geçersiz parlaklık değeri!"
+            END IF
+            
+        CASE 3
+            PRINT "Renk seçenekleri:"
+            PRINT "1. Beyaz    2. Sıcak beyaz    3. Mavi    4. Kırmızı    5. Yeşil"
+            INPUT "Renk seçimi: ", color_choice
+            
+            DIM colors AS ARRAY
+            colors = ["beyaz", "sıcak beyaz", "mavi", "kırmızı", "yeşil"]
+            
+            IF color_choice >= 1 AND color_choice <= 5 THEN
+                d.color = colors(color_choice - 1)
+                PRINT "Renk " + d.color + " olarak değiştirildi."
+            ELSE
+                PRINT "Geçersiz renk seçimi!"
+            END IF
+    END SELECT
+    
+    devices(device_index) = d
+END SUB
+
+DEF SUB control_hvac(device_index AS INTEGER)
+    DIM d AS OBJECT
+    d = devices(device_index)
+    
+    PRINT "IKLIMLENDIRME KONTROL:"
+    PRINT "Mevcut sıcaklık: " + STR$(d.temperature) + "°C"
+    PRINT "Mod: " + d.mode
+    PRINT
+    PRINT "1. Açık/Kapalı"
+    PRINT "2. Sıcaklık Ayarı"
+    PRINT "3. Mod Değiştir"
+    PRINT "4. Otomatik Mod"
+    
+    INPUT "Seçiminiz: ", control_choice
+    
+    SELECT CASE control_choice
+        CASE 1
+            IF d.status = "açık" THEN
+                d.status = "kapalı"
+                PRINT d.name + " kapatıldı."
+            ELSE
+                d.status = "açık"
+                PRINT d.name + " açıldı."
+            END IF
+            
+        CASE 2
+            INPUT "Hedef sıcaklık: ", target_temp
+            IF target_temp >= 16 AND target_temp <= 30 THEN
+                d.temperature = target_temp
+                d.status = "açık"
+                PRINT "Hedef sıcaklık " + STR$(target_temp) + "°C olarak ayarlandı."
+            ELSE
+                PRINT "Sıcaklık 16-30°C arasında olmalıdır!"
+            END IF
+            
+        CASE 3
+            PRINT "Mod seçenekleri:"
+            PRINT "1. Soğutma    2. Isıtma    3. Fan    4. Otomatik"
+            INPUT "Mod seçimi: ", mode_choice
+            
+            DIM modes AS ARRAY
+            modes = ["soğutma", "ısıtma", "fan", "otomatik"]
+            
+            IF mode_choice >= 1 AND mode_choice <= 4 THEN
+                d.mode = modes(mode_choice - 1)
+                PRINT "Mod " + d.mode + " olarak değiştirildi."
+            ELSE
+                PRINT "Geçersiz mod seçimi!"
+            END IF
+            
+        CASE 4
+            call auto_climate_control(device_index)
+    END SELECT
+    
+    devices(device_index) = d
+END SUB
+
+DEF SUB auto_climate_control(device_index AS INTEGER)
+    DIM d AS OBJECT
+    d = devices(device_index)
+    
+    REM Oda sıcaklığını al
+    DIM room_temp AS DOUBLE
+    room_temp = get_room_temperature(d.room)
+    
+    DIM target_temp AS DOUBLE
+    target_temp = 22.0  ' Ideal sıcaklık
+    
+    IF room_temp > target_temp + 1 THEN
+        d.mode = "soğutma"
+        d.temperature = target_temp
+        d.status = "açık"
+        PRINT "Otomatik mod: Soğutma başlatıldı (Oda: " + STR$(room_temp) + "°C)"
+    ELSEIF room_temp < target_temp - 1 THEN
+        d.mode = "ısıtma"
+        d.temperature = target_temp
+        d.status = "açık"
+        PRINT "Otomatik mod: Isıtma başlatıldı (Oda: " + STR$(room_temp) + "°C)"
+    ELSE
+        d.status = "kapalı"
+        PRINT "Otomatik mod: Sıcaklık ideal seviyede, cihaz kapatıldı."
+    END IF
+    
+    devices(device_index) = d
+END SUB
+
+DEF FUNCTION get_room_temperature(room_name AS STRING) AS DOUBLE
+    FOR i = 0 TO LEN(rooms) - 1
+        IF rooms(i).name = room_name THEN
+            RETURN rooms(i).temperature
+        END IF
+    NEXT i
+    RETURN 22.0  ' Varsayılan
+END FUNCTION
+
+DEF FUNCTION find_device_by_id(id AS INTEGER) AS INTEGER
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).id = id THEN
+            RETURN i
+        END IF
+    NEXT i
+    RETURN -1
+END FUNCTION
+
+DEF SUB room_status()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ ODA DURUMU ═══"
+        PRINT "1. Tüm Odaları Göster"
+        PRINT "2. Oda Detayları"
+        PRINT "3. Oda Ortamı Ayarla"
+        PRINT "4. Konfor Analizi"
+        PRINT "5. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call show_all_rooms()
+            CASE 2: call room_details()
+            CASE 3: call adjust_room_environment()
+            CASE 4: call comfort_analysis()
+            CASE 5: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB show_all_rooms()
+    PRINT
+    PRINT "TÜM ODALAR:"
+    PRINT STRING$(70, "=")
+    PRINT "Oda Adı        | Sıcaklık | Nem  | Işık | Kişi Var"
+    PRINT STRING$(70, "-")
+    
+    FOR i = 0 TO LEN(rooms) - 1
+        DIM r AS OBJECT
+        r = rooms(i)
+        
+        DIM occupancy_status AS STRING
+        IF r.occupancy THEN
+            occupancy_status = "👤 Evet"
+        ELSE
+            occupancy_status = "❌ Hayır"
+        END IF
+        
+        PRINT LEFT$(r.name + STRING$(14, " "), 14) + " | " +
+              RIGHT$("       " + STR$(r.temperature), 8) + " | " +
+              RIGHT$("   " + STR$(r.humidity), 4) + " | " +
+              RIGHT$("   " + STR$(r.lighting), 4) + " | " +
+              occupancy_status
+    NEXT i
+    
+    PRINT STRING$(70, "=")
+    
+    REM Genel durum özeti
+    DIM occupied_rooms AS INTEGER
+    DIM avg_temp AS DOUBLE
+    DIM total_temp AS DOUBLE
+    
+    occupied_rooms = 0
+    total_temp = 0
+    
+    FOR i = 0 TO LEN(rooms) - 1
+        IF rooms(i).occupancy THEN occupied_rooms = occupied_rooms + 1
+        total_temp = total_temp + rooms(i).temperature
+    NEXT i
+    
+    avg_temp = total_temp / LEN(rooms)
+    
+    PRINT "Dolu oda sayısı: " + STR$(occupied_rooms) + "/" + STR$(LEN(rooms))
+    PRINT "Ortalama ev sıcaklığı: " + STR$(ROUND(avg_temp, 1)) + "°C"
+END SUB
+
+DEF SUB energy_management()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ ENERJİ YÖNETİMİ ═══"
+        PRINT "1. Anlık Güç Tüketimi"
+        PRINT "2. Enerji Tasarruf Önerileri"
+        PRINT "3. Tüketim Analizi"
+        PRINT "4. Enerji Planlaması"
+        PRINT "5. Maliyet Hesaplama"
+        PRINT "6. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call current_power_consumption()
+            CASE 2: call energy_saving_suggestions()
+            CASE 3: call consumption_analysis()
+            CASE 4: call energy_scheduling()
+            CASE 5: call cost_calculation()
+            CASE 6: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB current_power_consumption()
+    PRINT
+    PRINT "ANLIK GÜÇ TÜKETİMİ:"
+    PRINT STRING$(60, "=")
+    
+    DIM total_power AS INTEGER
+    DIM active_devices AS INTEGER
+    total_power = 0
+    active_devices = 0
+    
+    PRINT "Cihaz                   | Durum | Güç (W)"
+    PRINT STRING$(60, "-")
+    
+    FOR i = 0 TO LEN(devices) - 1
+        DIM d AS OBJECT
+        d = devices(i)
+        
+        DIM power_display AS STRING
+        IF d.status = "açık" THEN
+            power_display = STR$(d.power)
+            total_power = total_power + d.power
+            active_devices = active_devices + 1
+        ELSE
+            power_display = "0"
+        END IF
+        
+        DIM status_symbol AS STRING
+        IF d.status = "açık" THEN
+            status_symbol = "🟢"
+        ELSE
+            status_symbol = "🔴"
+        END IF
+        
+        PRINT LEFT$(d.name + STRING$(23, " "), 23) + " | " +
+              status_symbol + d.status + " | " +
+              RIGHT$("      " + power_display, 7)
+    NEXT i
+    
+    PRINT STRING$(60, "=")
+    PRINT "Toplam anlık güç: " + STR$(total_power) + " W"
+    PRINT "Aktif cihaz sayısı: " + STR$(active_devices)
+    
+    REM Maliyet hesaplama
+    DIM hourly_cost AS DOUBLE
+    DIM daily_cost AS DOUBLE
+    DIM monthly_cost AS DOUBLE
+    
+    hourly_cost = (total_power / 1000) * 0.85  ' 0.85 ₺/kWh
+    daily_cost = hourly_cost * 24
+    monthly_cost = daily_cost * 30
+    
+    PRINT
+    PRINT "ELEKTRİK MALİYETİ:"
+    PRINT "Saatlik: " + STR$(ROUND(hourly_cost, 2)) + " ₺"
+    PRINT "Günlük: " + STR$(ROUND(daily_cost, 2)) + " ₺"
+    PRINT "Aylık: " + STR$(ROUND(monthly_cost, 2)) + " ₺"
+END SUB
+
+DEF SUB energy_saving_suggestions()
+    PRINT
+    PRINT "ENERJİ TASARRUF ÖNERİLERİ:"
+    PRINT STRING$(50, "=")
+    
+    DIM suggestions AS ARRAY
+    suggestions = []
+    
+    REM Açık olan gereksiz cihazları kontrol et
+    FOR i = 0 TO LEN(devices) - 1
+        DIM d AS OBJECT
+        d = devices(i)
+        
+        IF d.status = "açık" THEN
+            REM Odada kimse yoksa öner
+            DIM room_occupied AS BOOLEAN
+            room_occupied = is_room_occupied(d.room)
+            
+            IF NOT room_occupied THEN
+                INSERT(suggestions, "💡 " + d.room + " boş - " + d.name + " kapatılabilir (Tasarruf: " + STR$(d.power) + "W)")
+            END IF
+            
+            REM Yüksek güç tüketimi kontrolü
+            IF d.power > 1000 THEN
+                INSERT(suggestions, "⚡ " + d.name + " yüksek güç tüketiyor (" + STR$(d.power) + "W) - Kullanım süresi optimize edilebilir")
+            END IF
+        END IF
+    NEXT i
+    
+    REM Sıcaklık optimizasyonu önerileri
+    FOR i = 0 TO LEN(devices) - 1
+        DIM d AS OBJECT
+        d = devices(i)
+        
+        IF d.type = "hvac" AND d.status = "açık" THEN
+            IF d.mode = "soğutma" AND d.temperature < 24 THEN
+                INSERT(suggestions, "🌡️ " + d.name + " sıcaklığı 24°C'ye çıkarılabilir (Tasarruf: ~%15)")
+            ELSEIF d.mode = "ısıtma" AND d.temperature > 20 THEN
+                INSERT(suggestions, "🌡️ " + d.name + " sıcaklığı 20°C'ye düşürülebilir (Tasarruf: ~%10)")
+            END IF
+        END IF
+    NEXT i
+    
+    REM Genel öneriler
+    INSERT(suggestions, "⏰ Gece saatlerinde cihazları zamanlayıcıyla kapatın")
+    INSERT(suggestions, "🔋 Standby modundaki cihazları prizden çekin")
+    INSERT(suggestions, "💡 LED ampul kullanımına geçin")
+    
+    IF LEN(suggestions) = 0 THEN
+        PRINT "✅ Harika! Şu anda enerji kullanımınız optimal görünüyor."
+    ELSE
+        FOR i = 0 TO LEN(suggestions) - 1
+            PRINT suggestions(i)
+        NEXT i
+    END IF
+    
+    PRINT
+    PRINT "TASARRuf POTANSİYELİ:"
+    DIM potential_saving AS INTEGER
+    potential_saving = 0
+    
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).status = "açık" AND NOT is_room_occupied(devices(i).room) THEN
+            potential_saving = potential_saving + devices(i).power
+        END IF
+    NEXT i
+    
+    IF potential_saving > 0 THEN
+        PRINT "Boş odalardaki cihazları kapatarak " + STR$(potential_saving) + "W tasarruf yapabilirsiniz."
+        PRINT "Aylık tasarruf: ~" + STR$(ROUND((potential_saving / 1000) * 0.85 * 24 * 30, 2)) + " ₺"
+    END IF
+END SUB
+
+DEF FUNCTION is_room_occupied(room_name AS STRING) AS BOOLEAN
+    FOR i = 0 TO LEN(rooms) - 1
+        IF rooms(i).name = room_name THEN
+            RETURN rooms(i).occupancy
+        END IF
+    NEXT i
+    RETURN False
+END FUNCTION
+
+DEF SUB smart_scenarios()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ AKILLI SENARYOLAR ═══"
+        PRINT "1. Hazır Senaryolar"
+        PRINT "2. Senaryo Çalıştır"
+        PRINT "3. Özel Senaryo Oluştur"
+        PRINT "4. Otomatik Senaryolar"
+        PRINT "5. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call list_scenarios()
+            CASE 2: call execute_scenario()
+            CASE 3: call create_custom_scenario()
+            CASE 4: call automatic_scenarios()
+            CASE 5: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB list_scenarios()
+    PRINT
+    PRINT "HAZIR SENARYOLAR:"
+    PRINT STRING$(60, "=")
+    
+    FOR i = 0 TO LEN(scenarios) - 1
+        DIM s AS OBJECT
+        s = scenarios(i)
+        
+        DIM status_icon AS STRING
+        IF s.active THEN
+            status_icon = "🟢"
+        ELSE
+            status_icon = "⚪"
+        END IF
+        
+        PRINT STR$(i + 1) + ". " + status_icon + " " + s.name
+        PRINT "   " + s.description
+        PRINT
+    NEXT i
+END SUB
+
+DEF SUB execute_scenario()
+    INPUT "Çalıştırmak istediğiniz senaryo numarası: ", scenario_num
+    
+    IF scenario_num < 1 OR scenario_num > LEN(scenarios) THEN
+        PRINT "Geçersiz senaryo numarası!"
+        EXIT SUB
+    END IF
+    
+    DIM selected_scenario AS STRING
+    selected_scenario = scenarios(scenario_num - 1).name
+    
+    PRINT "'" + selected_scenario + "' senaryosu çalıştırılıyor..."
+    PRINT
+    
+    SELECT CASE selected_scenario
+        CASE "Günaydın"
+            call scenario_good_morning()
+        CASE "İyi Geceler"
+            call scenario_good_night()
+        CASE "Ev Boş"
+            call scenario_away_mode()
+        CASE "Film Gecesi"
+            call scenario_movie_night()
+    END SELECT
+    
+    scenarios(scenario_num - 1).active = True
+    PRINT "✅ Senaryo başarıyla çalıştırıldı!"
+END SUB
+
+DEF SUB scenario_good_morning()
+    PRINT "🌅 GÜNAYDRIN SENARYOSU:"
+    
+    REM Yatak odasındaki ışıkları aç
+    call set_device_by_room("Yatak Odası", "lighting", "açık", 50)
+    PRINT "• Yatak odası ışıkları açıldı (%50)"
+    
+    REM Klima sıcaklığını ayarla
+    call set_hvac_temperature("Salon", 22)
+    PRINT "• Salon kliması 22°C'ye ayarlandı"
+    
+    REM Mutfak ışığını aç
+    call set_device_by_room("Mutfak", "lighting", "açık", 100)
+    PRINT "• Mutfak ışığı açıldı"
+    
+    REM Kombiyi çalıştır
+    call turn_on_device_by_name("Kombi")
+    PRINT "• Kombi çalıştırıldı"
+    
+    PRINT "• Güzel bir gün geçirmeniz dileğiyle! ☀️"
+END SUB
+
+DEF SUB scenario_good_night()
+    PRINT "🌙 İYİ GECELER SENARYOSU:"
+    
+    REM Tüm ışıkları kapat
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).type = "lighting" THEN
+            devices(i).status = "kapalı"
+            devices(i).brightness = 0
+        END IF
+    NEXT i
+    PRINT "• Tüm ışıklar kapatıldı"
+    
+    REM Sadece yatak odası lambaderini düşük yak
+    call set_device_by_name("Yatak Odası Lambader", "açık", 20)
+    PRINT "• Yatak odası lambadera düşük ışıkta açıldı"
+    
+    REM TV'yi kapat
+    call turn_off_device_by_name("Salon TV")
+    PRINT "• TV kapatıldı"
+    
+    REM Klima gece modu
+    call set_hvac_temperature("Yatak Odası", 20)
+    PRINT "• Yatak odası kliması gece modu (20°C)"
+    
+    REM Güvenlik sistemini aç
+    security.alarm_status = "açık"
+    PRINT "• Güvenlik sistemi aktifleştirildi"
+    
+    PRINT "• İyi geceler ve tatlı rüyalar! 💤"
+END SUB
+
+DEF SUB scenario_away_mode()
+    PRINT "🏠 EV BOŞ SENARYOSU:"
+    
+    REM Tüm cihazları kapat (kombi hariç)
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).name <> "Kombi" THEN
+            devices(i).status = "kapalı"
+            IF devices(i).type = "lighting" THEN
+                devices(i).brightness = 0
+            END IF
+        END IF
+    NEXT i
+    PRINT "• Gereksiz tüm cihazlar kapatıldı"
+    
+    REM Güvenlik sistemini aktive et
+    security.alarm_status = "açık"
+    security.motion_detection = True
+    PRINT "• Güvenlik sistemi ve hareket sensörleri aktifleştirildi"
+    
+    REM Tüm odaları boş olarak işaretle
+    FOR i = 0 TO LEN(rooms) - 1
+        rooms(i).occupancy = False
+    NEXT i
+    PRINT "• Tüm odalar boş olarak işaretlendi"
+    
+    PRINT "• Ev güvenlik modunda. İyi yolculuklar! ✈️"
+END SUB
+
+DEF SUB scenario_movie_night()
+    PRINT "🎬 FİLM GECESİ SENARYOSU:"
+    
+    REM Salon TV'yi aç
+    call turn_on_device_by_name("Salon TV")
+    PRINT "• TV açıldı"
+    
+    REM Salon ışıklarını kıs
+    call set_device_by_room("Salon", "lighting", "açık", 30)
+    PRINT "• Salon ışıkları kısıldı (%30)"
+    
+    REM Diğer odaların ışıklarını kapat
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).type = "lighting" AND devices(i).room <> "Salon" THEN
+            devices(i).status = "kapalı"
+            devices(i).brightness = 0
+        END IF
+    NEXT i
+    PRINT "• Diğer odaların ışıkları kapatıldı"
+    
+    REM Klima konfor seviyesi
+    call set_hvac_temperature("Salon", 23)
+    PRINT "• Salon kliması konfor seviyesine ayarlandı (23°C)"
+    
+    PRINT "• Film keyfini çıkarın! 🍿"
+END SUB
+
+DEF SUB set_device_by_room(room_name AS STRING, device_type AS STRING, status AS STRING, brightness AS INTEGER)
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).room = room_name AND devices(i).type = device_type THEN
+            devices(i).status = status
+            IF device_type = "lighting" THEN
+                devices(i).brightness = brightness
+            END IF
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB set_hvac_temperature(room_name AS STRING, temperature AS INTEGER)
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).room = room_name AND devices(i).type = "hvac" THEN
+            devices(i).status = "açık"
+            devices(i).temperature = temperature
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB turn_on_device_by_name(device_name AS STRING)
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).name = device_name THEN
+            devices(i).status = "açık"
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB turn_off_device_by_name(device_name AS STRING)
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).name = device_name THEN
+            devices(i).status = "kapalı"
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB set_device_by_name(device_name AS STRING, status AS STRING, brightness AS INTEGER)
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).name = device_name THEN
+            devices(i).status = status
+            IF devices(i).type = "lighting" THEN
+                devices(i).brightness = brightness
+            END IF
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB security_system()
+    DIM running AS BOOLEAN
+    running = True
+    
+    WHILE running
+        PRINT
+        PRINT "═══ GÜVENLİK SİSTEMİ ═══"
+        PRINT "1. Güvenlik Durumu"
+        PRINT "2. Alarm Sistemi"
+        PRINT "3. Kamera Kontrolü"
+        PRINT "4. Kapı/Pencere Sensörleri"
+        PRINT "5. Güvenlik Geçmişi"
+        PRINT "6. Ana Menüye Dön"
+        
+        INPUT "Seçiminiz: ", choice
+        
+        SELECT CASE choice
+            CASE 1: call security_status()
+            CASE 2: call alarm_control()
+            CASE 3: PRINT "Kamera kontrol modülü geliştirme aşamasında..."
+            CASE 4: call sensor_control()
+            CASE 5: PRINT "Güvenlik geçmişi modülü geliştirme aşamasında..."
+            CASE 6: running = False
+        END SELECT
+    WEND
+END SUB
+
+DEF SUB security_status()
+    PRINT
+    PRINT "GÜVENLİK DURUMU:"
+    PRINT STRING$(40, "=")
+    
+    DIM alarm_icon AS STRING
+    IF security.alarm_status = "açık" THEN
+        alarm_icon = "🔴"
+    ELSE
+        alarm_icon = "🟢"
+    END IF
+    
+    DIM door_icon AS STRING
+    IF security.door_locked THEN
+        door_icon = "🔒"
+    ELSE
+        door_icon = "🔓"
+    END IF
+    
+    PRINT "Alarm durumu: " + alarm_icon + " " + UPPER$(security.alarm_status)
+    PRINT "Ana kapı: " + door_icon + " " + IIF$(security.door_locked, "Kilitli", "Açık")
+    PRINT "Pencere sensörleri: " + IIF$(security.window_sensors, "✅ Aktif", "❌ Pasif")
+    PRINT "Hareket algılama: " + IIF$(security.motion_detection, "✅ Aktif", "❌ Pasif")
+    
+    PRINT
+    PRINT "SENSÖR DURUMU:"
+    FOR i = 0 TO LEN(sensors) - 1
+        DIM s AS OBJECT
+        s = sensors(i)
+        
+        IF s.type = "motion" THEN
+            DIM motion_status AS STRING
+            IF s.value = 1 THEN
+                motion_status = "🔴 Hareket var"
+            ELSE
+                motion_status = "🟢 Hareket yok"
+            END IF
+            PRINT s.room + " - " + motion_status
+        END IF
+    NEXT i
+END SUB
+
+DEF SUB reports_statistics()
+    PRINT
+    PRINT "═══ RAPORLAR VE İSTATİSTİKLER ═══"
+    PRINT "1. Günlük Özet"
+    PRINT "2. Enerji Raporu"
+    PRINT "3. Cihaz Kullanım İstatistikleri"
+    PRINT "4. Oda Konfor Analizi"
+    
+    INPUT "Seçiminiz: ", choice
+    
+    SELECT CASE choice
+        CASE 1: call daily_summary()
+        CASE 2: call energy_report()
+        CASE 3: call device_usage_stats()
+        CASE 4: call room_comfort_analysis()
+    END SELECT
+END SUB
+
+DEF SUB daily_summary()
+    PRINT
+    PRINT "GÜNLÜK ÖZET - " + FORMAT$(NOW(), "dd/mm/yyyy")
+    PRINT STRING$(50, "=")
+    
+    DIM active_count AS INTEGER
+    DIM total_power AS INTEGER
+    active_count = 0
+    total_power = 0
+    
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).status = "açık" THEN
+            active_count = active_count + 1
+            total_power = total_power + devices(i).power
+        END IF
+    NEXT i
+    
+    PRINT "📱 Aktif cihaz sayısı: " + STR$(active_count) + "/" + STR$(LEN(devices))
+    PRINT "⚡ Toplam güç tüketimi: " + STR$(total_power) + " W"
+    PRINT "💰 Günlük enerji maliyeti: " + STR$(ROUND((total_power / 1000) * 0.85 * 24, 2)) + " ₺"
+    
+    DIM occupied_rooms AS INTEGER
+    occupied_rooms = 0
+    FOR i = 0 TO LEN(rooms) - 1
+        IF rooms(i).occupancy THEN occupied_rooms = occupied_rooms + 1
+    NEXT i
+    PRINT "🏠 Kullanımdaki oda sayısı: " + STR$(occupied_rooms)
+    
+    PRINT "🔒 Güvenlik durumu: " + UPPER$(security.alarm_status)
+    
+    PRINT
+    PRINT "EN ÇOK ENERJİ TÜKETEN CİHAZLAR:"
+    FOR i = 0 TO LEN(devices) - 1
+        IF devices(i).status = "açık" AND devices(i).power > 500 THEN
+            PRINT "• " + devices(i).name + ": " + STR$(devices(i).power) + "W"
+        END IF
+    NEXT i
+END SUB
+
+REM Ana program döngüsü
+DIM running AS BOOLEAN
+running = True
+
+WHILE running
+    show_main_menu()
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-10): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            device_control_panel()
+        CASE 2
+            room_status()
+        CASE 3
+            energy_management()
+        CASE 4
+            PRINT "Zamanlama ve otomasyon modülü geliştirme aşamasında..."
+        CASE 5
+            PRINT "Sensör verileri modülü geliştirme aşamasında..."
+        CASE 6
+            smart_scenarios()
+        CASE 7
+            security_system()
+        CASE 8
+            reports_statistics()
+        CASE 9
+            PRINT "Sistem ayarları modülü geliştirme aşamasında..."
+        CASE 10
+            running = False
+            PRINT "Akıllı ev sistemi kapatılıyor..."
+        CASE ELSE
+            PRINT "Geçersiz seçim!"
+    END SELECT
+    
+    IF running THEN
+        PRINT
+        INPUT "Devam etmek için Enter tuşuna basın...", dummy
+        PRINT
+    END IF
+WEND
+
+PRINT "Akıllı ev otomasyon sistemi kapatıldı."
