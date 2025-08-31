@@ -1,0 +1,18 @@
+REM Test backup functions
+PRINT "=== Function Table Test ==="
+
+REM Test numpy functions
+DIM arr AS ARRAY = [1, 2, 3, 4, 5]
+PRINT "MEAN:", MEAN(arr)
+PRINT "STD:", STD(arr)
+
+REM Test math functions  
+PRINT "SQR(16):", SQR(16)
+PRINT "SIN(0):", SIN(0)
+
+REM Test string functions
+PRINT "LEN('Hello'):", LEN("Hello")
+DIM LEFT AS STRING
+PRINT "LEFT('Hello', 3):", LEFT("Hello", 3)
+
+PRINT "=== Test Complete ==="
