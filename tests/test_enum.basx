@@ -1,0 +1,12 @@
+' Test ENUM
+
+ENUM Colors
+Red = 1
+Green = 2
+Blue = 3
+END ENUM
+
+PRINT "ENUM test:"
+PRINT "Colors defined"
+
+END
