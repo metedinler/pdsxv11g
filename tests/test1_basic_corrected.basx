@@ -1,0 +1,46 @@
+PRINT "=== Test 1: Temel Komutlar ve String İşlemleri ==="
+
+REM Değişken tanımlama ve temel işlemler  
+DIM name AS STRING
+DIM age AS INTEGER  
+DIM pi AS DOUBLE
+
+LET name = "Merhaba Dünya"
+LET age = 25
+LET pi = 3.14159
+
+PRINT "İsim:", name
+PRINT "Yaş:", age  
+PRINT "Pi:", pi
+
+REM String fonksiyonları test
+DIM test_string AS STRING
+LET test_string = "  pdsXv11 Yorumlayıcısı  "
+PRINT "Orijinal string:", test_string
+PRINT "Length:", LEN(test_string)
+PRINT "Upper:", UCASE$(test_string)
+PRINT "Lower:", LCASE$(test_string)
+PRINT "Trimmed:", LTRIM$(RTRIM$(test_string))
+PRINT "Left 5:", LEFT$(test_string, 5)
+PRINT "Right 5:", RIGHT$(test_string, 5)
+PRINT "Mid 3-7:", MID$(test_string, 3, 7)
+
+REM Matematik fonksiyonları
+DIM number AS DOUBLE
+LET number = 16.7
+PRINT "Sayı:", number
+PRINT "Absolute:", ABS(number)
+PRINT "Integer:", INT(number)
+PRINT "Square root:", SQR(number)
+PRINT "Round:", ROUND(number, 1)
+
+REM Input testi
+DIM user_name AS STRING
+INPUT "Adınızı girin: ", user_name
+PRINT "Merhaba " + user_name + "!"
+
+REM Koşullu ifadeler  
+IF age >= 18 THEN PRINT "Reşit"
+IF age < 18 THEN PRINT "Reşit değil"
+
+PRINT "=== Test 1 Tamamlandı ==="
