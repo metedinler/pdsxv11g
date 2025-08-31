@@ -1,0 +1,190 @@
+REM Test 9: Veri yapıları testleri
+REM Bu program LIST, DICT, SET, TUPLE veri yapılarını test eder
+
+PRINT "=== Veri Yapıları Testleri ==="
+PRINT
+
+REM Liste işlemleri
+PRINT "1. Liste (LIST) İşlemleri:"
+DIM my_list AS LIST
+my_list = [10, 20, 30, 40, 50]
+
+PRINT "Orijinal liste:", my_list
+PRINT "Liste uzunluğu:", LEN(my_list)
+
+REM Liste elemanı ekleme
+INSERT(my_list, 60)
+PRINT "60 eklendikten sonra:", my_list
+
+REM Liste elemanı silme
+REMOVE(my_list, 2)  ' İndeks 2'deki elemanı sil
+PRINT "İndeks 2 silindikten sonra:", my_list
+
+REM Liste temizleme
+DIM temp_list AS LIST
+temp_list = [1, 2, 3]
+CLEAR(temp_list)
+PRINT "Temizlenmiş liste:", temp_list
+
+PRINT
+
+REM Sözlük işlemleri
+PRINT "2. Sözlük (DICT) İşlemleri:"
+DIM my_dict AS DICT
+my_dict = {"ad": "Ali", "yaş": 30, "şehir": "İstanbul"}
+
+PRINT "Orijinal sözlük:", my_dict
+
+REM Sözlüğe eleman ekleme
+INSERT(my_dict, "Mühendis", KEY="meslek")
+PRINT "Meslek eklendikten sonra:", my_dict
+
+REM Sözlükten eleman silme
+REMOVE(my_dict, KEY="şehir")
+PRINT "Şehir silindikten sonra:", my_dict
+
+REM Sözlük anahtarları
+DIM dict_keys AS ARRAY
+dict_keys = KEYS(my_dict)
+PRINT "Sözlük anahtarları:", dict_keys
+
+PRINT
+
+REM Küme (SET) işlemleri
+PRINT "3. Küme (SET) İşlemleri:"
+DIM my_set AS SET
+my_set = {1, 2, 3, 4, 5, 3, 2, 1}  ' Tekrarlı elemanlar otomatik kaldırılır
+
+PRINT "Orijinal küme:", my_set
+PRINT "Küme uzunluğu:", LEN(my_set)
+
+REM Kümeye eleman ekleme
+INSERT(my_set, 6)
+PRINT "6 eklendikten sonra:", my_set
+
+REM Kümeden eleman silme
+REMOVE(my_set, 3)
+PRINT "3 silindikten sonra:", my_set
+
+PRINT
+
+REM Tuple işlemleri
+PRINT "4. Tuple İşlemleri:"
+DIM my_tuple AS TUPLE
+my_tuple = (10, 20, 30, "string", True)
+
+PRINT "Tuple:", my_tuple
+PRINT "Tuple uzunluğu:", LEN(my_tuple)
+PRINT "Tuple[1]:", my_tuple(1)
+PRINT "Tuple[3]:", my_tuple(3)
+
+PRINT
+
+REM İç içe veri yapıları
+PRINT "5. İç İçe Veri Yapıları:"
+
+DIM complex_data AS DICT
+complex_data = {
+    "öğrenciler": [
+        {"ad": "Ahmet", "not": 85},
+        {"ad": "Ayşe", "not": 92},
+        {"ad": "Mehmet", "not": 78}
+    ],
+    "sınıf": "10A",
+    "ders": "Matematik"
+}
+
+PRINT "Karmaşık veri yapısı:", complex_data
+
+PRINT
+
+REM Veri yapısı dönüşümleri
+PRINT "6. Veri Yapısı Dönüşümleri:"
+
+DIM numbers_list AS LIST
+DIM numbers_set AS SET
+DIM numbers_tuple AS TUPLE
+
+numbers_list = [1, 2, 3, 2, 4, 3, 5]
+numbers_set = SET(numbers_list)    ' Liste'yi kümeye dönüştür
+numbers_tuple = TUPLE(numbers_list) ' Liste'yi tuple'a dönüştür
+
+PRINT "Orijinal liste:", numbers_list
+PRINT "Kümeye dönüştürülmüş:", numbers_set
+PRINT "Tuple'a dönüştürülmüş:", numbers_tuple
+
+PRINT
+
+REM Veri yapılarında arama ve filtreleme
+PRINT "7. Arama ve Filtreleme:"
+
+DIM student_scores AS LIST
+student_scores = [85, 92, 78, 96, 73, 89, 95, 82]
+
+REM Yüksek notları bul (90 ve üzeri)
+DEF FUNCTION is_high_score(score)
+    RETURN score >= 90
+END FUNCTION
+
+DIM high_scores AS LIST
+high_scores = FILTER(is_high_score, student_scores)
+
+PRINT "Tüm notlar:", student_scores
+PRINT "Yüksek notlar (>=90):", high_scores
+PRINT "Ortalama:", ROUND(MEAN(student_scores), 2)
+
+PRINT
+
+REM Stack ve Queue simülasyonu
+PRINT "8. Stack ve Queue Simülasyonu:"
+
+REM Stack (LIFO - Last In, First Out)
+DIM stack AS LIST
+stack = []
+
+PRINT "Stack işlemleri:"
+INSERT(stack, "A")
+INSERT(stack, "B")
+INSERT(stack, "C")
+PRINT "Stack durumu:", stack
+
+REM Son elemanı çıkar (pop)
+DIM popped_item
+popped_item = stack(LEN(stack) - 1)
+REMOVE(stack, LEN(stack) - 1)
+PRINT "Çıkarılan eleman:", popped_item
+PRINT "Stack son durum:", stack
+
+PRINT
+
+REM Queue (FIFO - First In, First Out)
+DIM queue AS LIST
+queue = []
+
+PRINT "Queue işlemleri:"
+INSERT(queue, "X")
+INSERT(queue, "Y")
+INSERT(queue, "Z")
+PRINT "Queue durumu:", queue
+
+REM İlk elemanı çıkar (dequeue)
+DIM dequeued_item
+dequeued_item = queue(0)
+REMOVE(queue, 0)
+PRINT "Çıkarılan eleman:", dequeued_item
+PRINT "Queue son durum:", queue
+
+PRINT
+
+REM Veri yapısı performans karşılaştırması
+PRINT "9. Performans Karşılaştırması:"
+
+DIM large_list AS LIST
+large_list = ARANGE(1, 1000, 1)
+
+PRINT "Büyük liste boyutu:", LEN(large_list)
+PRINT "İlk 5 eleman:", large_list[0:5]
+PRINT "Son 5 eleman:", large_list[-5:]
+
+PRINT
+PRINT "Veri yapıları testleri tamamlandı!"
