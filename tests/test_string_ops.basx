@@ -1,0 +1,11 @@
+DIM LEN AS INTEGER
+DIM UZUNLUK AS INTEGER
+REM Test string islemleri
+DIM A AS STRING
+A = "Hello"
+DIM B AS STRING
+B = "World"
+DIM C AS STRING
+C = A + " " + B
+PRINT C
+PRINT "Uzunluk: ", LEN(C)
