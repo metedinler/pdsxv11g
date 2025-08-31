@@ -1,0 +1,50 @@
+' Test yeni DATAFRAME ve array özellikleri
+
+' Test 1: DATAFRAME block syntax
+DATAFRAME df1
+"name": ["Ali", "Veli", "Ahmet"]
+"age": [25, 30, 35]
+"city": ["İstanbul", "Ankara", "İzmir"]
+END DATAFRAME
+
+PRINT "DataFrame df1 oluşturuldu"
+PRINT df1
+
+' Test 2: DIM AS DATAFRAME
+DIM df2 AS DATAFRAME
+PRINT "Boş DataFrame df2 oluşturuldu"
+
+' Test 3: DIM AS STRING ARRAY
+DIM names(5) AS STRING
+names(0) = "Mehmet"
+names(1) = "Ayşe"
+names(2) = "Fatma"
+PRINT "String array names oluşturuldu:"
+PRINT names(0), names(1), names(2)
+
+' Test 4: DIM AS ARRAY
+DIM mixed(3) AS ARRAY
+mixed(0) = "Text"
+mixed(1) = 42
+mixed(2) = 3.14
+PRINT "Mixed array:"
+PRINT mixed(0), mixed(1), mixed(2)
+
+' Test 5: FOR EACH IN
+DIM test_list AS LIST
+test_list = [1, 2, 3, 4, 5]
+
+PRINT "FOR EACH test:"
+FOR EACH item IN test_list
+    PRINT "Item:", item
+NEXT
+
+' Test 6: String array functions
+DIM str_arr AS ARRAY
+str_arr = ["hello", "world", "test"]
+PRINT "String array operations:"
+PRINT "Original:", STRJOIN(str_arr, " ")
+PRINT "Upper case:", STRUPPER(str_arr)
+PRINT "Lengths:", STRLEN(str_arr)
+
+END
