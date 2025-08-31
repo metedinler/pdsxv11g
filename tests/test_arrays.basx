@@ -1,0 +1,9 @@
+DIM ARR AS INTEGER
+DIM DIZI AS INTEGER
+REM Test diziler
+ARR(1) = 10
+ARR(2) = 20
+ARR(3) = 30
+PRINT "Dizi[1] = ", ARR(1)
+PRINT "Dizi[2] = ", ARR(2)
+PRINT "Dizi[3] = ", ARR(3)
