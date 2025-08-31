@@ -1,0 +1,18 @@
+DIM RESULT AS INTEGER
+DIM TEST_RESULT AS INTEGER
+DIM CAGRILDI AS INTEGER
+DIM FINAL AS INTEGER
+DIM HESAPLANDI AS INTEGER
+DIM N AS INTEGER
+DIM SIMPLE_RECURSIVE AS INTEGER
+REM Expression debug
+DEF FUNCTION simple_recursive(n)
+PRINT "simple_recursive cagrildi, n =", n
+IF n <= 1 THEN result = 1
+IF n > 1 THEN result = 2
+PRINT "result hesaplandi:", result
+RETURN result
+END FUNCTION
+
+test_result = simple_recursive(3)
+PRINT "Final result:", test_result
