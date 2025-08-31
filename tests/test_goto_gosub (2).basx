@@ -1,0 +1,12 @@
+REM Test GOTO ve GOSUB
+PRINT "Baslangic"
+GOTO Test100
+PRINT "Bu calismaz"
+LABEL Test100
+PRINT "GOTO calisti"
+GOSUB Test200
+PRINT "Son"
+END
+LABEL Test200
+PRINT "GOSUB calisti"
+RETURN
