@@ -1,0 +1,532 @@
+{
+  "core": [
+    {
+      "name": "PRINT",
+      "description": "Bir veya birden fazla ifadeyi ekrana yazdırır.",
+      "usage": "PRINT ifade1, ifade2, ...",
+      "example": "PRINT \"Merhaba\", 5*2"
+    },
+    {
+      "name": "INPUT",
+      "description": "Kullanıcıdan veri alır ve bir değişkene atar.",
+      "usage": "INPUT \"Sayı girin\", x",
+      "example": "INPUT \"Adınızı girin\", isim"
+    },
+    {
+      "name": "LET",
+      "description": "Bir değişkene değer atar.",
+      "usage": "LET x = ifade",
+      "example": "LET x = 10"
+    },
+    {
+      "name": "DIM",
+      "description": "Bir değişkenin tipini tanımlar.",
+      "usage": "DIM x AS INTEGER",
+      "example": "DIM liste AS LIST"
+    },
+    {
+      "name": "IF",
+      "description": "Koşullu ifade çalıştırır.",
+      "usage": "IF koşul THEN komut",
+      "example": "IF x > 5 THEN PRINT x"
+    },
+    {
+      "name": "FOR",
+      "description": "Döngü başlatır.",
+      "usage": "FOR i = 1 TO 10 STEP 1",
+      "example": "FOR i = 1 TO 5\nPRINT i\nNEXT"
+    },
+    {
+      "name": "NEXT",
+      "description": "FOR döngüsünü devam ettirir veya bitirir.",
+      "usage": "NEXT",
+      "example": "FOR i = 1 TO 3\nPRINT i\nNEXT"
+    },
+    {
+      "name": "WHILE",
+      "description": "Koşullu döngü başlatır.",
+      "usage": "WHILE koşul",
+      "example": "WHILE x < 10\nPRINT x\nWEND"
+    },
+    {
+      "name": "WEND",
+      "description": "WHILE döngüsünü bitirir.",
+      "usage": "WEND",
+      "example": "WHILE x < 5\nPRINT x\nWEND"
+    },
+    {
+      "name": "GOTO",
+      "description": "Belirli bir etikete atlar.",
+      "usage": "GOTO etiket",
+      "example": "LABEL BASLA\nPRINT \"Başladı\"\nGOTO BASLA"
+    },
+    {
+      "name": "HELP",
+      "description": "Tüm komut ve fonksiyonların açıklamasını gösterir.",
+      "usage": "HELP [komut_adı]",
+      "example": "HELP PRINT"
+    },
+    {
+      "name": "IMPORT",
+      "description": "Dış modül veya kütüphane yükler.",
+      "usage": "IMPORT dosyaadı [AS takma_ad]",
+      "example": "IMPORT mathlib.hz AS math"
+    },
+    {
+      "name": "EXIT",
+      "description": "REPL ortamından çıkış yapar.",
+      "usage": "EXIT",
+      "example": "EXIT"
+    },
+    {
+      "name": "END",
+      "description": "Çok satırlı komut girişini tamamlar.",
+      "usage": "END",
+      "example": "...\nEND"
+    },
+    {
+      "name": "REPL END",
+      "description": "Çok satırlı komut girişini tamamlar.",
+      "usage": "END",
+      "example": "...\nEND"
+    },
+    {
+      "name": "CALL API::POST",
+      "description": "Bir API'ye POST isteği gönderir. URL ve opsiyonel veri (JSON) parametresi alır.",
+      "usage": "CALL API::POST \"url\", {json_verisi}",
+      "example": "CALL API::POST \"https://httpbin.org/post\", {\"ad\":\"Ali\", \"yas\":25}"
+    }
+  ],
+  "types": [
+    {
+      "name": "STRING",
+      "description": "Metin verisi tutar.",
+      "usage": "DIM s AS STRING",
+      "example": "LET s = \"Merhaba\""
+    },
+    {
+      "name": "INTEGER",
+      "description": "Tamsayı veri tipi.",
+      "usage": "DIM x AS INTEGER",
+      "example": "LET x = 5"
+    },
+    {
+      "name": "LONG",
+      "description": "Büyük tamsayı veri tipi.",
+      "usage": "DIM l AS LONG",
+      "example": "LET l = 123456789"
+    },
+    {
+      "name": "SINGLE",
+      "description": "Tek hassasiyetli ondalık sayı.",
+      "usage": "DIM f AS SINGLE",
+      "example": "LET f = 3.14"
+    },
+    {
+      "name": "DOUBLE",
+      "description": "Çift hassasiyetli ondalık sayı.",
+      "usage": "DIM d AS DOUBLE",
+      "example": "LET d = 2.71828"
+    },
+    {
+      "name": "BYTE",
+      "description": "0-255 arası tamsayı.",
+      "usage": "DIM b AS BYTE",
+      "example": "LET b = 255"
+    },
+    {
+      "name": "SHORT",
+      "description": "Kısa tamsayı veri tipi.",
+      "usage": "DIM s AS SHORT",
+      "example": "LET s = 32767"
+    },
+    {
+      "name": "UNSIGNED INTEGER",
+      "description": "Negatif olmayan tamsayı.",
+      "usage": "DIM u AS UNSIGNED INTEGER",
+      "example": "LET u = 42"
+    },
+    {
+      "name": "CHAR",
+      "description": "Tek karakterlik veri tipi.",
+      "usage": "DIM c AS CHAR",
+      "example": "LET c = 'A'"
+    },
+    {
+      "name": "LIST",
+      "description": "Sıralı veri koleksiyonu.",
+      "usage": "DIM l AS LIST",
+      "example": "LET l = [1,2,3]"
+    },
+    {
+      "name": "DICT",
+      "description": "Anahtar-değer koleksiyonu.",
+      "usage": "DIM d AS DICT",
+      "example": "LET d = {'a':1}"
+    },
+    {
+      "name": "SET",
+      "description": "Benzersiz elemanlar kümesi.",
+      "usage": "DIM s AS SET",
+      "example": "LET s = {1,2,3}"
+    },
+    {
+      "name": "TUPLE",
+      "description": "Sıralı, değiştirilemez koleksiyon.",
+      "usage": "DIM t AS TUPLE",
+      "example": "LET t = (1,2)"
+    },
+    {
+      "name": "ARRAY",
+      "description": "Çok boyutlu dizi.",
+      "usage": "DIM a AS ARRAY",
+      "example": "LET a = ARRAY([1,2,3])"
+    },
+    {
+      "name": "DATAFRAME",
+      "description": "Tablolu veri yapısı (pandas).",
+      "usage": "DIM df AS DATAFRAME",
+      "example": "LET df = DATAFRAME(...)"
+    },
+    {
+      "name": "POINTER",
+      "description": "Bellek adresi tutar.",
+      "usage": "DIM p AS POINTER",
+      "example": "LET p = NEW(4)"
+    },
+    {
+      "name": "STRUCT",
+      "description": "Yapılandırılmış veri tipi.",
+      "usage": "TYPE T ... END TYPE",
+      "example": "TYPE Kisi\nAd AS STRING\nYas AS INTEGER\nEND TYPE"
+    },
+    {
+      "name": "UNION",
+      "description": "Birden fazla tipten birini tutan veri tipi.",
+      "usage": "UNION U ... END UNION",
+      "example": "UNION Veri\nSayi AS INTEGER\nMetin AS STRING\nEND UNION"
+    },
+    {
+      "name": "ENUM",
+      "description": "Sabit değerler kümesi.",
+      "usage": "ENUM Renk ... END ENUM",
+      "example": "ENUM Renk\nKirmizi\nYesil\nMavi\nEND ENUM"
+    },
+    {
+      "name": "VOID",
+      "description": "Değer döndürmeyen tip.",
+      "usage": "SUB foo() AS VOID",
+      "example": "SUB foo() AS VOID\nPRINT \"Hi\"\nEND SUB"
+    },
+    {
+      "name": "BITFIELD",
+      "description": "Bit alanı olarak kullanılan tamsayı.",
+      "usage": "DIM b AS BITFIELD",
+      "example": "LET b = 0b1010"
+    }
+  ],
+  "functions": [
+    {
+      "name": "MID$",
+      "description": "Bir dizgeden parça alır.",
+      "usage": "MID$(s, start, length)",
+      "example": "MID$(\"Merhaba\",2,3)"
+    },
+    {
+      "name": "LEN",
+      "description": "Bir dizgenin/nesnenin uzunluğunu döndürür.",
+      "usage": "LEN(x)",
+      "example": "LEN(\"abc\")"
+    },
+    {
+      "name": "RND",
+      "description": "0-1 arası rastgele sayı üretir.",
+      "usage": "RND()",
+      "example": "LET x = RND()"
+    },
+    {
+      "name": "ABS",
+      "description": "Mutlak değer.",
+      "usage": "ABS(x)",
+      "example": "ABS(-5)"
+    },
+    {
+      "name": "INT",
+      "description": "Tamsayıya dönüştürür.",
+      "usage": "INT(x)",
+      "example": "INT(3.7)"
+    },
+    {
+      "name": "LEFT$",
+      "description": "Dizgenin solundan parça alır.",
+      "usage": "LEFT$(s, n)",
+      "example": "LEFT$(\"abcde\",2)"
+    },
+    {
+      "name": "RIGHT$",
+      "description": "Dizgenin sağından parça alır.",
+      "usage": "RIGHT$(s, n)",
+      "example": "RIGHT$(\"abcde\",2)"
+    },
+    {
+      "name": "LTRIM$",
+      "description": "Soldaki boşlukları siler.",
+      "usage": "LTRIM$(s)",
+      "example": "LTRIM$(\"  abc\")"
+    },
+    {
+      "name": "RTRIM$",
+      "description": "Sağdaki boşlukları siler.",
+      "usage": "RTRIM$(s)",
+      "example": "RTRIM$(\"abc   \")"
+    },
+    {
+      "name": "STRING$",
+      "description": "Bir karakteri n kez tekrarlar.",
+      "usage": "STRING$(n, c)",
+      "example": "STRING$(5, \"*\")"
+    },
+    {
+      "name": "SPACE$",
+      "description": "n adet boşluk üretir.",
+      "usage": "SPACE$(n)",
+      "example": "SPACE$(3)"
+    },
+    {
+      "name": "INSTR",
+      "description": "Alt dizge arar.",
+      "usage": "INSTR(start, s, sub)",
+      "example": "INSTR(1, \"abcde\", \"cd\")"
+    },
+    {
+      "name": "UCASE$",
+      "description": "Büyük harfe çevirir.",
+      "usage": "UCASE$(s)",
+      "example": "UCASE$(\"abc\")"
+    },
+    {
+      "name": "LCASE$",
+      "description": "Küçük harfe çevirir.",
+      "usage": "LCASE$(s)",
+      "example": "LCASE$(\"ABC\")"
+    },
+    {
+      "name": "STR$",
+      "description": "Sayısal değeri dizgeye çevirir.",
+      "usage": "STR$(n)",
+      "example": "STR$(123)"
+    },
+    {
+      "name": "SQR",
+      "description": "Karekök alır.",
+      "usage": "SQR(x)",
+      "example": "SQR(9)"
+    },
+    {
+      "name": "SIN",
+      "description": "Sinüs değeri.",
+      "usage": "SIN(x)",
+      "example": "SIN(3.14)"
+    },
+    {
+      "name": "COS",
+      "description": "Kosinüs değeri.",
+      "usage": "COS(x)",
+      "example": "COS(0)"
+    },
+    {
+      "name": "TAN",
+      "description": "Tanjant değeri.",
+      "usage": "TAN(x)",
+      "example": "TAN(1)"
+    },
+    {
+      "name": "LOG",
+      "description": "Doğal logaritma.",
+      "usage": "LOG(x)",
+      "example": "LOG(10)"
+    },
+    {
+      "name": "EXP",
+      "description": "e üzeri x.",
+      "usage": "EXP(x)",
+      "example": "EXP(1)"
+    },
+    {
+      "name": "ATN",
+      "description": "Arktanjant.",
+      "usage": "ATN(x)",
+      "example": "ATN(1)"
+    },
+    {
+      "name": "FIX",
+      "description": "Aşağı yuvarlar.",
+      "usage": "FIX(x)",
+      "example": "FIX(3.7)"
+    },
+    {
+      "name": "ROUND",
+      "description": "Yuvarlama.",
+      "usage": "ROUND(x, n)",
+      "example": "ROUND(3.1415,2)"
+    },
+    {
+      "name": "SGN",
+      "description": "Sayı işareti.",
+      "usage": "SGN(x)",
+      "example": "SGN(-5)"
+    },
+    {
+      "name": "MOD",
+      "description": "Mod alma.",
+      "usage": "MOD(x, y)",
+      "example": "MOD(10,3)"
+    },
+    {
+      "name": "MIN",
+      "description": "Minimum değer.",
+      "usage": "MIN(a, b)",
+      "example": "MIN(1,2)"
+    },
+    {
+      "name": "MAX",
+      "description": "Maksimum değer.",
+      "usage": "MAX(a, b)",
+      "example": "MAX(1,2)"
+    }
+  ],
+  "operators": [
+    {
+      "name": "++",
+      "description": "Bir artırma.",
+      "usage": "x++",
+      "example": "LET x = 1\nx++"
+    },
+    {
+      "name": "--",
+      "description": "Bir azaltma.",
+      "usage": "x--",
+      "example": "LET x = 2\nx--"
+    },
+    {
+      "name": "<<",
+      "description": "Bit sola kaydırma.",
+      "usage": "x << y",
+      "example": "8 << 1"
+    },
+    {
+      "name": ">>",
+      "description": "Bit sağa kaydırma.",
+      "usage": "x >> y",
+      "example": "8 >> 1"
+    },
+    {
+      "name": "&",
+      "description": "Bit düzeyinde VE.",
+      "usage": "x & y",
+      "example": "5 & 3"
+    },
+    {
+      "name": "|",
+      "description": "Bit düzeyinde VEYA.",
+      "usage": "x | y",
+      "example": "5 | 2"
+    },
+    {
+      "name": "^",
+      "description": "Bit düzeyinde XOR.",
+      "usage": "x ^ y",
+      "example": "5 ^ 3"
+    },
+    {
+      "name": "~",
+      "description": "Bit düzeyinde TERSLEME.",
+      "usage": "~x",
+      "example": "~5"
+    },
+    {
+      "name": "AND",
+      "description": "Mantıksal VE.",
+      "usage": "x AND y",
+      "example": "TRUE AND FALSE"
+    },
+    {
+      "name": "OR",
+      "description": "Mantıksal VEYA.",
+      "usage": "x OR y",
+      "example": "TRUE OR FALSE"
+    },
+    {
+      "name": "XOR",
+      "description": "Mantıksal XOR.",
+      "usage": "x XOR y",
+      "example": "TRUE XOR FALSE"
+    },
+    {
+      "name": "NOT",
+      "description": "Mantıksal TERSLEME.",
+      "usage": "NOT x",
+      "example": "NOT TRUE"
+    },
+    {
+      "name": "+=",
+      "description": "Toplayıp ata.",
+      "usage": "x += y",
+      "example": "x += 2"
+    },
+    {
+      "name": "-=",
+      "description": "Çıkarıp ata.",
+      "usage": "x -= y",
+      "example": "x -= 2"
+    },
+    {
+      "name": "*=",
+      "description": "Çarpıp ata.",
+      "usage": "x *= y",
+      "example": "x *= 2"
+    },
+    {
+      "name": "/=",
+      "description": "Bölüp ata.",
+      "usage": "x /= y",
+      "example": "x /= 2"
+    },
+    {
+      "name": "%=",
+      "description": "Mod alıp ata.",
+      "usage": "x %= y",
+      "example": "x %= 2"
+    },
+    {
+      "name": "&=",
+      "description": "Bit düzeyinde VE ile ata.",
+      "usage": "x &= y",
+      "example": "x &= 2"
+    },
+    {
+      "name": "|=",
+      "description": "Bit düzeyinde VEYA ile ata.",
+      "usage": "x |= y",
+      "example": "x |= 2"
+    },
+    {
+      "name": "^=",
+      "description": "Bit düzeyinde XOR ile ata.",
+      "usage": "x ^= y",
+      "example": "x ^= 2"
+    },
+    {
+      "name": "<<=",
+      "description": "Bit sola kaydırıp ata.",
+      "usage": "x <<= y",
+      "example": "x <<= 1"
+    },
+    {
+      "name": ">>=",
+      "description": "Bit sağa kaydırıp ata.",
+      "usage": "x >>= y",
+      "example": "x >>= 1"
+    }
+  ]
+}
