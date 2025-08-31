@@ -1,0 +1,20 @@
+DIM CALL AS INTEGER
+DIM DIRECT AS INTEGER
+DIM FACTORIAL AS INTEGER
+REM Factorial debug testi
+DEF FUNCTION factorial(n)
+DIM result AS INTEGER
+result = 1
+IF n > 1 THEN
+result = n * factorial(n - 1)
+END IF
+RETURN result
+END FUNCTION
+
+REM Direkt cagri testi
+DIM test1 AS INTEGER
+test1 = factorial(5)
+PRINT "test1 =", test1
+
+REM Print icinde cagri testi  
+PRINT "Direct call:", factorial(3)
