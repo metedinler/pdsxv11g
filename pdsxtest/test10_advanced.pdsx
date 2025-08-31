@@ -1,0 +1,263 @@
+REM Test 10: İleri seviye özellikler testleri
+REM Bu program CLASS, STRUCT, TYPE ve modül özelliklerini test eder
+
+PRINT "=== İleri Seviye Özellikler Testleri ==="
+PRINT
+
+REM TYPE tanımlaması
+TYPE Person
+    name AS STRING
+    age AS INTEGER
+    salary AS DOUBLE
+END TYPE
+
+PRINT "1. TYPE Tanımlaması:"
+DIM employee AS Person
+employee.name = "Ahmet Yılmaz"
+employee.age = 35
+employee.salary = 7500.50
+
+PRINT "Çalışan bilgileri:"
+PRINT "  Ad:", employee.name
+PRINT "  Yaş:", employee.age
+PRINT "  Maaş:", employee.salary
+
+PRINT
+
+REM STRUCT tanımlaması
+STRUCT Point
+    x AS DOUBLE
+    y AS DOUBLE
+END STRUCT
+
+STRUCT Rectangle
+    top_left AS Point
+    width AS DOUBLE
+    height AS DOUBLE
+END STRUCT
+
+PRINT "2. STRUCT Tanımlaması:"
+DIM p1 AS Point
+DIM rect AS Rectangle
+
+p1.x = 10.5
+p1.y = 20.3
+
+rect.top_left = p1
+rect.width = 150.0
+rect.height = 80.0
+
+PRINT "Dikdörtgen bilgileri:"
+PRINT "  Sol üst köşe: (" + STR$(rect.top_left.x) + ", " + STR$(rect.top_left.y) + ")"
+PRINT "  Genişlik:", rect.width
+PRINT "  Yükseklik:", rect.height
+
+PRINT
+
+REM CLASS tanımlaması
+CLASS Calculator
+    STATIC version AS STRING = "1.0"
+    
+    SUB add(a, b)
+        RETURN a + b
+    END SUB
+    
+    SUB multiply(a, b)
+        RETURN a * b
+    END SUB
+    
+    SUB get_info()
+        PRINT "Calculator v" + Calculator.version
+    END SUB
+    
+    PRIVATE SUB internal_check()
+        PRINT "Internal validation OK"
+    END SUB
+END CLASS
+
+PRINT "3. CLASS Tanımlaması:"
+DIM calc AS Calculator
+calc.get_info()
+PRINT "5 + 3 =", calc.add(5, 3)
+PRINT "4 * 7 =", calc.multiply(4, 7)
+
+PRINT
+
+REM UNION tanımlaması (benzetim)
+UNION Data
+    int_val AS INTEGER
+    float_val AS DOUBLE
+    str_val AS STRING
+END UNION
+
+PRINT "4. UNION Tanımlaması:"
+DIM my_data AS Data
+my_data.int_val = 42
+PRINT "Integer değer:", my_data.int_val
+
+my_data.str_val = "Hello"
+PRINT "String değer:", my_data.str_val
+
+PRINT
+
+REM Enum simülasyonu
+PRINT "5. ENUM Simülasyonu:"
+LET MONDAY = 1
+LET TUESDAY = 2
+LET WEDNESDAY = 3
+LET THURSDAY = 4
+LET FRIDAY = 5
+LET SATURDAY = 6
+LET SUNDAY = 7
+
+DEF FUNCTION get_day_name(day_num)
+    SELECT CASE day_num
+        CASE MONDAY
+            RETURN "Pazartesi"
+        CASE TUESDAY
+            RETURN "Salı"
+        CASE WEDNESDAY
+            RETURN "Çarşamba"
+        CASE THURSDAY
+            RETURN "Perşembe"
+        CASE FRIDAY
+            RETURN "Cuma"
+        CASE SATURDAY
+            RETURN "Cumartesi"
+        CASE SUNDAY
+            RETURN "Pazar"
+        CASE ELSE
+            RETURN "Geçersiz gün"
+    END SELECT
+END FUNCTION
+
+DIM today AS INTEGER
+today = WEDNESDAY
+PRINT "Bugün:", get_day_name(today)
+
+PRINT
+
+REM Memory management
+PRINT "6. Memory Management:"
+DIM ptr AS POINTER
+ptr = NEW(100)  ' 100 byte tahsis et
+PRINT "Bellek tahsis edildi, adres:", ADDR(ptr)
+
+DELETE(ptr)  ' Belleği serbest bırak
+PRINT "Bellek serbest bırakıldı"
+
+PRINT
+
+REM Tip kontrolü ve boyut hesaplama
+PRINT "7. Tip Kontrolü ve Boyut Hesaplama:"
+DIM test_int AS INTEGER
+DIM test_string AS STRING
+DIM test_array AS ARRAY
+
+test_int = 42
+test_string = "Hello World"
+test_array = [1, 2, 3, 4, 5]
+
+PRINT "Integer tipi:", TYPE_OF(test_int)
+PRINT "String tipi:", TYPE_OF(test_string)
+PRINT "Array tipi:", TYPE_OF(test_array)
+
+PRINT "Integer boyutu:", SIZEOF(test_int)
+PRINT "String boyutu:", SIZEOF(test_string)
+PRINT "Array boyutu:", SIZEOF(test_array)
+
+PRINT
+
+REM Fonksiyonel programlama
+PRINT "8. Fonksiyonel Programlama:"
+
+DEF FUNCTION square_func(x)
+    RETURN x * x
+END FUNCTION
+
+DEF FUNCTION is_even_func(x)
+    RETURN x MOD 2 = 0
+END FUNCTION
+
+DEF FUNCTION sum_func(a, b)
+    RETURN a + b
+END FUNCTION
+
+DIM numbers AS ARRAY
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+DIM squared_numbers AS ARRAY
+DIM even_numbers AS ARRAY
+DIM total AS INTEGER
+
+squared_numbers = MAP(square_func, numbers)
+even_numbers = FILTER(is_even_func, numbers)
+total = REDUCE(sum_func, numbers, 0)
+
+PRINT "Orijinal sayılar:", numbers
+PRINT "Kareler:", squared_numbers
+PRINT "Çift sayılar:", even_numbers
+PRINT "Toplam:", total
+
+PRINT
+
+REM Async işlemler
+PRINT "9. Async İşlemler:"
+PRINT "2 saniye bekleniyor..."
+ASYNC_WAIT(2.0)
+PRINT "Bekleme tamamlandı!"
+
+PRINT
+
+REM System bilgileri
+PRINT "10. System Bilgileri:"
+PRINT "Aktif thread sayısı:", THREAD_COUNT()
+PRINT "Mevcut thread ID:", CURRENT_THREAD()
+PRINT "İşlemci sayısı:", CPU_COUNT()
+PRINT "Bellek kullanımı (MB):", MEMORY_USAGE()
+
+PRINT
+
+REM Dosya sistemi işlemleri
+PRINT "11. Dosya Sistemi İşlemleri:"
+DIM temp_file AS STRING
+temp_file = "test_temp.txt"
+
+IF EXISTS(temp_file) THEN
+    PRINT temp_file + " dosyası mevcut"
+ELSE
+    PRINT temp_file + " dosyası mevcut değil"
+END IF
+
+PRINT "Mevcut dizin:", DIR$(".")
+
+PRINT
+
+REM Date ve Time işlemleri
+PRINT "12. Tarih ve Saat İşlemleri:"
+PRINT "Bugünün tarihi:", DATE$
+PRINT "Şu anki saat:", TIME$
+PRINT "Unix timestamp:", ROUND(TIMER(), 0)
+
+DIM current_time AS STRING
+current_time = TIME_NOW()
+PRINT "Detaylı zaman bilgisi:", current_time
+
+PRINT
+
+REM Utility fonksiyonları
+PRINT "13. Utility Fonksiyonları:"
+
+DIM test_condition AS BOOLEAN
+test_condition = True
+
+DIM result AS STRING
+result = IFTHEN(test_condition, "Doğru", "Yanlış")
+PRINT "IFTHEN sonucu:", result
+
+REM Assertion testi
+ASSERT(5 > 3, "5 büyüktür 3")
+PRINT "Assertion başarılı"
+
+PRINT
+PRINT "İleri seviye özellikler testleri tamamlandı!"
