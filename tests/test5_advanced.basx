@@ -1,0 +1,38 @@
+' Test Programi 5: Gelismis Ozellikler ve Fonksiyonlar
+PRINT "=== Test 5: Gelismis Ozellikler ve Fonksiyonlar ==="
+
+' Temel hesaplama
+LET x = 3.0
+LET y = 4.0
+LET result = x * x + y * y
+PRINT "Calculate(3,4) sonucu:", result
+
+' Degisken tanimlama
+LET name = "Ahmet"
+LET age = 25
+PRINT "Isim:"; name; " Yas:"; age
+
+' Matematik fonksiyonlari
+PRINT "SIN(30): "; SIN(0.5236)
+PRINT "COS(60): "; COS(1.047)
+PRINT "SQRT(25): "; SQR(25)
+
+' Random sayilar
+FOR i = 1 TO 3
+    PRINT "Random "; i; ":"; RND()
+NEXT i
+
+' SELECT CASE testi
+LET today = 3
+SELECT CASE today
+    CASE 1
+        PRINT "Pazartesi"
+    CASE 2
+        PRINT "Sali"
+    CASE 3
+        PRINT "Carsamba"
+    CASE ELSE
+        PRINT "Diger gun"
+END SELECT
+
+PRINT "=== Test 5 Tamamlandi ==="
