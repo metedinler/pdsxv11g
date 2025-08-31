@@ -1,0 +1,12 @@
+DIM TOPLAM AS INTEGER
+REM Basit FOR dongu testi  
+DIM i AS INTEGER
+DIM sum AS INTEGER
+sum = 0
+
+FOR i = 1 TO 3
+PRINT "i =", i
+sum = sum + i
+NEXT i
+
+PRINT "Toplam =", sum
