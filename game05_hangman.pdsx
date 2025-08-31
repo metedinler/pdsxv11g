@@ -1,0 +1,502 @@
+REM Oyun 5: Hangman (Adam Asmaca)
+REM Kelime tahmin oyunu - Türkçe kelimeler ile
+
+PRINT "╔══════════════════════════════════════╗"
+PRINT "║             HANGMAN                  ║"
+PRINT "║          (Adam Asmaca)               ║"
+PRINT "║           pdsXv11g v1.0              ║"
+PRINT "╚══════════════════════════════════════╝"
+PRINT
+
+REM Global değişkenler
+DIM word_list AS ARRAY
+DIM current_word AS STRING
+DIM guessed_word AS STRING
+DIM guessed_letters AS ARRAY
+DIM wrong_letters AS ARRAY
+DIM remaining_attempts AS INTEGER
+DIM max_attempts AS INTEGER
+DIM games_won AS INTEGER
+DIM games_lost AS INTEGER
+DIM total_games AS INTEGER
+DIM difficulty AS STRING
+
+REM Kelime listesini oluştur
+call create_word_list()
+
+REM Oyunu başlat
+call show_main_menu()
+
+DEF SUB create_word_list()
+    word_list = []
+    
+    REM Kolay kelimeler (4-5 harf)
+    INSERT(word_list, "KEDI")
+    INSERT(word_list, "KÖPEK")
+    INSERT(word_list, "MASA")
+    INSERT(word_list, "KAPI")
+    INSERT(word_list, "EV")
+    INSERT(word_list, "SU")
+    INSERT(word_list, "AĞAÇ")
+    INSERT(word_list, "GÖKYÜZÜ")
+    INSERT(word_list, "GÜNEŞ")
+    INSERT(word_list, "AY")
+    INSERT(word_list, "YILDIZ")
+    INSERT(word_list, "ÇIÇEK")
+    INSERT(word_list, "KUTU")
+    INSERT(word_list, "KITAP")
+    INSERT(word_list, "KALEM")
+    INSERT(word_list, "OKUL")
+    INSERT(word_list, "ARABA")
+    INSERT(word_list, "UÇAK")
+    INSERT(word_list, "GEMI")
+    INSERT(word_list, "TREN")
+    
+    REM Orta kelimeler (6-8 harf)
+    INSERT(word_list, "BİLGİSAYAR")
+    INSERT(word_list, "TELEFON")
+    INSERT(word_list, "PENCERE")
+    INSERT(word_list, "MUTFAK")
+    INSERT(word_list, "BAHÇE")
+    INSERT(word_list, "ÜNİVERSİTE")
+    INSERT(word_list, "HASTANE")
+    INSERT(word_list, "MARKET")
+    INSERT(word_list, "SİNEMA")
+    INSERT(word_list, "RESTORAN")
+    INSERT(word_list, "KÜTÜPHANE")
+    INSERT(word_list, "MÜZE")
+    INSERT(word_list, "PARK")
+    INSERT(word_list, "HAVUZ")
+    INSERT(word_list, "PLAJİ")
+    INSERT(word_list, "DAĞLAR")
+    INSERT(word_list, "ORMAN")
+    INSERT(word_list, "ÇÖLLER")
+    INSERT(word_list, "NEHIR")
+    INSERT(word_list, "GÖLLER")
+    
+    REM Zor kelimeler (9+ harf)
+    INSERT(word_list, "PROJE")
+    INSERT(word_list, "PROGRAM")
+    INSERT(word_list, "ALGORİTMA")
+    INSERT(word_list, "VERİTABANI")
+    INSERT(word_list, "YAZILIM")
+    INSERT(word_list, "DONANIM")
+    INSERT(word_list, "İNTERNET")
+    INSERT(word_list, "SOSYAL")
+    INSERT(word_list, "MEDYA")
+    INSERT(word_list, "İLETİŞİM")
+    INSERT(word_list, "EĞİTİM")
+    INSERT(word_list, "ÖĞRENME")
+    INSERT(word_list, "GELİŞTİRME")
+    INSERT(word_list, "TASARIM")
+    INSERT(word_list, "MİMARİ")
+    INSERT(word_list, "MÜHENDİSLİK")
+    INSERT(word_list, "MATEMATIK")
+    INSERT(word_list, "FİZİK")
+    INSERT(word_list, "KİMYA")
+    INSERT(word_list, "BİYOLOJİ")
+END SUB
+
+DEF SUB show_main_menu()
+    PRINT
+    PRINT "═══════════════ HANGMAN OYUNU ═══════════════"
+    PRINT "1. Yeni Oyun Başlat"
+    PRINT "2. Zorluk Seviyesi Seç"
+    PRINT "3. İstatistikleri Görüntüle"
+    PRINT "4. Oyun Kuralları"
+    PRINT "5. Çıkış"
+    PRINT "═════════════════════════════════════════════"
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-5): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            call start_new_game()
+        CASE 2
+            call select_difficulty()
+        CASE 3
+            call show_statistics()
+        CASE 4
+            call show_rules()
+        CASE 5
+            PRINT "Hangman oyununa veda ediyoruz... İyi günler!"
+            END
+        CASE ELSE
+            PRINT "❌ Geçersiz seçim!"
+            call show_main_menu()
+    END SELECT
+END SUB
+
+DEF SUB select_difficulty()
+    PRINT
+    PRINT "═══════════════ ZORLUK SEVİYESİ ═══════════════"
+    PRINT "1. Kolay (10 deneme hakkı)"
+    PRINT "2. Orta (7 deneme hakkı)"
+    PRINT "3. Zor (5 deneme hakkı)"
+    PRINT "4. Ana Menüye Dön"
+    PRINT "════════════════════════════════════════════════"
+    
+    DIM diff_choice AS INTEGER
+    INPUT "Zorluk seviyesi (1-4): ", diff_choice
+    
+    SELECT CASE diff_choice
+        CASE 1
+            difficulty = "KOLAY"
+            max_attempts = 10
+            PRINT "✅ Kolay seviye seçildi (10 deneme hakkı)"
+        CASE 2
+            difficulty = "ORTA"
+            max_attempts = 7
+            PRINT "✅ Orta seviye seçildi (7 deneme hakkı)"
+        CASE 3
+            difficulty = "ZOR"
+            max_attempts = 5
+            PRINT "✅ Zor seviye seçildi (5 deneme hakkı)"
+        CASE 4
+            call show_main_menu()
+            EXIT SUB
+        CASE ELSE
+            PRINT "❌ Geçersiz seçim!"
+            call select_difficulty()
+            EXIT SUB
+    END SELECT
+    
+    PRINT
+    INPUT "Ana menüye dönmek için Enter'a basın...", dummy
+    call show_main_menu()
+END SUB
+
+DEF SUB start_new_game()
+    REM Varsayılan ayarlar
+    IF difficulty = "" THEN
+        difficulty = "ORTA"
+        max_attempts = 7
+    END IF
+    
+    REM Rastgele kelime seç
+    DIM word_index AS INTEGER
+    word_index = RND(0, LEN(word_list) - 1)
+    current_word = word_list(word_index)
+    
+    REM Oyun değişkenlerini başlat
+    guessed_word = STRING$(LEN(current_word), "_")
+    guessed_letters = []
+    wrong_letters = []
+    remaining_attempts = max_attempts
+    
+    PRINT
+    PRINT "═══════════════ YENİ OYUN ═══════════════"
+    PRINT "Zorluk: " + difficulty + " (" + STR$(max_attempts) + " deneme hakkı)"
+    PRINT "Kelime uzunluğu: " + STR$(LEN(current_word)) + " harf"
+    PRINT
+    
+    REM Ana oyun döngüsü
+    call play_game()
+END SUB
+
+DEF SUB play_game()
+    WHILE remaining_attempts > 0 AND INSTR(guessed_word, "_") > 0
+        call display_game_state()
+        call get_player_guess()
+        
+        REM Oyunu kazandı mı kontrol et
+        IF INSTR(guessed_word, "_") = 0 THEN
+            call display_game_state()
+            PRINT
+            PRINT "🏆 TEBRİKLER! Kelimeyi doğru tahmin ettiniz!"
+            PRINT "✨ Kelime: " + current_word
+            games_won = games_won + 1
+            total_games = total_games + 1
+            call show_game_end_menu()
+            EXIT SUB
+        END IF
+    WEND
+    
+    REM Oyunu kaybetti
+    call display_hangman()
+    PRINT
+    PRINT "💀 GAME OVER! Kelimeyi bulamadınız."
+    PRINT "🔍 Doğru kelime: " + current_word
+    games_lost = games_lost + 1
+    total_games = total_games + 1
+    call show_game_end_menu()
+END SUB
+
+DEF SUB display_game_state()
+    PRINT
+    PRINT "═══════════════════════════════════════"
+    call display_hangman()
+    PRINT
+    PRINT "Kelime: " + format_guessed_word()
+    PRINT "Kalan deneme: " + STR$(remaining_attempts)
+    
+    IF LEN(wrong_letters) > 0 THEN
+        PRINT "Yanlış harfler: " + join_array(wrong_letters, ", ")
+    END IF
+    
+    IF LEN(guessed_letters) > 0 THEN
+        PRINT "Denenen harfler: " + join_array(guessed_letters, ", ")
+    END IF
+    
+    PRINT "═══════════════════════════════════════"
+    PRINT
+END SUB
+
+DEF FUNCTION format_guessed_word() AS STRING
+    DIM formatted AS STRING
+    formatted = ""
+    
+    FOR i = 1 TO LEN(guessed_word)
+        formatted = formatted + MID$(guessed_word, i, 1) + " "
+    NEXT i
+    
+    RETURN formatted
+END FUNCTION
+
+DEF FUNCTION join_array(arr AS ARRAY, separator AS STRING) AS STRING
+    DIM result AS STRING
+    result = ""
+    
+    FOR i = 0 TO LEN(arr) - 1
+        result = result + arr(i)
+        IF i < LEN(arr) - 1 THEN
+            result = result + separator
+        END IF
+    NEXT i
+    
+    RETURN result
+END FUNCTION
+
+DEF SUB get_player_guess()
+    DIM guess AS STRING
+    DIM valid AS BOOLEAN
+    valid = False
+    
+    WHILE NOT valid
+        INPUT "Bir harf tahmin edin: ", guess
+        guess = UPPER$(TRIM$(guess))
+        
+        REM Girdi kontrolü
+        IF LEN(guess) <> 1 THEN
+            PRINT "❌ Lütfen sadece bir harf girin!"
+        ELSEIF NOT is_letter(guess) THEN
+            PRINT "❌ Lütfen sadece harf girin!"
+        ELSEIF is_already_guessed(guess) THEN
+            PRINT "❌ Bu harfi zaten denediniz!"
+        ELSE
+            valid = True
+        END IF
+    WEND
+    
+    REM Harfi tahmin listesine ekle
+    INSERT(guessed_letters, guess)
+    
+    REM Harf kelimede var mı kontrol et
+    IF INSTR(current_word, guess) > 0 THEN
+        PRINT "✅ Doğru! '" + guess + "' harfi kelimede var."
+        call update_guessed_word(guess)
+    ELSE
+        PRINT "❌ Yanlış! '" + guess + "' harfi kelimede yok."
+        INSERT(wrong_letters, guess)
+        remaining_attempts = remaining_attempts - 1
+    END IF
+END SUB
+
+DEF FUNCTION is_letter(ch AS STRING) AS BOOLEAN
+    DIM ascii_val AS INTEGER
+    ascii_val = ASC(ch)
+    RETURN (ascii_val >= 65 AND ascii_val <= 90) OR (ascii_val >= 192 AND ascii_val <= 254)
+END FUNCTION
+
+DEF FUNCTION is_already_guessed(letter AS STRING) AS BOOLEAN
+    FOR i = 0 TO LEN(guessed_letters) - 1
+        IF guessed_letters(i) = letter THEN
+            RETURN True
+        END IF
+    NEXT i
+    RETURN False
+END FUNCTION
+
+DEF SUB update_guessed_word(letter AS STRING)
+    DIM temp_word AS STRING
+    temp_word = ""
+    
+    FOR i = 1 TO LEN(current_word)
+        IF MID$(current_word, i, 1) = letter THEN
+            temp_word = temp_word + letter
+        ELSE
+            temp_word = temp_word + MID$(guessed_word, i, 1)
+        END IF
+    NEXT i
+    
+    guessed_word = temp_word
+END SUB
+
+DEF SUB display_hangman()
+    DIM wrong_count AS INTEGER
+    wrong_count = max_attempts - remaining_attempts
+    
+    PRINT "  ┌─────┐"
+    
+    SELECT CASE wrong_count
+        CASE 0
+            PRINT "  │     │"
+            PRINT "  │      "
+            PRINT "  │      "
+            PRINT "  │      "
+            PRINT "  │      "
+            
+        CASE 1
+            PRINT "  │     │"
+            PRINT "  │     O"
+            PRINT "  │      "
+            PRINT "  │      "
+            PRINT "  │      "
+            
+        CASE 2, 3
+            PRINT "  │     │"
+            PRINT "  │     O"
+            PRINT "  │     │"
+            PRINT "  │      "
+            PRINT "  │      "
+            
+        CASE 4
+            PRINT "  │     │"
+            PRINT "  │     O"
+            PRINT "  │    /│"
+            PRINT "  │      "
+            PRINT "  │      "
+            
+        CASE 5, 6
+            PRINT "  │     │"
+            PRINT "  │     O"
+            PRINT "  │    /│\"
+            PRINT "  │      "
+            PRINT "  │      "
+            
+        CASE 7, 8
+            PRINT "  │     │"
+            PRINT "  │     O"
+            PRINT "  │    /│\"
+            PRINT "  │    / "
+            PRINT "  │      "
+            
+        CASE ELSE
+            PRINT "  │     │"
+            PRINT "  │     O"
+            PRINT "  │    /│\"
+            PRINT "  │    / \"
+            PRINT "  │      "
+    END SELECT
+    
+    PRINT "──┴──────────"
+END SUB
+
+DEF SUB show_game_end_menu()
+    PRINT
+    PRINT "═══════════════════════════════════════"
+    PRINT "1. Tekrar Oyna"
+    PRINT "2. Ana Menü"
+    PRINT "3. İstatistikleri Gör"
+    PRINT "4. Çıkış"
+    PRINT "═══════════════════════════════════════"
+    
+    DIM choice AS INTEGER
+    INPUT "Seçiminiz (1-4): ", choice
+    
+    SELECT CASE choice
+        CASE 1
+            call start_new_game()
+        CASE 2
+            call show_main_menu()
+        CASE 3
+            call show_statistics()
+            call show_game_end_menu()
+        CASE 4
+            PRINT "Hangman oyununa veda ediyoruz... İyi günler!"
+            END
+        CASE ELSE
+            PRINT "❌ Geçersiz seçim!"
+            call show_game_end_menu()
+    END SELECT
+END SUB
+
+DEF SUB show_statistics()
+    PRINT
+    PRINT "═══════════════ İSTATİSTİKLER ═══════════════"
+    PRINT "Toplam Oyun: " + STR$(total_games)
+    PRINT "Kazanılan Oyunlar: " + STR$(games_won)
+    PRINT "Kaybedilen Oyunlar: " + STR$(games_lost)
+    
+    IF total_games > 0 THEN
+        DIM win_rate AS DOUBLE
+        win_rate = (games_won * 100.0) / total_games
+        PRINT "Kazanma Oranı: %" + STR$(ROUND(win_rate, 1))
+    END IF
+    
+    PRINT "Mevcut Zorluk: " + difficulty + " (" + STR$(max_attempts) + " deneme)"
+    
+    REM Başarı değerlendirmesi
+    IF total_games >= 5 THEN
+        DIM rating AS STRING
+        IF win_rate >= 80 THEN
+            rating = "🏆 EFSANE"
+        ELSEIF win_rate >= 60 THEN
+            rating = "⭐ UZMAN"
+        ELSEIF win_rate >= 40 THEN
+            rating = "👍 İYİ"
+        ELSEIF win_rate >= 20 THEN
+            rating = "📈 GELİŞİYOR"
+        ELSE
+            rating = "🎯 BAŞLANGIÇ"
+        END IF
+        PRINT "Seviye: " + rating
+    END IF
+    
+    PRINT "═══════════════════════════════════════════════"
+    PRINT
+    INPUT "Devam etmek için Enter'a basın...", dummy
+END SUB
+
+DEF SUB show_rules()
+    PRINT
+    PRINT "═══════════════ OYUN KURALLARI ═══════════════"
+    PRINT
+    PRINT "🎯 HEDEF:"
+    PRINT "   Gizli kelimeyi harf harf tahmin ederek bulun!"
+    PRINT
+    PRINT "🎮 NASIL OYNANIR:"
+    PRINT "   1. Bilgisayar rastgele bir kelime seçer"
+    PRINT "   2. Kelime uzunluğu kadar çizgi görürsünüz"
+    PRINT "   3. Her seferde bir harf tahmin edin"
+    PRINT "   4. Doğru harfler kelimede yerlerine yerleşir"
+    PRINT "   5. Yanlış harfler adam asmaca figürünü çizer"
+    PRINT
+    PRINT "⚠️ DİKKAT:"
+    PRINT "   • Yanlış tahminleriniz sınırlıdır!"
+    PRINT "   • Adam asmaca figürü tamamlanırsa oyunu kaybedersiniz"
+    PRINT "   • Kelimeyi tamamlarsanız kazanırsınız!"
+    PRINT
+    PRINT "🎚️ ZORLUK SEVİYELERİ:"
+    PRINT "   • Kolay: 10 yanlış hakkı"
+    PRINT "   • Orta: 7 yanlış hakkı"
+    PRINT "   • Zor: 5 yanlış hakkı"
+    PRINT
+    PRINT "💡 STRATEJİ İPUÇLARI:"
+    PRINT "   • Önce sesli harfleri deneyin (A, E, I, O, U)"
+    PRINT "   • Yaygın harfleri kullanın (N, R, S, T, L)"
+    PRINT "   • Kelime uzunluğuna göre tahmin yapın"
+    PRINT "   • Türkçe kelime yapısını düşünün"
+    PRINT
+    PRINT "════════════════════════════════════════════════"
+    PRINT
+    INPUT "Ana menüye dönmek için Enter'a basın...", dummy
+    call show_main_menu()
+END SUB
+
+REM Başlangıç değerlerini ayarla
+games_won = 0
+games_lost = 0
+total_games = 0
+difficulty = ""
