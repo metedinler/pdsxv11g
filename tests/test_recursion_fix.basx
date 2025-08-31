@@ -1,0 +1,14 @@
+DIM FACTORIAL_FUNC AS INTEGER
+DIM RESULT AS INTEGER
+DIM factorial AS INTEGER
+factorial = 5
+
+DEF FUNCTION factorial_func(n)
+IF n <= 1 THEN
+RETURN 1
+ELSE
+RETURN n * factorial_func(n - 1)
+END IF
+END FUNCTION
+
+PRINT "Factorial result:", factorial_func(factorial)
