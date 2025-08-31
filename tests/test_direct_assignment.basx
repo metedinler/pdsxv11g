@@ -1,0 +1,31 @@
+DIM ATAMA AS INTEGER
+DIM DIREKT AS INTEGER
+DIM SAYILAR AS INTEGER
+DIM SEMICOLON AS INTEGER
+DIM SONUCLARI AS INTEGER
+DIM TAMAMLANDI AS INTEGER
+DIM TESTI AS INTEGER
+REM Test: Direkt atama ve semicolon testi
+DIM a AS INTEGER
+DIM b AS INTEGER
+DIM c AS STRING
+
+REM Direkt atama testleri (LET olmadan)
+a = 10
+b = 20
+c = "Hello"
+
+PRINT "Direkt atama sonuclari:"
+PRINT "a =", a
+PRINT "b =", b
+PRINT "c =", c
+
+REM Semicolon test (ayni satirda yazdirma)
+PRINT "Semicolon testi:"
+PRINT "Sayilar: ";
+PRINT a;
+PRINT " ";
+PRINT b;
+PRINT " ";
+PRINT c
+PRINT "Tamamlandi!"
