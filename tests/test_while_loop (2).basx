@@ -1,0 +1,6 @@
+REM Test WHILE dongusu  
+I = 1
+WHILE I <= 3
+    PRINT "While: ", I
+    I = I + 1
+WEND
