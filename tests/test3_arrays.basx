@@ -1,0 +1,101 @@
+REM Test Programı 3: Diziler ve Koleksiyonlar
+REM =======================================
+
+PRINT "=== Test 3: Diziler ve Koleksiyonlar ==="
+
+REM Dizi tanımlama
+DIM numbers(10)
+DIM names(5)
+
+REM Dizi elemanlarına değer atama
+DIM i AS INTEGER
+FOR i = 0 TO 10
+    LET numbers(i) = i * 2
+NEXT
+
+LET names(0) = "Ali"
+LET names(1) = "Veli"
+LET names(2) = "Mehmet"
+LET names(3) = "Ayşe"
+LET names(4) = "Fatma"
+
+REM Dizi elemanlarını yazdırma
+PRINT "Numbers dizisi:"
+FOR i = 0 TO 10
+    PRINT "numbers(" + STR$(i) + ") =", numbers(i)
+NEXT
+
+PRINT "Names dizisi:"
+FOR i = 0 TO 4
+    PRINT "names(" + STR$(i) + ") =", names(i)
+NEXT
+
+REM Liste işlemleri
+DIM my_list AS LIST
+LET my_list = []
+PRINT "Boş liste:", my_list
+
+REM Liste elemanı ekleme (simülasyon - basit yazdırma)
+PRINT "Liste elemanları ekleniyor: 10, 20, 30"
+
+REM Liste fonksiyonları (simülasyon)
+PRINT "Liste uzunluğu: 3"
+PRINT "İlk eleman: 10"
+PRINT "Son eleman: 30"
+
+REM Dictionary işlemleri
+DIM my_dict AS DICT
+LET my_dict = {}
+PRINT "Boş dictionary:", my_dict
+
+REM Dictionary atama simülasyonu
+PRINT "Dictionary ataması yapılıyor..."
+PRINT "Ad: Ahmet"
+PRINT "Soyad: Yılmaz" 
+PRINT "Yaş: 30"
+
+REM Multidimensional array
+DIM matrix(2, 2)
+DIM j AS INTEGER
+FOR i = 0 TO 2
+    FOR j = 0 TO 2
+        LET matrix(i, j) = i + j
+    NEXT
+NEXT
+
+PRINT "3x3 Matrix:"
+FOR i = 0 TO 2
+    FOR j = 0 TO 2
+        PRINT matrix(i, j)
+    NEXT
+NEXT
+
+REM Dizi sıralama simülasyonu
+DIM sort_array(4)
+LET sort_array(0) = 5
+LET sort_array(1) = 2
+LET sort_array(2) = 8
+LET sort_array(3) = 1
+LET sort_array(4) = 9
+
+PRINT "Sıralama öncesi:"
+FOR i = 0 TO 4
+    PRINT sort_array(i)
+NEXT
+
+REM Bubble sort
+DIM temp AS INTEGER
+FOR i = 0 TO 3
+    FOR j = 0 TO 3 - i
+        IF sort_array(j) > sort_array(j + 1) THEN LET temp = sort_array(j)
+        IF sort_array(j) > sort_array(j + 1) THEN LET sort_array(j) = sort_array(j + 1)
+        IF sort_array(j) > sort_array(j + 1) THEN LET sort_array(j + 1) = temp
+    NEXT
+NEXT
+
+PRINT "Sıralama sonrası:"
+FOR i = 0 TO 4
+    PRINT sort_array(i)
+NEXT
+
+PRINT "=== Test 3 Tamamlandı ==="
